@@ -24,6 +24,8 @@ $ make
 ### Windows
 Use CMake-GUI to generate project-files for your favorite build-system/IDE. Then proceed to build the library as usual.
 
+> ZenLib requires a compiler capable of the C++14-standard!
+
 # Samples
 There are some sample programs inside the */samples*-folder, which can teach you how the library works and what you can do with it.
 
