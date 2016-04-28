@@ -9,6 +9,8 @@ Contains loaders for:
  - Skeleton-Hierarchy
  - Animation-Samples
 
+There is no possibility to write files at the moment. However, this is planned for a later release.
+
 # Building
 ### Linux
 ```sh
