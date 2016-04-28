@@ -75,6 +75,27 @@ vdf.getFileData("MyAsset.ext", data);
 
 > See *zenload/zTypes.h* for more information about the packed data structs returned by the objects.
 
+### Textures
+```
+#include <zenload/ztex2dds.h>
+
+/** ... **/
+std::vector<uint8_t> zTexData = ...; // Get data from vdfs or something
+
+// Convert the ZTex to a usual DDS-Texture
+std::vector<uint8_t> ddsData;
+ZenLoad::convertZTEX2DDS(zTexData, ddsData);
+
+// ... do something with ddsData
+// or...
+
+// Convert the DDS-Texture to 32bpp RGBA-Data, if wanted
+std::vector<uint8_t> rgbaData;
+ZenLoad::convertDDSToRGBA8(ddsData, rgbaData);
+
+// .. do something with rgbaData
+```
+
 ### Log-Callback
 By default, the internal Logging-Class will output to stdout (and OutputDebugString on Windows).
 
