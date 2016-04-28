@@ -31,7 +31,7 @@ There are some sample programs inside the */samples*-folder, which can teach you
 
 # Basic usage
 ### VDF-Archives
-```
+```cpp
 #include <vdfs/fileIndex.h>
 
 /** ... **/
@@ -47,7 +47,7 @@ vdf.getFileData("MyAsset.ext", data);
 ```
 
 ### ZEN-Archives
-```
+```cpp
 #include <zenload/zenParser.h>
 
 /** ... **/
@@ -63,7 +63,7 @@ vdf.getFileData("MyAsset.ext", data);
 ```
 
 ### Meshes/Animations
-```
+```cpp
  // Load by filename + initialized VDFS::FileIndex
  ZenLoad::zCProgMeshProto mesh("MyMesh.MRM", vdfIndex);
 
@@ -76,7 +76,7 @@ vdf.getFileData("MyAsset.ext", data);
 > See *zenload/zTypes.h* for more information about the packed data structs returned by the objects.
 
 ### Textures
-```
+```cpp
 #include <zenload/ztex2dds.h>
 
 /** ... **/
@@ -100,7 +100,7 @@ ZenLoad::convertDDSToRGBA8(ddsData, rgbaData);
 By default, the internal Logging-Class will output to stdout (and OutputDebugString on Windows).
 
 You can define your own target by calling:
-```
+```cpp
 #include <utils/logger.h>
 
 /** ... **/
