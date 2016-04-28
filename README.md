@@ -8,6 +8,7 @@ Contains loaders for:
  - Compiled-Mesh formats (Static, Skeletal)
  - Skeleton-Hierarchy
  - Animation-Samples
+ - Compiled textures
 
 There is no possibility to write files at the moment. However, this is planned for a later release.
 
