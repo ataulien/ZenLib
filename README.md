@@ -14,6 +14,7 @@ There is no possibility to write files at the moment. However, this is planned f
 # Building
 ### Linux
 ```sh
+$ cd <project-root>
 $ mkdir build
 $ cd build
 $ cmake ..
