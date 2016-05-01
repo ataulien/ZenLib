@@ -13,6 +13,8 @@ Contains loaders for:
 There is no possibility to write files at the moment. However, this is planned for a later release.
 
 # Building
+> ZenLib requires a compiler capable of the C++11-standard and at least CMake 3.1!
+
 ### Linux
 ```sh
 $ cd <project-root>
@@ -23,8 +25,6 @@ $ make
 ```
 ### Windows
 Use CMake-GUI to generate project-files for your favorite build-system/IDE. Then proceed to build the library as usual.
-
-> ZenLib requires a compiler capable of the C++11-standard and at least CMake 3.1!
 
 # Samples
 There are some sample programs inside the */samples*-folder, which can teach you how the library works and what you can do with it.
