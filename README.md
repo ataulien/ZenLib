@@ -58,8 +58,9 @@ vdf.getFileData("MyAsset.ext", data);
  // Do parsing
  parser.readHeader();
  ZenLoad::oCWorldData world = parser.readWorld();
+ ZenLoad::zCMesh* mesh = parser.getWorldMesh();
  
- // Do something with 'world'
+ // Do something with 'world' or 'worldMesh'
 ```
 
 ### Meshes/Animations
