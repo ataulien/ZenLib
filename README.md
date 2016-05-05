@@ -1,5 +1,5 @@
 # ZenLib
-Loading of proprietary formats used by the engine used by the games "Gothic" and "Gothic II".
+Loading of proprietary formats used by the engine of the games "Gothic" and "Gothic II".
 
 > Currently, only Gothic II is supported
 
