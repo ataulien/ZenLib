@@ -13,6 +13,8 @@ Contains loaders for:
 There is no possibility to write files at the moment. However, this is planned for a later release.
 
 # Building
+> ZenLib requires a compiler capable of the C++11-standard and at least CMake 3.1!
+
 ### Linux
 ```sh
 $ cd <project-root>
@@ -24,14 +26,12 @@ $ make
 ### Windows
 Use CMake-GUI to generate project-files for your favorite build-system/IDE. Then proceed to build the library as usual.
 
-> ZenLib requires a compiler capable of the C++14-standard!
-
 # Samples
 There are some sample programs inside the */samples*-folder, which can teach you how the library works and what you can do with it.
 
 # Basic usage
 ### VDF-Archives
-```
+```cpp
 #include <vdfs/fileIndex.h>
 
 /** ... **/
@@ -47,7 +47,7 @@ vdf.getFileData("MyAsset.ext", data);
 ```
 
 ### ZEN-Archives
-```
+```cpp
 #include <zenload/zenParser.h>
 
 /** ... **/
@@ -58,12 +58,13 @@ vdf.getFileData("MyAsset.ext", data);
  // Do parsing
  parser.readHeader();
  ZenLoad::oCWorldData world = parser.readWorld();
+ ZenLoad::zCMesh* mesh = parser.getWorldMesh();
  
- // Do something with 'world'
+ // Do something with 'world' or 'worldMesh'
 ```
 
 ### Meshes/Animations
-```
+```cpp
  // Load by filename + initialized VDFS::FileIndex
  ZenLoad::zCProgMeshProto mesh("MyMesh.MRM", vdfIndex);
 
@@ -75,11 +76,32 @@ vdf.getFileData("MyAsset.ext", data);
 
 > See *zenload/zTypes.h* for more information about the packed data structs returned by the objects.
 
+### Textures
+```cpp
+#include <zenload/ztex2dds.h>
+
+/** ... **/
+std::vector<uint8_t> zTexData = ...; // Get data from vdfs or something
+
+// Convert the ZTex to a usual DDS-Texture
+std::vector<uint8_t> ddsData;
+ZenLoad::convertZTEX2DDS(zTexData, ddsData);
+
+// ... do something with ddsData
+// or...
+
+// Convert the DDS-Texture to 32bpp RGBA-Data, if wanted
+std::vector<uint8_t> rgbaData;
+ZenLoad::convertDDSToRGBA8(ddsData, rgbaData);
+
+// .. do something with rgbaData
+```
+
 ### Log-Callback
 By default, the internal Logging-Class will output to stdout (and OutputDebugString on Windows).
 
 You can define your own target by calling:
-```
+```cpp
 #include <utils/logger.h>
 
 /** ... **/
