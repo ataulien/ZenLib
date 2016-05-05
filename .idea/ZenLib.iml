@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CPP_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/split.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/systemwindows.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/mathlib.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/vector.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/tuple.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/logger.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/split.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/logger.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/alignment.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/systemlinux.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/mathlib.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/utils/system.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/simd_ve.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/squish.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/singlecolourfit.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/colourfit.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/rangefit.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/simd_sse.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/simd_float.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/colourset.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/singlecolourlookup.inl" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/rangefit.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/alpha.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/clusterfit.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/squish.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/colourfit.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/colourblock.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/singlecolourfit.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/maths.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/maths.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/colourset.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/alpha.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/simd.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/colourblock.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/libsquish/clusterfit.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/vdfs/fileIndex.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/vdfs/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/vdfs/archive_virtual.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/vdfs/archive_virtual.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/vdfs/fileIndex.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/vdfs/archive_physical.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/samples/zen_load.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/samples/vdf_unpack.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/samples/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/samples/content_load.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/export.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCModelAni.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zenParser.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zenParser.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zenParserPropRead.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCMeshSoftSkin.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/vob.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/ztex2dds.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/ztex.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCMaterial.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/oCWorld.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/parserImpl.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCVob.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/CMakeLists.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/ztex2dds.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/parserImplBinary.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/parserImplASCII.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCProgMeshProto.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCModelMeshLib.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/parserImplBinary.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCModelAni.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/vob.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zTypes.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCMeshSoftSkin.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/parserImplASCII.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCMesh.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCModelMeshLib.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCMaterial.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/parserImplBinSafe.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/parserImpl.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCMesh.cpp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/parserImplBinSafe.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/zCProgMeshProto.h" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/zenload/export.cpp" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library">
+      <library name="Header Search Paths">
+        <CLASSES>
+          <root url="file:///usr/include" />
+          <root url="file:///usr/lib/gcc/x86_64-unknown-linux-gnu/5.3.0/include-fixed" />
+          <root url="file:///usr/lib/gcc/x86_64-unknown-linux-gnu/5.3.0/include" />
+          <root url="file:///usr/local/include" />
+        </CLASSES>
+        <SOURCES>
+          <root url="file:///usr/include" />
+          <root url="file:///usr/lib/gcc/x86_64-unknown-linux-gnu/5.3.0/include-fixed" />
+          <root url="file:///usr/lib/gcc/x86_64-unknown-linux-gnu/5.3.0/include" />
+          <root url="file:///usr/local/include" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+  </component>
+</module>
