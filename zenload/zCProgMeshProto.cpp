@@ -4,7 +4,6 @@
 #include "zTypes.h"
 #include <string>
 #include "vdfs/fileIndex.h"
-#include "vob.h"
 #include "zCMaterial.h"
 
 using namespace ZenLoad;

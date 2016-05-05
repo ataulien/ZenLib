@@ -4,7 +4,6 @@
 #include "zTypes.h"
 #include <string>
 #include "vdfs/fileIndex.h"
-#include "vob.h"
 #include "zCMaterial.h"
 #include <map>
 
@@ -26,9 +25,6 @@ static const unsigned short	MSID_MESH_END = 0xB060;
 */
 zCMesh::zCMesh(const std::string& fileName, VDFS::FileIndex& fileIndex)
 {
-	ZenLoad::Chunk parentVob("parent", "", 0);
-	ZenLoad::zCMesh worldMesh;
-
 	std::vector<uint8_t> data;
 	fileIndex.getFileData(fileName, data);
 
