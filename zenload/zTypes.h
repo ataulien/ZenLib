@@ -46,7 +46,13 @@ namespace ZenLoad
 		{
 			Math::Matrix m = Math::Matrix::CreateIdentity();
 			m.Up(getUpVector());
-			m.Forward(-1.0f * getAtVector());
+                        
+                        Math::float3 fwd = getAtVector();
+                        fwd.x *= -1.0f;
+                        fwd.y *= -1.0f;
+                        fwd.z *= -1.0f;
+                        
+			m.Forward(fwd);
 			m.Right(getRightVector());
 			m.Translation(position);
 
@@ -210,9 +216,10 @@ namespace ZenLoad
 		/**
 		* @brief Returns the interpolated lighting value for the given position on the triangle
 		*/
-		Math::float4 interpolateLighting(const Math::float3& position) const 
+		
+                Math::float4 interpolateLighting(const Math::float3& position) const 
 		{
-			float u,v,w;
+			/*float u,v,w;
 			Math::barycentric(position, vertices[0].Position, vertices[1].Position, vertices[2].Position, u, v, w);
 
 			Math::float4 c[3];
@@ -220,7 +227,9 @@ namespace ZenLoad
 			c[1].fromABGR8(vertices[1].Color);
 			c[2].fromABGR8(vertices[2].Color);
 
-			return u * c[0] + v * c[1] + w * c[2];
+			return u * c[0] + v * c[1] + w * c[2];*/
+                        
+                        return Math::float4(1,1,1,1); // TODO: Implementation missing without GLM
 		}
 
 		/**

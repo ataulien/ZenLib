@@ -222,15 +222,6 @@ void zCModelMeshLib::loadMDH(ZenParser& parser)
 
 			m_NodeChecksum = parser.readBinaryDWord();
 
-			// Calculate "global" transforms, for debugging
-			for(int i = 0; i < numNodes; i++)
-			{
-				if(m_Nodes[i].parentValid())
-					m_Nodes[i].transformBindPoseDebug = m_Nodes[m_Nodes[i].parentIndex].transformBindPoseDebug * m_Nodes[i].transformLocal;
-				else 
-					m_Nodes[i].transformBindPoseDebug = m_Nodes[i].transformLocal;
-			}
-
 			parser.setSeek(chunkEnd); // Skip chunk
 		}
 		break;

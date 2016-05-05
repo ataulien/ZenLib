@@ -5,6 +5,7 @@
 #include <string>
 #include "vdfs/fileIndex.h"
 #include "zCProgMeshProto.h"
+#include <math.h>
 
 using namespace ZenLoad;
 
@@ -18,7 +19,7 @@ static const uint16_t MSID_MAN_ANIEVENTS = 0xA030;
 static const uint16_t MSID_MAN_RAWDATA = 0xA090;
 
 static const float SAMPLE_ROT_BITS			= float(1 << 16) - 1.0f;
-static const float SAMPLE_ROT_SCALER		= (float(1.0f) / SAMPLE_ROT_BITS) * 2.0f * Math::PI;
+static const float SAMPLE_ROT_SCALER		= (float(1.0f) / SAMPLE_ROT_BITS) * 2.0f * Math::Pi;
 static const float SAMPLE_QUAT_SCALER		= (1.0f / SAMPLE_ROT_BITS) * 2.1f;
 static const uint16_t SAMPLE_QUAT_MIDDLE      = (1 << 15) - 1; 
 
@@ -91,7 +92,7 @@ zCModelAni::zCModelAni(const std::string& fileName, const VDFS::FileIndex& fileI
 		{
 			for(size_t i = 0, end = m_AniSamples.size(); i < end; i++)
 			{
-				m_AniSamples[i].position *= scale;
+				m_AniSamples[i].position = m_AniSamples[i].position * scale;
 			}
 		}
 	}

@@ -417,6 +417,6 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale)
 		mesh.triangles.push_back(t);
 
 		for(int v = 0; v < 3; v++)
-			mesh.triangles.back().vertices[v].Position *= scale;
+			mesh.triangles.back().vertices[v].Position = mesh.triangles.back().vertices[v].Position * scale;
 	}
 }
