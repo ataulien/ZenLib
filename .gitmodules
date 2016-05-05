@@ -1,6 +1,6 @@
 [submodule "lib/glm"]
 	path = lib/glm
-	url = git@github.com:g-truc/glm.git
+	url = https://github.com/g-truc/glm.git
 [submodule "lib/libsquish"]
 	path = lib/libsquish
-	url = git@github.com:tito/libsquish.git
+	url = https://github.com/tito/libsquish.git

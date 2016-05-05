@@ -1,6 +1,8 @@
 # ZenLib
 Loading of proprietary formats used by the engine used by the games "Gothic" and "Gothic II".
 
+> Currently, only Gothic II is supported
+
 ### Features
 Contains loaders for:
  - Zen-Archives (ASCII, BinSafe)
@@ -13,6 +15,8 @@ Contains loaders for:
 There is no possibility to write files at the moment. However, this is planned for a later release.
 
 # Building
+> ZenLib requires a compiler capable of the C++11-standard and at least CMake 3.1!
+
 ### Linux
 ```sh
 $ cd <project-root>
@@ -23,8 +27,6 @@ $ make
 ```
 ### Windows
 Use CMake-GUI to generate project-files for your favorite build-system/IDE. Then proceed to build the library as usual.
-
-> ZenLib requires a compiler capable of the C++14-standard!
 
 # Samples
 There are some sample programs inside the */samples*-folder, which can teach you how the library works and what you can do with it.
@@ -58,8 +60,9 @@ vdf.getFileData("MyAsset.ext", data);
  // Do parsing
  parser.readHeader();
  ZenLoad::oCWorldData world = parser.readWorld();
+ ZenLoad::zCMesh* mesh = parser.getWorldMesh();
  
- // Do something with 'world'
+ // Do something with 'world' or 'worldMesh'
 ```
 
 ### Meshes/Animations
