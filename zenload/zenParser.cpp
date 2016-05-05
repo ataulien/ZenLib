@@ -172,6 +172,8 @@ void ZenParser::readWorldMesh()
 		readBinaryDWord(); // Version
 		m_Seek += readBinaryDWord();
 	}
+
+	LogInfo() << "ZEN: Done reading mesh!";
 }
 
 /**

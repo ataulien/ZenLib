@@ -20,6 +20,12 @@ static const unsigned short	MSID_FEATLIST = 0xB040;
 static const unsigned short	MSID_POLYLIST = 0xB050;
 static const unsigned short	MSID_MESH_END = 0xB060;
 
+enum EVersion
+{
+	G1_1_08k = 9,
+	G2_2_6fix = 265
+};
+
 /**
 * @brief Loads the mesh from the given VDF-Archive
 */
@@ -48,12 +54,62 @@ zCMesh::zCMesh(const std::string& fileName, VDFS::FileIndex& fileIndex)
 }
 
 /**
+ * Helper structs for version independend loading of polygon data
+ */
+#pragma pack(push, 1)
+// FIXME: This is going to give some unaligned access issues on ARM
+template<typename FT>
+struct polyData1
+{
+    int16_t	materialIndex;
+    int16_t	lightmapIndex;
+    zTPlane		polyPlane;
+    FT          flags;
+    uint8_t		polyNumVertices;
+};
+
+template<typename IT, typename FT>
+struct polyData2 : public polyData1<FT>
+{
+    /**
+     * @brief ugly helper-constructor to get from the specific G1/G2-format to a generic one
+     */
+    template<typename _IT, typename _FT>
+    void from(const polyData2<_IT,_FT>& src)
+    {
+        for(size_t i=0;i<src.polyNumVertices;i++)
+        {
+            indices[i].VertexIndex = static_cast<IT>(src.indices[i].VertexIndex);
+            indices[i].FeatIndex = src.indices[i].FeatIndex;
+        }
+
+        polyData1<FT>::materialIndex = src.materialIndex;
+        polyData1<FT>::lightmapIndex = src.lightmapIndex;
+        polyData1<FT>::polyPlane = src.polyPlane;
+        polyData1<FT>::polyNumVertices = src.polyNumVertices;
+        polyData1<FT>::flags = src.flags.generify();
+    }
+
+    polyData2(){}
+
+    struct Index
+    {
+        IT VertexIndex;
+        uint32_t FeatIndex;
+    };
+
+
+    Index indices[255];
+};
+#pragma pack(pop)
+/**
 * @brief Reads the mesh-object from the given binary stream
 */
 void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
 {
 	// Information about the whole file we are reading here
 	BinaryFileInfo fileInfo;
+	uint32_t version = 0;
 
 	// Information about a single chunk 
 	BinaryChunkInfo chunkInfo;
@@ -91,7 +147,7 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
 			// uint32 - version
 			// zDate - Structure
 			// \n terminated string for the name
-			uint32_t version = parser.readBinaryWord();
+			version = parser.readBinaryWord();
 			zDate date; parser.readStructure(date);
 			std::string name = parser.readLine(false);
 			(void)date;
@@ -149,6 +205,9 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
 					m_Materials.emplace_back(zCMaterial::readObjectData(p2));
 				}
 
+				// Note: There is a bool stored here in the G2-Formats, which says whether to use alphatesting or not
+				// 		 We just skip this for now
+
 				parser.setSeek(chunkEnd); // Skip chunk
 			}
 			break;
@@ -174,6 +233,7 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
 				m_Vertices.resize(numVertices);
 				parser.readBinaryRaw(m_Vertices.data(), numVertices * sizeof(float) * 3);
 
+                LogInfo() << "Found " << numVertices << " vertices";
 				// Flip x-coord to make up for right handedness
 				//for(auto& v : m_Vertices)
 				//	v.x = -v.x;
@@ -197,27 +257,6 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
 
 		case MSID_POLYLIST:
 			{
-				// uint32 - number of polygons
-				struct polyData1
-				{
-					uint16_t	materialIndex;
-					uint16_t	lightmapIndex;
-					zTPlane		polyPlane;
-					PolyFlags	flags;
-					uint8_t		polyNumVertices;
-				};
-
-				struct polyData2 : public polyData1
-				{
-					struct Index
-					{
-						uint32_t VertexIndex;
-						uint32_t FeatIndex;
-					};
-
-					Index indices[255];
-				};
-
 				// Read number of polys
 				int numPolys = parser.readBinaryDWord();
 
@@ -227,80 +266,100 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
 				parser.readBinaryRaw(dataBlock.data(), chunkInfo.length);
 
 				uint8_t* blockPtr = dataBlock.data();
+                size_t blockSize = version == EVersion::G2_2_6fix
+                                   ? sizeof(polyData1<PolyFlags2_6fix>)
+                                   : sizeof(polyData1<PolyFlags1_08k>);
+
+                size_t indicesSize = version == EVersion::G2_2_6fix
+                                     ? sizeof(polyData2<uint32_t, PolyFlags2_6fix>::Index)
+                                     : sizeof(polyData2<uint16_t, PolyFlags1_08k>::Index);
 
 				// Iterate throuh every poly
 				for(int i = 0; i < numPolys; i++)
 				{
-					polyData2* p = (polyData2 *)blockPtr;
+					polyData2<uint32_t, PolyFlags2_6fix>* p26 = (polyData2<uint32_t, PolyFlags2_6fix> *)blockPtr;
+                    polyData2<uint16_t, PolyFlags1_08k>* p18k = (polyData2<uint16_t, PolyFlags1_08k> *)blockPtr;
+
+                    // Convert to a generic version
+                    polyData2<uint32_t, PolyFlags> p;
+                    if(version == EVersion::G2_2_6fix) {
+                        p.from(*p26);
+                    }
+                    else {
+                        p.from(*p18k);
+                    }
 
 					// TODO: Store these somewhere else
-					if(!p->flags.ghostOccluder && !p->flags.portalPoly)
+					if(!p.flags.ghostOccluder && !p.flags.portalPoly)
 					{
-						if(p->polyNumVertices == 3)
-						{
-							// Write indices directly to a vector
-							WorldVertex vx[3];
-							for(int v = 0; v < 3; v++)
-							{
-								m_Indices.emplace_back(p->indices[v].VertexIndex);
-								m_FeatureIndices.emplace_back(p->indices[v].FeatIndex);
+                        if(p.polyNumVertices != 0) {
 
-								// Gather vertex information
-								vx[v].Position = m_Vertices[p->indices[v].VertexIndex];
-								vx[v].Color = m_Features[p->indices[v].FeatIndex].lightStat;
-								vx[v].TexCoord = Math::float2(m_Features[p->indices[v].FeatIndex].uv[0], m_Features[p->indices[v].FeatIndex].uv[1]);
-								vx[v].Normal = m_Features[p->indices[v].FeatIndex].vertNormal;
-							}
+                            if (p.polyNumVertices == 3) {
 
-							// Save material index for the written triangle
-							m_TriangleMaterialIndices.emplace_back(p->materialIndex);
+                                // Write indices directly to a vector
+                                WorldVertex vx[3];
+                                for (int v = 0; v < 3; v++) {
+                                    m_Indices.emplace_back(p.indices[v].VertexIndex);
+                                    m_FeatureIndices.emplace_back(p.indices[v].FeatIndex);
 
-							WorldTriangle triangle;
-							triangle.flags = p->flags;
-							memcpy(triangle.vertices, vx, sizeof(vx));
+                                    // Gather vertex information
+                                    vx[v].Position = m_Vertices[p.indices[v].VertexIndex];
+                                    vx[v].Color = m_Features[p.indices[v].FeatIndex].lightStat;
 
-							// Save triangle
-							m_Triangles.push_back(triangle);
-						}
-						else
-						{
-							// Triangulate a triangle-fan
-							//for(unsigned int i = p->polyNumVertices - 2; i >= 1; i--)
-							for(unsigned int i = 1; i < p->polyNumVertices - 1; i++)
-							{
-								m_Indices.emplace_back(p->indices[0].VertexIndex);
-								m_Indices.emplace_back(p->indices[i].VertexIndex);
-								m_Indices.emplace_back(p->indices[i+1].VertexIndex);
+                                    vx[v].TexCoord = Math::float2(m_Features[p.indices[v].FeatIndex].uv[0],
+                                                                  m_Features[p.indices[v].FeatIndex].uv[1]);
+                                    vx[v].Normal = m_Features[p.indices[v].FeatIndex].vertNormal;
+                                }
 
-								m_FeatureIndices.emplace_back(p->indices[0].FeatIndex);
-								m_FeatureIndices.emplace_back(p->indices[i].FeatIndex);
-								m_FeatureIndices.emplace_back(p->indices[i+1].FeatIndex);
+                                // Save material index for the written triangle
+                                m_TriangleMaterialIndices.emplace_back(p.materialIndex);
 
-								// Save material index for the written triangle
-								m_TriangleMaterialIndices.emplace_back(p->materialIndex);
+                                WorldTriangle triangle;
+                                triangle.flags = p.flags;
+                                memcpy(triangle.vertices, vx, sizeof(vx));
 
-								WorldTriangle triangle;
-								triangle.flags = p->flags;
+                                // Save triangle
+                                m_Triangles.push_back(triangle);
+                            }
+                            else {
+                                // Triangulate a triangle-fan
+                                //for(unsigned int i = p.polyNumVertices - 2; i >= 1; i--)
+                                for (unsigned int i = 1; i < p.polyNumVertices - 1; i++) {
+                                    m_Indices.emplace_back(p.indices[0].VertexIndex);
+                                    m_Indices.emplace_back(p.indices[i].VertexIndex);
+                                    m_Indices.emplace_back(p.indices[i + 1].VertexIndex);
 
-								uint32_t idx[] = {p->indices[0].VertexIndex, p->indices[i].VertexIndex, p->indices[i+1].VertexIndex};
+                                    m_FeatureIndices.emplace_back(p.indices[0].FeatIndex);
+                                    m_FeatureIndices.emplace_back(p.indices[i].FeatIndex);
+                                    m_FeatureIndices.emplace_back(p.indices[i + 1].FeatIndex);
 
-								// Gather vertex information
-								for(int v = 0; v < 3; v++)
-								{
-									triangle.vertices[v].Position = m_Vertices[idx[v]];
-									triangle.vertices[v].Color = m_Features[idx[v]].lightStat;
-									triangle.vertices[v].TexCoord = Math::float2(m_Features[idx[v]].uv[0], m_Features[idx[v]].uv[1]);
-									triangle.vertices[v].Normal = m_Features[idx[v]].vertNormal;
-								}
+                                    // Save material index for the written triangle
+                                    m_TriangleMaterialIndices.emplace_back(p.materialIndex);
 
-								// Start filling in the flags
-								m_Triangles.push_back(triangle);
-							}
-						}
+                                    WorldTriangle triangle;
+                                    triangle.flags = p.flags;
+
+                                    uint32_t idx[] = {p.indices[0].VertexIndex, p.indices[i].VertexIndex,
+                                                      p.indices[i + 1].VertexIndex};
+
+                                    // Gather vertex information
+                                    for (int v = 0; v < 3; v++) {
+                                        triangle.vertices[v].Position = m_Vertices[idx[v]];
+                                        triangle.vertices[v].Color = m_Features[idx[v]].lightStat;
+                                        triangle.vertices[v].TexCoord = Math::float2(m_Features[idx[v]].uv[0],
+                                                                                     m_Features[idx[v]].uv[1]);
+                                        triangle.vertices[v].Normal = m_Features[idx[v]].vertNormal;
+                                    }
+
+                                    // Start filling in the flags
+                                    m_Triangles.push_back(triangle);
+                                }
+                            }
+                        }
 					}
 
 					// Goto next polygon using this weird shit
-					blockPtr += sizeof(polyData1) + sizeof(polyData2::Index) * p->polyNumVertices;
+					blockPtr += blockSize + indicesSize * p.polyNumVertices;
 				}
 
 				parser.setSeek(chunkEnd); // Skip chunk, there could be more data here which is never read

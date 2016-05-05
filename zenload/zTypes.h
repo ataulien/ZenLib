@@ -180,7 +180,24 @@ namespace ZenLoad
 		uint32_t length;
 	};
 
-	struct PolyFlags 
+	/**
+	 * @brief Merged flags-struct to contain all flags from all versions of the files
+	 */
+	struct PolyFlags
+	{
+		uint8_t			portalPoly			: 2;
+		uint8_t			occluder			: 1;
+		uint8_t			sectorPoly			: 1;
+		uint8_t			mustRelight			: 1;
+		uint8_t			portalIndoorOutdoor	: 1;
+		uint8_t			ghostOccluder		: 1;
+		uint8_t			noDynLightNear		: 1;
+		uint16_t		sectorIndex			: 16;
+		uint8_t			lodFlag				: 1;
+		uint8_t			normalMainAxis		: 2;
+	};
+
+	struct PolyFlags2_6fix
 	{
 		uint8_t			portalPoly			: 2;		
 		uint8_t			occluder			: 1;		
@@ -190,7 +207,78 @@ namespace ZenLoad
 		uint8_t			ghostOccluder		: 1;		
 		uint8_t			noDynLightNear		: 1;		
 		uint16_t		sectorIndex			: 16;
+
+        PolyFlags2_6fix(){}
+        PolyFlags2_6fix(const PolyFlags& p)
+        {
+            portalPoly = p.portalPoly;
+            occluder = p.occluder;
+            sectorPoly = p.sectorPoly ;
+            mustRelight = p.mustRelight;
+            portalIndoorOutdoor = p.portalIndoorOutdoor;
+            ghostOccluder = p.ghostOccluder;
+            noDynLightNear = p.noDynLightNear;
+            sectorIndex = p.sectorIndex;
+        }
+
+		PolyFlags generify() const
+		{
+			PolyFlags p;
+			memset(&p, 0, sizeof(p));
+
+			p.portalPoly = portalPoly;
+			p.occluder = occluder;
+			p.sectorPoly = sectorPoly;
+			p.mustRelight = mustRelight;
+			p.portalIndoorOutdoor = portalIndoorOutdoor;
+			p.ghostOccluder = ghostOccluder;
+			p.noDynLightNear = noDynLightNear;
+			p.sectorIndex = sectorIndex;
+		}
 	};
+
+	struct PolyFlags1_08k
+	{
+		uint8_t			portalPoly			: 2;
+		uint8_t			occluder			: 1;
+		uint8_t			sectorPoly			: 1;
+		uint8_t			lodFlag				: 1;
+		uint8_t			portalIndoorOutdoor	: 1;
+		uint8_t			ghostOccluder		: 1;
+		uint8_t			normalMainAxis		: 2;
+		uint16_t		sectorIndex			: 16;
+
+
+        PolyFlags1_08k(){}
+        PolyFlags1_08k(const PolyFlags& p)
+        {
+            portalPoly = p.portalPoly;
+            occluder = p.occluder;
+            sectorPoly = p.sectorPoly ;
+            lodFlag = p.lodFlag;
+            portalIndoorOutdoor = p.portalIndoorOutdoor;
+            ghostOccluder = p.ghostOccluder;
+            normalMainAxis = p.normalMainAxis;
+            sectorIndex = p.sectorIndex;
+        }
+
+        PolyFlags generify() const
+        {
+            PolyFlags p;
+            memset(&p, 0, sizeof(p));
+
+            p.portalPoly = portalPoly;
+            p.occluder = occluder;
+            p.sectorPoly = sectorPoly;
+            p.lodFlag = lodFlag;
+            p.portalIndoorOutdoor = portalIndoorOutdoor;
+            p.ghostOccluder = ghostOccluder;
+            p.normalMainAxis = normalMainAxis;
+            p.sectorIndex = sectorIndex;
+        }
+	};
+
+
 
 	struct zTMSH_FeatureChunk 
 	{
