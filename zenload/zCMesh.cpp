@@ -290,7 +290,7 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
                     }
 
 					// TODO: Store these somewhere else
-					if(!p.flags.ghostOccluder && !p.flags.portalPoly)
+					if(!p.flags.ghostOccluder && !p.flags.portalPoly && !p.flags.lodFlag)
 					{
                         if(p.polyNumVertices != 0) {
 
