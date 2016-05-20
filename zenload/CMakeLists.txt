@@ -7,6 +7,6 @@ file(GLOB SRC
 )
 
 
-add_library(zenload STATIC ${SRC})
+add_library(zenload STATIC ${SRC} DATFile.cpp DATFile.h DaedalusVM.cpp DaedalusVM.h DaedalusStdlib.cpp DaedalusStdlib.h)
 target_link_libraries(zenload utils vdfs squish) 
 set_target_properties(zenload PROPERTIES LINKER_LANGUAGE C)

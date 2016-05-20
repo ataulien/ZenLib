@@ -72,6 +72,8 @@ namespace ZenLoad
 		* @brief reads a zen from memory
 		*/
 		ZenParser(const void* data, size_t size);
+
+		ZenParser(){}
 		~ZenParser();
 
         /**
