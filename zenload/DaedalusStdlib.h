@@ -1,9 +1,9 @@
 #pragma once
 
-#include "DaedalusVM.h"
-
 namespace ZenLoad
 {
+    class DaedalusVM;
+
     namespace GEngineClasses
     {
         const int MAX_CHAPTER = 5;
@@ -31,6 +31,16 @@ namespace ZenLoad
         const int PROT_POINT = DAM_INDEX_POINT;
         const int PROT_FALL = DAM_INDEX_FALL;
         const int PROT_INDEX_MAX = DAM_INDEX_MAX;
+
+        enum EInstanceClass
+        {
+            IC_Npc,
+            IC_Mission,
+            IC_Info,
+            IC_Item,
+            IC_ItemReact,
+            IC_Focus
+        };
 
         struct C_NPC
         {

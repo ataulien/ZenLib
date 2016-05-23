@@ -97,6 +97,12 @@ namespace ZenLoad
 
     struct PARSymbol
     {
+		PARSymbol()
+		{
+			dataOffset = -1;
+			instanceData = nullptr;
+		}
+
         std::string name;
 
         struct Properties
@@ -148,52 +154,74 @@ namespace ZenLoad
         int32_t classOffset;
         uint32_t address;
 
-		void* dataAddress; // Not stored in files, only valid for classes to directly write to engine memory
+		int32_t dataOffset; // Not stored in files, only valid for classes to directly write to engine memory
+		void* instanceData; // Not stored in files, only valid for classes to directly write to engine memory
 
         int32_t parent; // 0xFFFFFFFF (-1) = none
 
-		int32_t* getIntAddr(size_t idx = 0)
+		int32_t* getIntAddr(size_t idx = 0, void* baseAddr=nullptr)
 		{
+			if(baseAddr && dataOffset != -1)
+				return reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(int32_t) * idx));
+
 			if(intData.size() <= idx) intData.resize(idx+1);
 			return &intData[idx];
 		}
 
-		std::string* getStrAddr(size_t idx = 0)
+		std::string* getStrAddr(size_t idx = 0, void* baseAddr=nullptr)
 		{
+			if(baseAddr && dataOffset != -1)
+				return reinterpret_cast<std::string*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(std::string) * idx));
+
 			if(strData.size() <= idx) strData.resize(idx+1);
 			return &strData[idx];
 		}
 
-		int32_t getIntValue(size_t idx=0)
+		int32_t getIntValue(size_t idx=0, void* baseAddr=nullptr)
 		{
+			if(baseAddr && dataOffset != -1)
+				return *reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(int32_t) * idx));
+
 			if(intData.size() <= idx) intData.resize(idx+1);
 			return intData[idx];
 		}
 
-		void set(int32_t v, size_t idx = 0)
+		void set(int32_t v, size_t idx = 0, void* baseAddr=nullptr)
 		{
 			switch(properties.elemProps.type)
 			{
 				case EParType_Int:
 					if(intData.size() <= idx) intData.resize(idx+1);
 					intData[idx] = v;
+
+					if(baseAddr && dataOffset != -1)
+						*reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(int32_t) * idx)) = v;
 					break;
 
 				case EParType_Float:
 					if(floatData.size() <= idx) floatData.resize(idx+1);
 					floatData[idx] = *reinterpret_cast<float*>(&v);
+
+					if(baseAddr && dataOffset != -1)
+						*reinterpret_cast<float*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(float) * idx)) = v;
 					break;
 
 				case EParType_Func:
 					address = v;
+
+					if(baseAddr && dataOffset != -1)
+						*reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(int32_t) * idx)) = v;
 					break;
 			}
 		}
 
-		void set(const std::string& v, size_t idx=0)
+		void set(const std::string& v, size_t idx=0, void* baseAddr=nullptr)
 		{
 			if(strData.size() <= idx) strData.resize(idx+1);
 			strData[idx] = v;
+
+			if(baseAddr && dataOffset != -1)
+				*reinterpret_cast<std::string*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(float) * idx)) = v;
 		}
 
 		bool isDataSame(const PARSymbol& other) const

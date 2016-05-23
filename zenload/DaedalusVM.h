@@ -3,7 +3,9 @@
 #include <stack>
 #include <functional>
 #include <queue>
+#include <set>
 #include "DATFile.h"
+#include "DaedalusStdlib.h"
 
 namespace ZenLoad
 {
@@ -63,10 +65,73 @@ namespace ZenLoad
         std::string popString();
 
         /**
+         * @brief Sets the datapointer for the given instance-symbol
+         */
+        void setInstance(const std::string& instSymbol, void* addr);
+        void setCurrentInstance(size_t symIdx);
+
+        /**
+         * @brief Sets the
+         */
+
+        /**
+         * @brief Initializes the given instance by script
+         * @param instance Allocated instance of the right type
+         * @param symIdx Script-Symbol of the instance to initialize
+         */
+        void initializeInstance(GEngineClasses::C_NPC* instance, size_t symIdx)
+        {
+            initializeInstance(instance, symIdx, GEngineClasses::IC_Npc);
+        }
+
+        void initializeInstance(GEngineClasses::C_Focus* instance, size_t symIdx)
+        {
+            initializeInstance(instance, symIdx, GEngineClasses::IC_Focus);
+        }
+
+        void initializeInstance(GEngineClasses::C_Item* instance, size_t symIdx)
+        {
+            initializeInstance(instance, symIdx, GEngineClasses::IC_Item);
+        }
+
+        void initializeInstance(GEngineClasses::C_ITEMREACT* instance, size_t symIdx)
+        {
+            initializeInstance(instance, symIdx, GEngineClasses::IC_ItemReact);
+        }
+
+        void initializeInstance(GEngineClasses::C_INFO* instance, size_t symIdx)
+        {
+            initializeInstance(instance, symIdx, GEngineClasses::IC_Info);
+        }
+
+        void initializeInstance(GEngineClasses::C_Mission* instance, size_t symIdx)
+        {
+            initializeInstance(instance, symIdx, GEngineClasses::IC_Mission);
+        }
+
+        /**
+         * @return all instances of the given class
+         */
+        const std::set<void*>& getRegisteredInstancesOf(GEngineClasses::EInstanceClass classIdx){ return m_RegisteredInstances[classIdx]; }
+
+        /**
+         * @return The currently registered instance-data pointer
+         */
+        void* getCurrentInstanceDataPtr(){ return m_CurrentInstanceDataPtr; }
+
+        /**
          * @brief Returns the DAT-File this VM runs on
          */
         DATFile& getDATFile(){return m_DATFile;}
     private:
+
+        /**
+         * @brief Initializes the given instance by script
+         * @param instance Allocated instance of the right type
+         * @param symIdx Script-Symbol of the instance to initialize
+         */
+        void initializeInstance(void* instance, size_t symIdx, GEngineClasses::EInstanceClass classIdx);
+
         DATFile m_DATFile;
 
         /**
@@ -86,10 +151,16 @@ namespace ZenLoad
          * @brief instance set by SetInstance
          */
         size_t m_CurrentInstance;
+        void* m_CurrentInstanceDataPtr;
 
         /**
          * @brief Temporary string symbols for general purpose use
          */
         std::queue<size_t> m_FakeStringSymbols;
+
+        /**
+         * @brief Map of all created instances by their class index
+         */
+        std::map<GEngineClasses::EInstanceClass, std::set<void*>> m_RegisteredInstances;
     };
 }

@@ -34,6 +34,8 @@ DaedalusVM::DaedalusVM(ZenLoad::DATFile& dat, const std::string& main)
     // Make fake-strings
     for(size_t i=0;i<NUM_FAKE_STRING_SYMBOLS;i++)
         m_FakeStringSymbols.push(m_DATFile.addSymbol());
+
+    m_CurrentInstanceDataPtr = nullptr;
 }
 
 bool DaedalusVM::doStack()
@@ -47,7 +49,7 @@ bool DaedalusVM::doStack()
     uint32_t arr, arr2;
     int32_t* addr;
     std::string* straddr, *straddr2;
-    PARSymbol s;
+    static PARSymbol s;
     PARSymbol& sym = s;
     PARSymbol& sym2 = s;
 
@@ -70,7 +72,7 @@ bool DaedalusVM::doStack()
 
             LogInfo() << " - a: " << a << ", arr: " << arr;
 
-            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr);
+            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, m_CurrentInstanceDataPtr);
             b = *addr;
             *addr = popDataValue();
             LogInfo() << " - " << b << " -> " << *addr;
@@ -85,22 +87,22 @@ bool DaedalusVM::doStack()
         case EParOp_GreaterOrEqual:pushInt(popDataValue() >= popDataValue() ? 1 : 0);break;
         case EParOp_AssignAdd:
             a = popVar(arr);
-            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr);
+            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, m_CurrentInstanceDataPtr);
             *addr += popDataValue();
             break;
         case EParOp_AssignSubtract:
             a = popVar(arr);
-            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr);
+            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, m_CurrentInstanceDataPtr);
             *addr -= popDataValue();
             break;
         case EParOp_AssignMultiply:
             a = popVar(arr);
-            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr);
+            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, m_CurrentInstanceDataPtr);
             *addr *= popDataValue();
             break;
         case EParOp_AssignDivide:
             a = popVar(arr);
-            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr);
+            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, m_CurrentInstanceDataPtr);
             *addr /= popDataValue();
             break;
         case EParOp_Plus:
@@ -149,14 +151,17 @@ bool DaedalusVM::doStack()
             pushVar(op.symbol);
             LogInfo() << " - [" << op.symbol << "] " << m_DATFile.getSymbolByIndex(op.symbol).name << ": " << popDataValue();
             break;
-        case EParOp_PushInstance: pushVar(op.symbol); break; //TODO: Not sure about this
+        case EParOp_PushInstance:
+            pushVar(op.symbol);
+            LogInfo() << " - [" << op.symbol << "] " << m_DATFile.getSymbolByIndex(op.symbol).name << ", addr: " << m_DATFile.getSymbolByIndex(op.symbol).instanceData;
+            break; //TODO: Not sure about this
         case EParOp_AssignString:
             a = popVar(arr);
             b = popVar(arr2);
-            straddr = m_DATFile.getSymbolByIndex(a).getStrAddr(arr);
-            *straddr = *m_DATFile.getSymbolByIndex(b).getStrAddr(arr2);
+            straddr = m_DATFile.getSymbolByIndex(a).getStrAddr(arr, m_CurrentInstanceDataPtr);
+            *straddr = *m_DATFile.getSymbolByIndex(b).getStrAddr(arr2, m_CurrentInstanceDataPtr);
 
-            LogInfo() << " - " << a << ", " << b << ": " << *m_DATFile.getSymbolByIndex(b).getStrAddr(arr2);
+            LogInfo() << " - " << a << ", " << b << ": " << *m_DATFile.getSymbolByIndex(b).getStrAddr(arr2, m_CurrentInstanceDataPtr);
             break;
         case EParOp_AssignStringRef:
             LogError() << "EParOp_AssignStringRef not implemented!";
@@ -165,32 +170,31 @@ bool DaedalusVM::doStack()
             a = popDataValue();
             b = popDataValue(); // TODO: Maybe should be using popVar here
 
-            sym = m_DATFile.getSymbolByIndex(a);
             sym2 = m_DATFile.getSymbolByIndex(b);
-
-            sym.address = sym2.address;
+            m_DATFile.getSymbolByIndex(a).set(sym2.address, 0, m_CurrentInstanceDataPtr);
             break;
 
         case EParOp_AssignFloat:
             a = popVar(arr);
             b = popDataValue();
 
-            sym = m_DATFile.getSymbolByIndex(a);
-            assert(!sym.floatData.empty());
-
-            sym.floatData[arr] = *reinterpret_cast<float*>(b);
+            m_DATFile.getSymbolByIndex(a).set(b, arr, m_CurrentInstanceDataPtr);
             break;
 
         case EParOp_AssignInstance:
             a = popVar();
             b = popVar();
 
+
+
+            m_DATFile.getSymbolByIndex(a).instanceData = m_DATFile.getSymbolByIndex(b).instanceData;
+
+            //sym.classOffset = sym2.classOffset;
+            //sym.instanceData = sym2.instanceData;
+
             LogInfo() << "AssignInstance: a=" << a << ", b=" << b;
+            LogInfo() << " - [" << a << "] " << m_DATFile.getSymbolByIndex(a).name << ", addr: " << m_DATFile.getSymbolByIndex(a).instanceData;
 
-            sym = m_DATFile.getSymbolByIndex(a);
-            sym2 = m_DATFile.getSymbolByIndex(b);
-
-            sym.classOffset = sym2.classOffset;
             break;
 
         case EParOp_Jump:
@@ -208,6 +212,8 @@ bool DaedalusVM::doStack()
         case EParOp_SetInstance:
             m_CurrentInstance = op.symbol;
             LogInfo() << " - [" << op.symbol << "] " << m_DATFile.getSymbolByIndex(op.symbol).name;
+
+            m_CurrentInstanceDataPtr = m_DATFile.getSymbolByIndex(op.symbol).instanceData;
             break;
         case EParOp_PushArrayVar:
             pushVar(op.symbol, op.index);
@@ -215,298 +221,6 @@ bool DaedalusVM::doStack()
             break;
     }
 
-    /*switch(op.op)
-    {
-        case EParOp_CallExternal:
-        case EParOp_Call: {
-            LogInfo() << oldPC <<" - CALL: " << op.address;
-
-            // FIXME: Support actual externals
-            auto it = m_ExternalsByIndex.find(op.address);
-            if(it != m_ExternalsByIndex.end())
-            {
-                (*it).second(*this);
-            }else {
-                m_RetStack.push(m_PC);
-                m_PC = op.address;
-            }
-
-        }
-            break;
-
-        case EParOp_Ret:
-            if(m_RetStack.empty())
-                return false; // Program ended
-
-            LogInfo() << oldPC <<" - RET: -> " << static_cast<uint32_t>(m_RetStack.top());
-
-            m_PC = static_cast<uint32_t>(m_RetStack.top());
-            m_RetStack.pop();
-
-            break;
-
-        case EParOp_PushInt:
-            m_Stack.push(op.value);
-            LogInfo() << oldPC <<" - PUSHINT: " << op.value;
-            break;
-
-
-        case EParOp_SetInstance:
-            m_CurrentInstance = popDataValue();
-            break;
-
-        case EParOp_PushArrayVar:
-            m_Stack.push(op.symbol);
-            LogInfo() << oldPC <<" - PushArrayVar: " << op.symbol;
-            break;
-
-        case EParOp_PushVar:
-            m_Stack.push(op.symbol);
-            LogInfo() << oldPC <<" - PushVar: " << op.symbol;
-            break;
-
-        case EParOp_PushInstance:
-            m_Stack.push(op.symbol);
-            LogInfo() << oldPC <<" - PUSHINSTANCE: " << op.symbol;
-            break;
-
-        case EParOp_Jump:
-            m_PC = m_DATFile.getStack().stackSize - op.address - 1;
-            LogInfo() << oldPC <<" - JUMP: " << (op.address);
-            break;
-
-        case EParOp_JumpIf: {
-            int32_t b = m_Stack.top();
-            m_Stack.pop();
-
-            LogInfo() << oldPC <<" - JUMPIF: (" << b << ") -> " << (op.address);
-
-            if(b)
-                m_PC = (op.address);
-
-
-        }
-            break;
-
-
-        case EParOp_Equal: {
-            int32_t a = m_Stack.top();
-            m_Stack.pop();
-            int32_t b = m_Stack.top();
-            m_Stack.pop();
-
-            m_Stack.push(a == b ? 1 : 0);
-
-            LogInfo() << m_PC <<" - EQUAL: (" << a << " == " << b << ")";
-        }
-            break;
-
-        case EParOp_AssignString:
-            a = popDataValue();
-            b = popDataValue();
-
-            sym = m_DATFile.getSymbolByIndex(a);
-            sym2 = m_DATFile.getSymbolByIndex(b);
-            assert(!sym.strData.empty());
-            assert(!sym2.strData.empty());
-
-            sym.strData[0] = sym2.strData[0];
-            break;
-
-        case EParOp_Add:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a + b);
-            break;
-        case EParOp_Subract:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a - b);
-            break;
-        case EParOp_Multiply:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a * b);
-            break;
-        case EParOp_Divide:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a / b);
-            break;
-        case EParOp_Mod:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a % b);
-            break;
-        case EParOp_BinOr:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a | b);
-            break;
-        case EParOp_BinAnd:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a & b);
-            break;
-        case EParOp_Less:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a < b ? 1 : 0);
-            break;
-        case EParOp_Greater:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a > b ? 1 : 0);
-            break;
-        case EParOp_Assign:
-            a = popDataValue();
-            b = popDataValue();
-
-            sym = m_DATFile.getSymbolByIndex(a);
-            if(sym.intData.empty())
-                sym.intData.resize(1);
-
-            assert(!sym.intData.empty());
-
-            sym.intData[0] = b;
-            break;
-        case EParOp_LogOr:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a || b ? 1 : 0);
-            break;
-        case EParOp_LogAnd:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a && b ? 1 : 0);
-            break;
-        case EParOp_ShiftLeft:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a << b);
-            break;
-        case EParOp_ShiftRight:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a >> b);
-            break;
-        case EParOp_LessOrEqual:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a <= b ? 1 : 0);
-            break;
-        case EParOp_NotEqual:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a != b ? 1 : 0);
-            break;
-        case EParOp_GreaterOrEqual:
-            a = popDataValue();
-            b = popDataValue();
-            pushInt(a >= b ? 1 : 0);
-            break;
-        case EParOp_AssignAdd:
-            a = popDataValue();
-            b = popDataValue();
-
-            sym = m_DATFile.getSymbolByIndex(a);
-            assert(!sym.intData.empty());
-
-            sym.intData[0] += b;
-            break;
-        case EParOp_AssignSubtract:
-            a = popDataValue();
-            b = popDataValue();
-
-            sym = m_DATFile.getSymbolByIndex(a);
-            assert(!sym.intData.empty());
-
-            sym.intData[0] -= b;
-            break;
-        case EParOp_AssignMultiply:
-            a = popDataValue();
-            b = popDataValue();
-
-            sym = m_DATFile.getSymbolByIndex(a);
-            assert(!sym.intData.empty());
-
-            sym.intData[0] *= b;
-            break;
-        case EParOp_AssignDivide:
-            a = popDataValue();
-            b = popDataValue();
-
-            sym = m_DATFile.getSymbolByIndex(a);
-            assert(!sym.intData.empty());
-
-            sym.intData[0] /= b;
-            break;
-        case EParOp_Plus:
-            a = popDataValue();
-
-            sym = m_DATFile.getSymbolByIndex(a);
-            assert(!sym.intData.empty());
-
-            // TODO: Assumed + means abs. Find more information about this
-            sym.intData[0] = static_cast<int32_t>(std::abs(sym.intData[0]));
-            break;
-        case EParOp_Minus:
-            sym = m_DATFile.getSymbolByIndex(a);
-            assert(!sym.intData.empty());
-
-            sym.intData[0] = -sym.intData[0];
-            break;
-        case EParOp_Not:
-            sym = m_DATFile.getSymbolByIndex(a);
-            assert(!sym.intData.empty());
-
-            sym.intData[0] = !sym.intData[0];
-            break;
-        case EParOp_Negate:
-            sym = m_DATFile.getSymbolByIndex(a);
-            assert(!sym.intData.empty());
-
-            sym.intData[0] = ~sym.intData[0];
-            break;
-        case EParOp_AssignStringRef:
-            LogError() << "Unimplemented opcode: EParOp_AssignStringRef";
-            assert(false);
-            break;
-        case EParOp_AssignFunc:
-            a = popDataValue();
-            b = popDataValue();
-
-            sym = m_DATFile.getSymbolByIndex(a);
-            sym2 = m_DATFile.getSymbolByIndex(b);
-
-            sym.address = sym2.address;
-            break;
-        case EParOp_AssignFloat:
-            a = popDataValue();
-            b = popDataValue();
-
-            sym = m_DATFile.getSymbolByIndex(a);
-            sym2 = m_DATFile.getSymbolByIndex(b);
-            assert(!sym.strData.empty());
-            assert(!sym2.strData.empty());
-
-            sym.floatData[0] = sym2.floatData[0];
-            break;
-        case EParOp_AssignInstance:
-            a = popDataValue();
-            b = popDataValue();
-
-            sym = m_DATFile.getSymbolByIndex(a);
-            sym2 = m_DATFile.getSymbolByIndex(b);
-            assert(!sym.strData.empty());
-            assert(!sym2.strData.empty());
-
-            sym.address = sym2.address;
-            break;
-
-        default:
-            if(log) LogInfo() << OP_MAP[op.op];
-    }*/
 
     return true;
 }
@@ -666,6 +380,53 @@ void DaedalusVM::pushString(const std::string& str)
 
     pushVar(symIdx, 0);
 }
+
+void DaedalusVM::setInstance(const std::string& instSymbol, void* addr)
+{
+    PARSymbol& s = m_DATFile.getSymbolByName(instSymbol);
+    s.instanceData = addr;
+}
+
+void DaedalusVM::initializeInstance(void* instance, size_t symIdx, GEngineClasses::EInstanceClass classIdx)
+{
+    PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
+
+    // Enter address into instance-symbol
+    s.instanceData = instance;
+
+    setInstance("SELF", instance);
+    setCurrentInstance(m_DATFile.getSymbolIndexByName("SELF"));
+
+    // Point the PC to the instance-constructor
+    doCallOperation(s.address);
+
+    // Empty retstack, so we can stop execution after this call
+    std::stack<size_t> retStack = m_RetStack;
+    m_RetStack = std::stack<size_t>();
+    size_t pc = m_PC;
+
+    // Run script code to initialize the object
+    while(doStack());
+
+    // Return to old location and continue like nothing ever happened
+    m_PC = pc;
+    m_RetStack = retStack;
+
+    // Add to registered instances
+    m_RegisteredInstances[classIdx].insert(instance);
+}
+
+void DaedalusVM::setCurrentInstance(size_t symIdx)
+{
+    m_CurrentInstance = symIdx;
+    m_CurrentInstanceDataPtr = m_DATFile.getSymbolByIndex(symIdx).instanceData;
+}
+
+
+
+
+
+
 
 
 

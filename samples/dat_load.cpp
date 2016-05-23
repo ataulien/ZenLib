@@ -28,7 +28,7 @@ void runVM(ZenLoad::DaedalusVM& vm)
         if (s.isDataSame(o))
             continue;
 
-        LogInfo() << "Changed Symbol: " << s.name << " (" << i << "):";
+        /*LogInfo() << "Changed Symbol: " << s.name << " (" << i << "):";
 
         if (!s.intData.empty()) {
             for (size_t j = 0; j < s.intData.size(); j++) {
@@ -55,7 +55,7 @@ void runVM(ZenLoad::DaedalusVM& vm)
                 else if (o.floatData[j] != s.floatData[j])
                     LogInfo() << " - Float[" << j << "]: " << o.floatData[j] << " -> " << s.floatData[j];
             }
-        }
+        }*/
     }
 }
 
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    ZenLoad::DATFile f(file, true);
+    ZenLoad::DATFile f(file);
 
     if(listFunctions)
     {
@@ -207,6 +207,7 @@ int main(int argc, char** argv)
         });
 
         ZenLoad::registerDaedalusStdLib(vm);
+        ZenLoad::registerGothicEngineClasses(vm);
 
         //size_t self = vm.getDATFile().addSymbol();
         //vm.pushVar(self);
@@ -217,86 +218,97 @@ int main(int argc, char** argv)
             for(std::string& s : debugOutput)
                 LogInfo() << "DBG: " << s;
             debugOutput.clear();
-        }
-
-        while(true)
+        } else
         {
-            if (cmdLine) {
-                // Read commandline
-                std::cout << "> ";
-                std::string cmd;
-                std::getline(std::cin, cmd);
-
-                // Split into arguments
-                parts = Utils::split(cmd, ' ');
-
-                LogInfo() << cmd;
-
-                // First part is expected to be one of the following: "exec", [todo]
-                if (parts[0] == "exec")
+            while (true)
+            {
+                if (cmdLine)
                 {
-                    // Arguments for exec are to be given like this:
-                    // fname <vtype>:value1 <vtype2>:value2 ...
-                    // Example: exec myFunction i:3 s:hello! v:SELF
-                    // TODO: Support spaces in strings
-                    if(parts.size() < 2)
-                    {
-                        std::cout << "Missing argument for exec!" << std::endl;
-                        continue;
-                    }
+                    // Read commandline
+                    std::cout << "> ";
+                    std::string cmd;
+                    std::getline(std::cin, cmd);
 
-                    std::string fn = parts[1];
-                    std::vector<std::string> args(parts.begin() + 2, parts.end());
+                    // Split into arguments
+                    parts = Utils::split(cmd, ' ');
 
-                    if(!vm.getDATFile().hasSymbolName(fn))
-                    {
-                        std::cout << "Failed to find function: " << fn << std::endl;
-                        continue;
-                    }
+                    LogInfo() << cmd;
 
-                    uint32_t fnAddress = vm.getDATFile().getSymbolByName(fn).address;
-                    int32_t i;
-                    float flt;
-                    std::string s;
-                    size_t vidx;
-                    for(std::string& a : args)
+                    // First part is expected to be one of the following: "exec", [todo]
+                    if (parts[0] == "exec")
                     {
-                        switch(a.front())
+                        // Arguments for exec are to be given like this:
+                        // fname <vtype>:value1 <vtype2>:value2 ...
+                        // Example: exec myFunction i:3 s:hello! v:SELF
+                        // TODO: Support spaces in strings
+                        if (parts.size() < 2)
                         {
-                            case 'i':
-                                i = atoi(a.c_str() + 2);
-                                vm.pushInt(i);
-                                break;
-
-                            case 'f':
-                                flt = atof(a.c_str() + 2);
-                                vm.pushInt(*reinterpret_cast<uint32_t*>(&flt));
-                                break;
-
-                            case 's':
-                                s = a.c_str() + 2;
-                                vm.pushString(s);
-                                LogInfo() << "s:" << s;
-                                break;
-
-                            case 'v':
-                                s = a.c_str() + 2;
-                                vidx = vm.getDATFile().getSymbolIndexByName(s);
-                                vm.pushVar(vidx);
-                                break;
-
+                            std::cout << "Missing argument for exec!" << std::endl;
+                            continue;
                         }
+
+                        std::string fn = parts[1];
+                        std::vector<std::string> args(parts.begin() + 2, parts.end());
+
+                        if (!vm.getDATFile().hasSymbolName(fn))
+                        {
+                            std::cout << "Failed to find function: " << fn << std::endl;
+                            continue;
+                        }
+
+                        uint32_t fnAddress = vm.getDATFile().getSymbolByName(fn).address;
+                        int32_t i;
+                        float flt;
+                        std::string s;
+                        size_t vidx;
+                        for (std::string& a : args)
+                        {
+                            switch (a.front())
+                            {
+                                case 'i':
+                                    i = atoi(a.c_str() + 2);
+                                    vm.pushInt(i);
+                                    break;
+
+                                case 'f':
+                                    flt = atof(a.c_str() + 2);
+                                    vm.pushInt(*reinterpret_cast<uint32_t*>(&flt));
+                                    break;
+
+                                case 's':
+                                    s = a.c_str() + 2;
+                                    vm.pushString(s);
+                                    LogInfo() << "s:" << s;
+                                    break;
+
+                                case 'v':
+                                    s = a.c_str() + 2;
+                                    vidx = vm.getDATFile().getSymbolIndexByName(s);
+                                    vm.pushVar(vidx);
+                                    break;
+
+                            }
+                        }
+
+                        vm.doCallOperation(fnAddress);
+                        runVM(vm);
+
+                        const std::set<void*>& npcs = vm.getRegisteredInstancesOf(ZenLoad::GEngineClasses::IC_Npc);
+                        for(auto& np : npcs)
+                        {
+                            ZenLoad::GEngineClasses::C_NPC* n = (ZenLoad::GEngineClasses::C_NPC*)np;
+                            LogInfo() << "NPC: " << n->name[0];
+                            LogInfo() << " - Level: " << n->level;
+                            LogInfo() << " - WP: " << n->wp;
+                        }
+
+                        //for (std::string& s : debugOutput)
+                        //    LogInfo() << "DBG: " << s;
+                        debugOutput.clear();
+                    } else if (parts[0] == "exit")
+                    {
+                        break;
                     }
-
-                    vm.doCallOperation(fnAddress);
-                    runVM(vm);
-
-                    for(std::string& s : debugOutput)
-                        LogInfo() << "DBG: " << s;
-                    debugOutput.clear();
-                }else if(parts[0] == "exit")
-                {
-                    break;
                 }
             }
         }
