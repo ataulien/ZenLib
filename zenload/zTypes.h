@@ -155,6 +155,59 @@ namespace ZenLoad
 	};
 //#pragma pack(pop)
 
+	struct oCMsgConversationData : public ParsedZenObject
+	{
+		uint8_t subType;
+		std::string text;
+		std::string name;
+	};
+
+	struct zCCSRoleData : public ParsedZenObject
+	{
+		bool mustBeAlive;
+		std::string roleName;
+		uint8_t roleType;
+	};
+
+	struct zCCSBlockSyncData : public ParsedZenObject
+	{
+		std::vector<uint32_t> roleAss;
+	};
+
+	struct zCCSAtomicBlockData : public ParsedZenObject
+	{
+		oCMsgConversationData command;
+	};
+
+	struct zCCSBlockData : public ParsedZenObject
+	{
+		std::string blockName;
+
+		// This structure is different in the original files, but this is the only
+		// configuration happening while loading
+		zCCSAtomicBlockData atomicBlockData;
+	};
+
+
+	/*struct zCCutsceneData
+	{
+		zCCSPropsData props;
+		std::vector<zCCSRoleData> roles;
+		std::vector<zCVobData> roleVobs;
+		zCVobData mainRoleVob;
+	};*/
+
+	/*struct zCEventManagerData
+	{
+		bool cleared;
+		bool active;
+		zCCutsceneData cutsceneData;
+	};*/
+
+	struct zCCSLibData : public ParsedZenObject
+	{
+		std::vector<zCCSAtomicBlockData> blocks; // Gothic is only using atomic blocks, as it seems
+	};
 
 
 	/**

@@ -32,17 +32,12 @@ namespace ZenLoad
         const int PROT_FALL = DAM_INDEX_FALL;
         const int PROT_INDEX_MAX = DAM_INDEX_MAX;
 
-        enum EInstanceClass
+        struct Instance
         {
-            IC_Npc,
-            IC_Mission,
-            IC_Info,
-            IC_Item,
-            IC_ItemReact,
-            IC_Focus
+            size_t instanceSymbol;
         };
 
-        struct C_NPC
+        struct C_Npc : Instance
         {
             int32_t id;
             std::string name[5];
@@ -90,7 +85,7 @@ namespace ZenLoad
             int32_t lp;
         };
 
-        struct C_Mission
+        struct C_Mission : Instance
         {
             std::string name;        //	Name des Auftrages
             std::string description;
@@ -108,7 +103,7 @@ namespace ZenLoad
             uint32_t running;
         };
 
-        struct C_Item
+        struct C_Item : Instance
         {
             // Für alle Items
             int id;
@@ -171,7 +166,7 @@ namespace ZenLoad
             int count[ITM_TEXT_MAX];
         };
 
-        struct C_Focus
+        struct C_Focus : Instance
         {
             /// für NSCs
             float npc_longrange;        //	Zurufweite	( 20 m )
@@ -193,7 +188,7 @@ namespace ZenLoad
             int mob_prio;        //	Priorität
         };
 
-        struct C_INFO
+        struct C_Info : Instance
         {
             int npc;
             int nr;
@@ -205,7 +200,7 @@ namespace ZenLoad
             int permanent;
         };
 
-        struct C_ITEMREACT
+        struct C_ItemReact : Instance
         {
             int npc;
             int trade_item;
@@ -217,7 +212,13 @@ namespace ZenLoad
         };
     }
 
-    void registerDaedalusStdLib(DaedalusVM& vm);
+    /**
+     * @brief Implements some generic script-externals
+     */
+    void registerDaedalusStdLib(DaedalusVM& vm, bool enableVerboseLogging = false);
 
+    /**
+     * @brief Links the classes known to the engine to the VM.
+     */
     void registerGothicEngineClasses(DaedalusVM& vm);
 }

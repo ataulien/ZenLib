@@ -3,10 +3,23 @@
 #include <vector>
 #include <map>
 #include "zenParser.h"
+#include <utils/staticReferencedAllocator.h>
 
 namespace ZenLoad
 {
-    enum EParFlag
+
+	enum EInstanceClass
+	{
+		IC_Npc,
+		IC_Mission,
+		IC_Info,
+		IC_Item,
+		IC_ItemReact,
+		IC_Focus
+	};
+
+
+	enum EParFlag
     {
     	EParFlag_Const    = 1 << 0,
     	EParFlag_Return   = 1 << 1,
@@ -100,7 +113,8 @@ namespace ZenLoad
 		PARSymbol()
 		{
 			dataOffset = -1;
-			instanceData = nullptr;
+			instanceDataHandle.invalidate();
+			instanceDataClass = IC_Npc;
 		}
 
         std::string name;
@@ -156,8 +170,10 @@ namespace ZenLoad
 
 		int32_t dataOffset; // Not stored in files, only valid for classes to directly write to engine memory
 		void* instanceData; // Not stored in files, only valid for classes to directly write to engine memory
+		Memory::BigHandle instanceDataHandle;
+		EInstanceClass instanceDataClass;
 
-        int32_t parent; // 0xFFFFFFFF (-1) = none
+        uint32_t parent; // 0xFFFFFFFF (-1) = none
 
 		int32_t* getIntAddr(size_t idx = 0, void* baseAddr=nullptr)
 		{
@@ -283,6 +299,11 @@ namespace ZenLoad
 		PARSymbol& getSymbolByName(const std::string& symName);
 		size_t getSymbolIndexByName(const std::string& symName);
 		PARSymbol& getSymbolByIndex(size_t idx);
+
+		/**
+		 * Goes through all symbols and calls the given callback for every instance of the specified class
+		 */
+		void iterateSymbolsOfClass(const std::string& className, std::function<void(size_t, PARSymbol&)> callback);
 
 		/**
 		 * @return Object containing information about the opcode currently on the stack

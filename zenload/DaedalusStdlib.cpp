@@ -9,137 +9,78 @@
 #define OFFSET(c, v) (int32_t)(((char*)v) - ((char*)c))
 #define REGISTER(cname, obj, var) vm.getDATFile().getSymbolByName(cname "." #var).dataOffset = OFFSET(&obj, &obj.var);
 
-void ZenLoad::registerDaedalusStdLib(DaedalusVM& vm)
+void ZenLoad::registerDaedalusStdLib(DaedalusVM& vm, bool enableVerboseLogging)
 {
-    vm.registerExternalFunction("inttostring", [](ZenLoad::DaedalusVM& vm){
-        int32_t x = vm.popDataValue(); LogInfo() << "x: " << x;
+    bool l = enableVerboseLogging;
+
+    vm.registerExternalFunction("inttostring", [l](ZenLoad::DaedalusVM& vm){
+        int32_t x = vm.popDataValue();
 
         vm.setReturn(std::to_string(x));
     });
 
-    vm.registerExternalFunction("floattoint", [](ZenLoad::DaedalusVM& vm){
-        float x = *reinterpret_cast<float*>(vm.popDataValue()); LogInfo() << "x: " << x;
+    vm.registerExternalFunction("floattoint", [l](ZenLoad::DaedalusVM& vm){
+        float x = *reinterpret_cast<float*>(vm.popDataValue());
         vm.setReturn(static_cast<int32_t>(x));
     });
 
-    vm.registerExternalFunction("inttofloat", [](ZenLoad::DaedalusVM& vm){
-        int32_t x = vm.popDataValue(); LogInfo() << "x: " << x;
+    vm.registerExternalFunction("inttofloat", [l](ZenLoad::DaedalusVM& vm){
+        int32_t x = vm.popDataValue();
         float y = static_cast<float>(x);
 
         vm.setReturn(*reinterpret_cast<int32_t*>(&y));
     });
 
-    vm.registerExternalFunction("concatstrings", [](ZenLoad::DaedalusVM& vm){
+    vm.registerExternalFunction("concatstrings", [l](ZenLoad::DaedalusVM& vm){
         uint32_t arr1, arr2;
         int32_t s2 = vm.popVar(arr1);
         int32_t s1 = vm.popVar(arr2);
 
-        ZenLoad::PARSymbol& sym1 = vm.getDATFile().getSymbolByIndex(s1); LogInfo() << "s1: " << s1 << ", " << *sym1.getStrAddr(arr1);
-        ZenLoad::PARSymbol& sym2 = vm.getDATFile().getSymbolByIndex(s2); LogInfo() << "s2: " << s2 << ", " << *sym2.getStrAddr(arr2);
+        ZenLoad::PARSymbol& sym1 = vm.getDATFile().getSymbolByIndex(s1);
+        ZenLoad::PARSymbol& sym2 = vm.getDATFile().getSymbolByIndex(s2);
 
         std::string r = (*sym1.getStrAddr(arr1)) + (*sym2.getStrAddr(arr2));
-        LogInfo() << "Result: " << r;
 
         vm.setReturn(r);
     });
 
-    vm.registerExternalFunction("wld_insertitem", [](ZenLoad::DaedalusVM& vm){
-        std::string spawnpoint = vm.popString(); LogInfo() << "spawnpoint: " << spawnpoint;
-        uint32_t iteminstance = vm.popDataValue(); LogInfo() << "iteminstance: " << iteminstance;
 
-        // TODO: Put these in a continuous array
-        GEngineClasses::C_Item* item = new GEngineClasses::C_Item;
-        vm.initializeInstance(item, iteminstance);
-
-        LogInfo() << " ##### Created item: " << item->name;
-    });
-
-    vm.registerExternalFunction("wld_insertnpc", [](ZenLoad::DaedalusVM& vm){
-        std::string spawnpoint = vm.popString(); LogInfo() << "spawnpoint: " << spawnpoint;
-        uint32_t npcinstance = vm.popDataValue(); LogInfo() << "npcinstance: " << npcinstance;
-
-        // TODO: Put these in a continuous array
-        GEngineClasses::C_NPC* npc = new GEngineClasses::C_NPC;
-        npc->wp = spawnpoint;
-
-        vm.initializeInstance(npc, npcinstance);
-
-
-
-        LogInfo() << " ##### Created NPC: " << npc->name[0];
-    });
-
-    vm.registerExternalFunction("createinvitem", [](ZenLoad::DaedalusVM& vm){
-        int32_t itemInstance = vm.popDataValue(); LogInfo() << "itemInstance: " << itemInstance;
-        uint32_t arr_n0;
-        int32_t npc = vm.popVar(arr_n0); LogInfo() << "npc: " << npc;
-
-        // TODO: Put these in a continuous array
-        GEngineClasses::C_Item* item = new GEngineClasses::C_Item;
-        vm.initializeInstance(item, itemInstance);
-
-        // TODO: Put into inventory
-        GEngineClasses::C_NPC* npcAddr = (GEngineClasses::C_NPC*)vm.getDATFile().getSymbolByIndex(npc).instanceData;
-        LogInfo() << " ##### NPCAddr: 0x" << npcAddr;
-        LogInfo() << " ##### Created item '" << item->name << "' for NPC: " << npcAddr->name[0];
-
-    });
-
-    vm.registerExternalFunction("hlp_getnpc", [](ZenLoad::DaedalusVM& vm){
-        int32_t instancename = vm.popDataValue(); LogInfo() << "instancename: " << instancename;
-
-        if(!vm.getDATFile().getSymbolByIndex(instancename).instanceData)
-        {
-            // TODO: Put these in a continuous array
-            GEngineClasses::C_NPC* npc = new GEngineClasses::C_NPC;
-            vm.initializeInstance(npc, instancename);
-
-            LogInfo() << " ##### [HLP_GETNPC] Created NPC: " << npc->name[0];
-        }else
-        {
-            LogInfo() << " #### [HLP_GETNPC] Name: " << ((GEngineClasses::C_NPC*) vm.getDATFile().getSymbolByIndex(instancename).instanceData)->name[0];
-        }
-
-        // TODO: PB returns the actual address to the npc here. But why?
-        vm.setReturnVar(instancename);
-
-    });
 
     //
 }
 
 void ::ZenLoad::registerGothicEngineClasses(DaedalusVM& vm)
 {
-    GEngineClasses::C_NPC npc;
+    GEngineClasses::C_Npc npc;
     GEngineClasses::C_Focus focus;
-    GEngineClasses::C_INFO info;
-    GEngineClasses::C_ITEMREACT itemreact;
+    GEngineClasses::C_Info info;
+    GEngineClasses::C_ItemReact itemreact;
     GEngineClasses::C_Item item;
     GEngineClasses::C_Mission mission;
 
-    REGISTER("C_NPC", npc, id);
-    REGISTER("C_NPC", npc, name);
-    REGISTER("C_NPC", npc, slot);
-    REGISTER("C_NPC", npc, npcType);
-    REGISTER("C_NPC", npc, flags);
-    REGISTER("C_NPC", npc, attribute);
-    REGISTER("C_NPC", npc, protection);
-    REGISTER("C_NPC", npc, damage);
-    REGISTER("C_NPC", npc, damagetype);
-    REGISTER("C_NPC", npc, guild);
-    REGISTER("C_NPC", npc, level);
-    REGISTER("C_NPC", npc, mission);
-    REGISTER("C_NPC", npc, fight_tactic);
-    REGISTER("C_NPC", npc, weapon);
-    REGISTER("C_NPC", npc, voice);
-    REGISTER("C_NPC", npc, voicePitch);
-    REGISTER("C_NPC", npc, bodymass);
-    REGISTER("C_NPC", npc, daily_routine);
-    REGISTER("C_NPC", npc, spawnPoint32_t);
-    REGISTER("C_NPC", npc, spawnDelay);
-    REGISTER("C_NPC", npc, senses);
-    REGISTER("C_NPC", npc, senses_range);
-    REGISTER("C_NPC", npc, ai);
+    REGISTER("C_Npc", npc, id);
+    REGISTER("C_Npc", npc, name);
+    REGISTER("C_Npc", npc, slot);
+    REGISTER("C_Npc", npc, npcType);
+    REGISTER("C_Npc", npc, flags);
+    REGISTER("C_Npc", npc, attribute);
+    REGISTER("C_Npc", npc, protection);
+    REGISTER("C_Npc", npc, damage);
+    REGISTER("C_Npc", npc, damagetype);
+    REGISTER("C_Npc", npc, guild);
+    REGISTER("C_Npc", npc, level);
+    REGISTER("C_Npc", npc, mission);
+    REGISTER("C_Npc", npc, fight_tactic);
+    REGISTER("C_Npc", npc, weapon);
+    REGISTER("C_Npc", npc, voice);
+    REGISTER("C_Npc", npc, voicePitch);
+    REGISTER("C_Npc", npc, bodymass);
+    REGISTER("C_Npc", npc, daily_routine);
+    REGISTER("C_Npc", npc, spawnPoint32_t);
+    REGISTER("C_Npc", npc, spawnDelay);
+    REGISTER("C_Npc", npc, senses);
+    REGISTER("C_Npc", npc, senses_range);
+    REGISTER("C_Npc", npc, ai);
 
     REGISTER("C_Focus", focus, npc_longrange);
     REGISTER("C_Focus", focus, npc_range1);

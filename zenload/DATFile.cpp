@@ -390,6 +390,34 @@ size_t DATFile::addSymbol()
     return m_SymTable.symbols.size()-1;
 }
 
+void DATFile::iterateSymbolsOfClass(const std::string& className, std::function<void(size_t, PARSymbol&)> callback)
+{
+    // First, find the parent-symbol
+    size_t baseSym = getSymbolIndexByName(className);
+
+    for(size_t i = 0; i< m_SymTable.symbols.size(); i++)
+    {
+        PARSymbol& s = getSymbolByIndex(i);
+        if(s.parent == -1 || s.properties.elemProps.type != EParType_Instance)
+            continue;
+
+        PARSymbol& p = getSymbolByIndex(s.parent);
+        uint32_t pBase = s.parent;
+
+        // In case this is also just a prototype, go deeper one more level
+        if(p.properties.elemProps.type == EParType_Prototype && p.parent != -1)
+        {
+            pBase = p.parent;
+        }
+
+        // If the parent-classes match, we found an instance of our class
+        if(baseSym == pBase)
+            callback(i, s);
+    }
+}
+
+
+
 
 
 
