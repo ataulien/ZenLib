@@ -1,12 +1,15 @@
 #include <iostream>
-#include <zenload/DATFile.h>
-#include <zenload/DaedalusVM.h>
-#include <zenload/DaedalusStdlib.h>
-#include <zenload/DaedalusDialogManager.h>
+#include <daedalus/DATFile.h>
+#include <daedalus/DaedalusVM.h>
+#include <daedalus/DaedalusStdlib.h>
+#include <daedalus/DaedalusDialogManager.h>
 #include <utils/logger.h>
 #include <utils/split.h>
 #include <inttypes.h>
 #include <stdlib.h>
+#include <algorithm>
+
+using namespace Daedalus;
 
 bool listFunctions = false;
 bool listStrings = false;
@@ -26,7 +29,7 @@ void printDebugOutput(const std::vector< std::pair<std::string, size_t>>& dbg)
     }
 }
 
-void listNPCs(ZenLoad::DaedalusVM& vm)
+void listNPCs(Daedalus::DaedalusVM& vm)
 {
     GameState::DaedalusGameState& s = vm.getGameState();
     auto& npcs = s.getRegisteredObjects().NPCs;
@@ -35,25 +38,56 @@ void listNPCs(ZenLoad::DaedalusVM& vm)
 
     for(size_t i=0;i<npcs.getNumObtainedElements(); i++)
     {
-        ZenLoad::GEngineClasses::C_Npc& n = npcs.getElements()[i];
+        Daedalus::GEngineClasses::C_Npc& n = npcs.getElements()[i];
         LogInfo() << "NPC: " << n.name[0];
         LogInfo() << " - Level: " << n.level;
         LogInfo() << " - WP: " << n.wp;
     }
 }
 
-void createPlayer(ZenLoad::DaedalusVM& vm)
+size_t npcInstanceFromName(Daedalus::DaedalusVM& vm, const std::string& n)
 {
-    GameState::NpcHandle hero = vm.getGameState().createNPC();
-    vm.initializeInstance(Memory::toBigHandle(hero), vm.getDATFile().getSymbolIndexByName("PC_Hero"), ZenLoad::IC_Npc);
-    vm.setInstance("hero", Memory::toBigHandle(hero), ZenLoad::IC_Npc);
+    auto& npcs = vm.getGameState().getRegisteredObjects().NPCs;
+    for(size_t i=0;i<npcs.getNumObtainedElements();i++)
+    {
+        if(npcs.getElements()[i].name[0] == n)
+        {
+            return npcs.getElements()[i].instanceSymbol;
+        }
+    }
+
+    return static_cast<size_t>(-1);
 }
 
-void runVM(ZenLoad::DaedalusVM& vm, bool print = true)
+std::string join(const std::vector<std::string>& v, const std::string& delim)
+{
+    std::string s;
+
+    for(size_t i=0;i<v.size();i++)
+    {
+        if(!s.empty())
+        {
+            s += delim;
+        }
+
+        s += v[i];
+    }
+
+    return s;
+}
+
+void createPlayer(Daedalus::DaedalusVM& vm)
+{
+    GameState::NpcHandle hero = vm.getGameState().createNPC();
+    vm.initializeInstance(Memory::toBigHandle(hero), vm.getDATFile().getSymbolIndexByName("PC_Hero"), Daedalus::IC_Npc);
+    vm.setInstance("hero", Memory::toBigHandle(hero), Daedalus::IC_Npc);
+}
+
+void runVM(Daedalus::DaedalusVM& vm, bool print = true)
 {
     if(print) LogInfo() << " -------------------------- RUNNING -------------------------- ";
 
-    std::vector<ZenLoad::PARSymbol> storedSymbols = vm.getDATFile().getSymTable().symbols;
+    std::vector<Daedalus::PARSymbol> storedSymbols = vm.getDATFile().getSymTable().symbols;
 
     while (vm.doStack(verbose));
 
@@ -188,7 +222,7 @@ int main(int argc, char** argv)
         return 0;
     }
 
-    ZenLoad::DATFile f(file);
+    Daedalus::DATFile f(file);
 
     if(listFunctions)
     {
@@ -196,7 +230,7 @@ int main(int argc, char** argv)
         size_t i=0;
         for(const auto& s : f.getSymTable().symbols)
         {
-            if(s.properties.elemProps.type == ZenLoad::EParType_Func)
+            if(s.properties.elemProps.type == Daedalus::EParType_Func)
             {
                 LogInfo() << "[" << i << "] - '" << s.name << "', at: " << s.address;
             }
@@ -211,7 +245,7 @@ int main(int argc, char** argv)
         size_t i=0;
         for(const auto& s : f.getSymTable().symbols)
         {
-            if(s.properties.elemProps.type == ZenLoad::EParType_String)
+            if(s.properties.elemProps.type == Daedalus::EParType_String)
             {
                 if(s.strData.size() == 1 && !s.strData[0].empty())
                 {
@@ -234,7 +268,7 @@ int main(int argc, char** argv)
         int i=0;
         for(const auto& s : f.getSymTable().symbols)
         {
-            LogInfo() << "[" << i << "] -- Symbol: " << s.name;
+            LogInfo() << "[" << i << "] -- Symbol: " << s.name << ", Offset: " << s.classOffset;
 
             i++;
         }
@@ -242,12 +276,12 @@ int main(int argc, char** argv)
 
     if(!main.empty() || cmdLine)
     {
-        ZenLoad::DaedalusVM vm(f, main);
+        Daedalus::DaedalusVM vm(f, main);
 
 #include "lambdas.cpp"
 
         std::vector<std::pair<std::string, size_t>> debugOutput;
-        vm.registerExternalFunction("printdebug", [&](ZenLoad::DaedalusVM& vm){
+        vm.registerExternalFunction("printdebug", [&](Daedalus::DaedalusVM& vm){
             std::string s = vm.popString(); if(verbose) LogInfo() << "s: " << s;
 
             if(!debugOutput.empty() && debugOutput.back().first == s)
@@ -256,7 +290,7 @@ int main(int argc, char** argv)
                 debugOutput.push_back(std::make_pair(s, 0));
         });
 
-        vm.registerExternalFunction("printdebuginst", [&](ZenLoad::DaedalusVM& vm){
+        vm.registerExternalFunction("printdebuginst", [&](Daedalus::DaedalusVM& vm){
             std::string text = vm.popString(); if(verbose) LogInfo() << "text: " << text;
 
             if(!debugOutput.empty() && debugOutput.back().first == text)
@@ -265,7 +299,7 @@ int main(int argc, char** argv)
                 debugOutput.push_back(std::make_pair(text, 0));
         });
 
-        vm.registerExternalFunction("printdebuginstch", [&](ZenLoad::DaedalusVM& vm){
+        vm.registerExternalFunction("printdebuginstch", [&](Daedalus::DaedalusVM& vm){
             std::string text = vm.popString(); if(verbose) LogInfo() << "text: " << text;
 
             if(!debugOutput.empty() && debugOutput.back().first == text)
@@ -274,7 +308,7 @@ int main(int argc, char** argv)
                 debugOutput.push_back(std::make_pair(text, 0));
         });
 
-        vm.registerExternalFunction("printdebugch", [&](ZenLoad::DaedalusVM& vm){
+        vm.registerExternalFunction("printdebugch", [&](Daedalus::DaedalusVM& vm){
             std::string text = vm.popString(); if(verbose) LogInfo() << "text: " << text;
 
             if(!debugOutput.empty() && debugOutput.back().first == text)
@@ -283,8 +317,8 @@ int main(int argc, char** argv)
                 debugOutput.push_back(std::make_pair(text, 0));
         });
 
-        ZenLoad::registerDaedalusStdLib(vm, verbose);
-        ZenLoad::registerGothicEngineClasses(vm);
+        registerDaedalusStdLib(vm, verbose);
+        registerGothicEngineClasses(vm);
         vm.getGameState().registerExternals();
 
         // Create hero
@@ -308,12 +342,17 @@ int main(int argc, char** argv)
                 LogInfo() << "Started talking with: " << vm.getGameState().getNpc(self).name[0];
                 LogInfo() << "Options: ";
 
+                std::map<size_t, size_t> optionsMap;
+                std::vector<std::pair<size_t, size_t>> optionsSorted;
                 for(size_t i=0;i<infos.size();i++)
                 {
                     auto& info = vm.getGameState().getInfo(infos[i]);
 
+                    //LogInfo() << " ---------- Checking: " << info.description << " ------------ ";
+
                     // Check condition
                     std::string vstr;
+                    int32_t valid = 0;
                     if(info.condition)
                     {
                         // Most functions don't do a return
@@ -323,25 +362,44 @@ int main(int argc, char** argv)
                         vm.doCallOperation(info.condition);
                         runVM(vm, false);
 
-                        int32_t valid = vm.popDataValue();
-                        vstr = valid == 1 ? "    " : " [x]";
+                        valid = vm.popDataValue();
+                        //LogInfo() << "#### Valid: " << valid;
 
                         vm.popState();
                     }
 
-                    if(info.description.empty())
-                        LogInfo() << " - [" << i+1 << "]: [other]";
-                    else
-                        LogInfo() << " - [" << i+1 << "]" << vstr <<": " << info.description;
+                    if(valid && !info.description.empty())
+                    {
+                        //LogInfo() << info.nr << ": value, '" << info.description << "'";
+                        optionsMap[info.nr] = i;
+                        optionsSorted.push_back(std::make_pair(info.nr, i));
+                    }
+                    //if(info.description.empty())
+                    //    LogInfo() << " - [" << i+1 << "]: [other]";
+                    //else
+                    //    LogInfo() << " - [" << i+1 << "]" << vstr <<": " << info.description;
                 }
+
+                std::sort(optionsSorted.begin(), optionsSorted.end(),
+                          [](const std::pair<size_t, size_t>& l, const std::pair<size_t, size_t>& r)
+                          {return l.first < r.first;});
+
+                LogInfo() << "";
+                for(size_t i=0;i<optionsSorted.size();i++) {
+                    auto& info = vm.getGameState().getInfo(infos[optionsSorted[i].second]);
+                    LogInfo() << " - [" << i + 1 << "]" << ": " << info.description;
+                }
+                LogInfo() << "";
 
                 size_t choice;
                 std::cout << "Choice: " << std::flush;
                 std::cin >> choice;
 
-                if(choice-1 < infos.size() & choice > 0)
+                LogInfo() << "";
+
+                if(choice-1 < optionsSorted.size())
                 {
-                    ZenLoad::GEngineClasses::C_Info& info = vm.getGameState().getInfo(infos[choice-1]);
+                    Daedalus::GEngineClasses::C_Info& info = vm.getGameState().getInfo(infos[optionsSorted[choice-1].second]);
 
                     vm.pushState();
                     vm.doCallOperation(info.information);
@@ -357,7 +415,7 @@ int main(int argc, char** argv)
                     runVM(vm, false);
                     vm.popState();
 
-                    if(choice != infos.size())
+                    if(info.nr != 999)
                     {
                         // END wasn't selected, bring up dialog again
                         vm.pushState();
@@ -484,7 +542,7 @@ int main(int argc, char** argv)
                         }
 
                         Memory::BigHandle h = vm.getDATFile().getSymbolByName(parts[1]).instanceDataHandle;
-                        vm.setInstance("self", h, ZenLoad::IC_Npc);
+                        vm.setInstance("self", h, Daedalus::IC_Npc);
                     } else if (parts[0] == "other")
                     {
                         if(parts.size() != 2)
@@ -494,7 +552,7 @@ int main(int argc, char** argv)
                         }
 
                         Memory::BigHandle h = vm.getDATFile().getSymbolByName(parts[1]).instanceDataHandle;
-                        vm.setInstance("other", h, ZenLoad::IC_Npc);
+                        vm.setInstance("other", h, Daedalus::IC_Npc);
                     } else if (parts[0] == "exit")
                     {
                         if(parts.size() != 2)
@@ -504,7 +562,7 @@ int main(int argc, char** argv)
                         }
 
                         Memory::BigHandle h = vm.getDATFile().getSymbolByName(parts[1]).instanceDataHandle;
-                        vm.setInstance("other", h, ZenLoad::IC_Npc);
+                        vm.setInstance("other", h, Daedalus::IC_Npc);
 
 
                     }
@@ -522,38 +580,66 @@ int main(int argc, char** argv)
                             verbose = true;
                     }else if (parts[0] == "talk")
                     {
-                        if(parts.size() != 2)
-                        {
-                            LogInfo() << "Usage: talk <npc-name>";
-                            continue;
-                        }
-
                         auto& npcs = vm.getGameState().getRegisteredObjects().NPCs;
 
-                        bool found = false;
-                        for(size_t i=0;i<npcs.getNumObtainedElements();i++)
+                        parts.erase(parts.begin());
+
+                        std::string cname = join(parts, " ");
+
+                        size_t inst = npcInstanceFromName(vm, cname);
+
+                        if(inst != static_cast<uint32_t>(-1))
                         {
-                            if(npcs.getElements()[i].name[0] == parts[1])
-                            {
-                                vm.pushState();
-                                // Set up self and other
-                                Memory::BigHandle s = vm.getDATFile().getSymbolByIndex(npcs.getElements()[i].instanceSymbol).instanceDataHandle;
-                                vm.setInstance("self", s, ZenLoad::IC_Npc);
+                            vm.pushState();
+                            // Set up self and other
+                            Memory::BigHandle s = vm.getDATFile().getSymbolByIndex(inst).instanceDataHandle;
+                            vm.setInstance("self", s, Daedalus::IC_Npc);
 
-                                Memory::BigHandle o = vm.getDATFile().getSymbolByName("hero").instanceDataHandle;
-                                vm.setInstance("other", o, ZenLoad::IC_Npc);
+                            Memory::BigHandle o = vm.getDATFile().getSymbolByName("hero").instanceDataHandle;
+                            vm.setInstance("other", o, Daedalus::IC_Npc);
 
-                                vm.doCallOperation(vm.getDATFile().getSymbolByName("ZS_Talk").address);
-                                runVM(vm);
-                                vm.popState();
-
-                                found = true;
-                                break;
-                            }
+                            vm.doCallOperation(vm.getDATFile().getSymbolByName("ZS_Talk").address);
+                            runVM(vm);
+                            vm.popState();
                         }
+                        else
+                            LogInfo() << "Failed to find npc with name: " << cname;
+                    }else if (parts[0] == "log")
+                    {
 
-                        if(!found)
-                            LogInfo() << "Failed to find npc with name: " << parts[1];
+                        for(auto& t : vm.getGameState().getPlayerLog())
+                        {
+                            LogInfo() << " --- " << t.second.topic << " --- ";
+                            std::string ents;
+                            for(const std::string& s : t.second.entries)
+                                if(s.empty())
+                                        ents += s + "\n";
+                                    else
+                                        ents += "        \n        ---------\n        "
+                                            + s + "\n";
+
+                            LogInfo() << ents;
+                        }
+                    }
+                    else if (parts[0] == "inv")
+                    {
+                        auto& npcs = vm.getGameState().getRegisteredObjects().NPCs;
+
+                        parts.erase(parts.begin());
+
+                        std::string cname = join(parts, " ");
+
+                        size_t inst = npcInstanceFromName(vm, cname);
+
+                        if(inst != static_cast<uint32_t>(-1))
+                        {
+                            GameState::NpcHandle h = Memory::handleCast<GameState::NpcHandle>(vm.getDATFile().getSymbolByIndex(inst).instanceDataHandle);
+
+                            //vm.getGameState().getInventory(h)
+
+                        }
+                        else
+                            LogInfo() << "Failed to find npc with name: " << cname;
                     }else if (parts[0] == "exit")
                     {
                         break;

@@ -6,6 +6,7 @@
 #include <cstring>
 #include <functional>
 #include <cmath>
+#include <algorithm>
 
 namespace Memory
 {
@@ -17,22 +18,22 @@ namespace Memory
     template<int N1, int N2>
     struct GenericHandle
     {
+        enum : uint32_t { INVALID_HANDLE = static_cast<uint32_t>(-1) >> (32 - N1) };
+
         uint32_t index : N1;
         uint32_t generation : N2;
 
         void invalidate()
         {
-            // TODO: Find a way to get a -1 into the bitfield values without compiler warnings
-            memset(this, 0xff, sizeof(GenericHandle<N1,N2>));
+            // Assign -1 to index
+            index = INVALID_HANDLE;
             generation = 0;
         }
 
         bool isValid()
         {
-            // TODO: Find a way to get a -1 into the bitfield values without compiler warnings
-            GenericHandle<N1,N2> h;
-            h.invalidate();
-            return memcmp(this, &h, sizeof(h)) != 0;
+            // Index != -1
+            return index != INVALID_HANDLE;
         }
 
         bool operator<(const GenericHandle<N1,N2>& r) const
