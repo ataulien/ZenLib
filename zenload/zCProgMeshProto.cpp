@@ -146,20 +146,20 @@ void zCProgMeshProto::readObjectData(ZenParser& parser)
 				m_IsUsingAlphaTest = parser.readBinaryByte() != 0;
 				
 				// Read boundingbox
-				Math::float3 min, max;
+				ZMath::float3 min, max;
 				parser.readStructure(min);
 				parser.readStructure(max);
 
-				m_BBMin = Math::float3(min.x, min.y,min.z);
-				m_BBMax = Math::float3(max.x, max.y,max.z);
+				m_BBMin = ZMath::float3(min.x, min.y,min.z);
+				m_BBMax = ZMath::float3(max.x, max.y,max.z);
 
 				// Extract data
 				m_Vertices.resize(mainOffsets.position.size);
 				m_Normals.resize(mainOffsets.normal.size);
 
 				// Copy vertex-data
-				memcpy(m_Vertices.data(), &dataPool[mainOffsets.position.offset], sizeof(Math::float3) * mainOffsets.position.size);
-				memcpy(m_Normals.data(), &dataPool[mainOffsets.normal.offset], sizeof(Math::float3) * mainOffsets.normal.size);
+				memcpy(m_Vertices.data(), &dataPool[mainOffsets.position.offset], sizeof(ZMath::float3) * mainOffsets.position.size);
+				memcpy(m_Normals.data(), &dataPool[mainOffsets.normal.offset], sizeof(ZMath::float3) * mainOffsets.normal.size);
 			
 				// Copy submesh-data
 				m_SubMeshes.resize(numSubmeshes);

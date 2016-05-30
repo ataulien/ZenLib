@@ -160,12 +160,12 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
 
 		case MSID_BBOX3D:
 		{
-			Math::float4 min, max;
+			ZMath::float4 min, max;
 			parser.readStructure(min);
 			parser.readStructure(max);
 
-			m_BBMin = Math::float3(min.x, min.y,min.z);
-			m_BBMax = Math::float3(max.x, max.y,max.z);
+			m_BBMin = ZMath::float3(min.x, min.y,min.z);
+			m_BBMax = ZMath::float3(max.x, max.y,max.z);
 
 			parser.setSeek(chunkEnd); // Skip chunk
 		}
@@ -306,7 +306,7 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
                                     vx[v].Position = m_Vertices[p.indices[v].VertexIndex];
                                     vx[v].Color = m_Features[p.indices[v].FeatIndex].lightStat;
 
-                                    vx[v].TexCoord = Math::float2(m_Features[p.indices[v].FeatIndex].uv[0],
+                                    vx[v].TexCoord = ZMath::float2(m_Features[p.indices[v].FeatIndex].uv[0],
                                                                   m_Features[p.indices[v].FeatIndex].uv[1]);
                                     vx[v].Normal = m_Features[p.indices[v].FeatIndex].vertNormal;
                                 }
@@ -346,7 +346,7 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
                                     for (int v = 0; v < 3; v++) {
                                         triangle.vertices[v].Position = m_Vertices[idx[v]];
                                         triangle.vertices[v].Color = m_Features[idx[v]].lightStat;
-                                        triangle.vertices[v].TexCoord = Math::float2(m_Features[idx[v]].uv[0],
+                                        triangle.vertices[v].TexCoord = ZMath::float2(m_Features[idx[v]].uv[0],
                                                                                      m_Features[idx[v]].uv[1]);
                                         triangle.vertices[v].Normal = m_Features[idx[v]].vertNormal;
                                     }
@@ -411,7 +411,7 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale)
 			// Extract vertex information
 			vx.Position = m_Vertices[vertidx] * scale;
 			vx.Color = m_Features[featidx].lightStat;
-			vx.TexCoord = Math::float2(m_Features[featidx].uv[0], m_Features[featidx].uv[1]);
+			vx.TexCoord = ZMath::float2(m_Features[featidx].uv[0], m_Features[featidx].uv[1]);
 			vx.Normal = m_Features[featidx].vertNormal;
 
 			// Add index to this very vertex

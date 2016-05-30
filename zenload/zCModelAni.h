@@ -43,7 +43,7 @@ namespace ZenLoad
 			float samplePosRangeMin;
 			float samplePosScaler;
 
-			Math::float3 aniBBox[2];
+			ZMath::float3 aniBBox[2];
 
 			std::string nextAniName;
 
@@ -52,8 +52,8 @@ namespace ZenLoad
 
 		struct AniSample
 		{
-			Math::float4 rotation; // Quaternion
-			Math::float3 position;
+			ZMath::float4 rotation; // Quaternion
+			ZMath::float3 position;
 		};
 
 		zCModelAni(){}

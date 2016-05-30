@@ -218,7 +218,7 @@ void ParserImplASCII::readEntry(const std::string& expectedName, void* target, s
 		case ZVT_BYTE: *reinterpret_cast<uint8_t*>(target) = static_cast<uint8_t>(std::stoi(value)); break;
 		case ZVT_WORD: *reinterpret_cast<int16_t*>(target) = static_cast<int16_t>(std::stoi(value)); break;
 		case ZVT_BOOL: *reinterpret_cast<bool*>(target) = std::stoi(value) != 0; break;
-		case ZVT_VEC3: *reinterpret_cast<Math::float3*>(target) = Math::float3(std::stof(vparts[0]), std::stof(vparts[1]), std::stof(vparts[2])); break;
+		case ZVT_VEC3: *reinterpret_cast<ZMath::float3*>(target) = ZMath::float3(std::stof(vparts[0]), std::stof(vparts[1]), std::stof(vparts[2])); break;
 		
 		case ZVT_COLOR: 
 			reinterpret_cast<uint8_t*>(target)[0] = std::stoi(vparts[0]); // FIXME: These are may ordered wrong

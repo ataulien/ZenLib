@@ -14,9 +14,9 @@ static const uint16_t MSID_MESHSOFTSKIN_END = 0xE110;
 
 struct oBBox3d
 {
-	Math::float3 center;
-	Math::float3 axis[3];
-	Math::float3 extends;
+	ZMath::float3 center;
+	ZMath::float3 axis[3];
+	ZMath::float3 extends;
 
 	std::vector<oBBox3d> children;
 
@@ -138,7 +138,7 @@ void zCMeshSoftSkin::packMesh(PackedSkeletalMesh& mesh, float scale) const
 			// Note: Using zTWeightEntry here causes a SIGBUS on ARM because of packing!
 			float weight; Utils::getUnaligned(&weight, stream); stream += sizeof(float);
 
-			Math::float3 localVertexPosition;
+			ZMath::float3 localVertexPosition;
 			Utils::getUnaligned(&localVertexPosition.x, stream); stream += sizeof(float);
 			Utils::getUnaligned(&localVertexPosition.y, stream); stream += sizeof(float);
 			Utils::getUnaligned(&localVertexPosition.z, stream); stream += sizeof(float);

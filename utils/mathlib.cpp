@@ -1,12 +1,12 @@
 #include "mathlib.h"
 
-std::ostream &Math::operator<<(std::ostream &out, Math::t_float2 &v)
+std::ostream &ZMath::operator<<(std::ostream &out, ZMath::t_float2 &v)
 {
     out << "[" + std::to_string(v.x) + ", " + std::to_string(v.y) + "]";
     return out;
 }
 
-std::ostream &Math::operator<<(std::ostream &out, Math::t_float3 &v)
+std::ostream &ZMath::operator<<(std::ostream &out, ZMath::t_float3 &v)
 {
     out << "[" + std::to_string(v.x)
            + ", " + std::to_string(v.y)
@@ -14,7 +14,7 @@ std::ostream &Math::operator<<(std::ostream &out, Math::t_float3 &v)
     return out;
 }
 
-std::ostream &Math::operator<<(std::ostream &out, Math::t_float4 &v)
+std::ostream &ZMath::operator<<(std::ostream &out, ZMath::t_float4 &v)
 {
     out << "[" + std::to_string(v.x)
            + ", " + std::to_string(v.y)
@@ -23,7 +23,7 @@ std::ostream &Math::operator<<(std::ostream &out, Math::t_float4 &v)
     return out;
 }
 
-std::ostream &Math::operator<<(std::ostream &out, Math::Matrix &m)
+std::ostream &ZMath::operator<<(std::ostream &out, ZMath::Matrix &m)
 {
     out << "[";
     for(size_t i = 0; i < 16; i++)

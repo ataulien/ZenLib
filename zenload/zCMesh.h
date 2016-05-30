@@ -31,7 +31,7 @@ namespace ZenLoad
 		/**
 		@ brief returns the vector of vertex-positions
 		*/
-		const std::vector<Math::float3>& getVertices() const { return m_Vertices; }
+		const std::vector<ZMath::float3>& getVertices() const { return m_Vertices; }
 
 		/**
 		@ brief returns the vector of features
@@ -62,7 +62,7 @@ namespace ZenLoad
 		/**
 		 * @brief getter for the boudingboxes
 		 */
-		void getBoundingBox(Math::float3& min, Math::float3& max){min = m_BBMin; max = m_BBMax;}
+		void getBoundingBox(ZMath::float3& min, ZMath::float3& max){min = m_BBMin; max = m_BBMax;}
 
 		/**
 		 * @brief Creates packed submesh-data
@@ -73,7 +73,7 @@ namespace ZenLoad
 		/**
 		 * @brief vector of vertex-positions for this mesh
 		 */
-		std::vector<Math::float3> m_Vertices;
+		std::vector<ZMath::float3> m_Vertices;
 
 		/** 
 		 * @brief Featues for the vertices with the corresponding index
@@ -109,7 +109,7 @@ namespace ZenLoad
 		/**
 		 * @brief Bounding-box of this mesh
 		 */
-		Math::float3 m_BBMin;
-		Math::float3 m_BBMax;
+		ZMath::float3 m_BBMin;
+		ZMath::float3 m_BBMax;
 	};
 }

@@ -14,18 +14,18 @@ namespace ZenLoad
 
 	struct WorldVertex
 	{
-		Math::float3 Position;
-		Math::float3 Normal;
-		Math::float2 TexCoord;
+		ZMath::float3 Position;
+		ZMath::float3 Normal;
+		ZMath::float2 TexCoord;
 		uint32_t Color;
 	};
 
 	struct SkeletalVertex
 	{
-		Math::float3 Normal;
-		Math::float2 TexCoord;
+		ZMath::float3 Normal;
+		ZMath::float2 TexCoord;
 		uint32_t Color;
-		Math::float3 LocalPositions[4];
+		ZMath::float3 LocalPositions[4];
 		unsigned char BoneIndices[4];
 		float Weights[4];
 	};
@@ -34,20 +34,20 @@ namespace ZenLoad
 	{
 		float v[3][3];
 
-		Math::float3 getUpVector()const { return Math::float3(v[0][1], v[1][1], v[2][1]); };
-		Math::float3 getRightVector()const { return Math::float3(v[0][0], v[1][0], v[2][0]); };
-		Math::float3 getAtVector()const { return Math::float3(v[0][2], v[1][2], v[2][2]); };
+		ZMath::float3 getUpVector()const { return ZMath::float3(v[0][1], v[1][1], v[2][1]); };
+		ZMath::float3 getRightVector()const { return ZMath::float3(v[0][0], v[1][0], v[2][0]); };
+		ZMath::float3 getAtVector()const { return ZMath::float3(v[0][2], v[1][2], v[2][2]); };
 		
-		void setAtVector (const Math::float3& a) { v[0][2] = a.x; v[1][2] = a.y; v[2][2] = a.z; }
-		void setUpVector(const Math::float3& a) { v[0][1] = a.x; v[1][1] = a.y; v[2][1] = a.z; }
-		void setRightVector (const Math::float3& a) { v[0][0] = a.x; v[1][0] = a.y;	v[2][0] = a.z;}
+		void setAtVector (const ZMath::float3& a) { v[0][2] = a.x; v[1][2] = a.y; v[2][2] = a.z; }
+		void setUpVector(const ZMath::float3& a) { v[0][1] = a.x; v[1][1] = a.y; v[2][1] = a.z; }
+		void setRightVector (const ZMath::float3& a) { v[0][0] = a.x; v[1][0] = a.y;	v[2][0] = a.z;}
 
-		Math::Matrix toMatrix(const Math::float3& position = Math::float3(0,0,0)) const 
+		ZMath::Matrix toMatrix(const ZMath::float3& position = ZMath::float3(0,0,0)) const
 		{
-			Math::Matrix m = Math::Matrix::CreateIdentity();
+			ZMath::Matrix m = ZMath::Matrix::CreateIdentity();
 			m.Up(getUpVector());
                         
-                        Math::float3 fwd = getAtVector();
+                        ZMath::float3 fwd = getAtVector();
                         fwd.x *= -1.0f;
                         fwd.y *= -1.0f;
                         fwd.z *= -1.0f;
@@ -99,7 +99,7 @@ namespace ZenLoad
 		float			waveGridSize;
 		uint8_t			ignoreSun;
 		uint8_t			alphaFunc;
-		Math::float2	defaultMapping;
+		ZMath::float2	defaultMapping;
 	};
 
 	struct zCVisualData : public ParsedZenObject
@@ -125,11 +125,11 @@ namespace ZenLoad
 	{
 		uint32_t pack;
 		std::string presetName;
-		Math::float3 bbox[2];
-		Math::Matrix rotationMatrix;
+		ZMath::float3 bbox[2];
+		ZMath::Matrix rotationMatrix;
 		zMAT3 rotationMatrix3x3;
-		Math::Matrix worldMatrix;
-		Math::float3 position;
+		ZMath::Matrix worldMatrix;
+		ZMath::float3 position;
 		std::string vobName;
 		std::string visual;
 		bool showVisual;
@@ -337,7 +337,7 @@ namespace ZenLoad
 	{
 		float			uv[2];
 		uint32_t		lightStat;
-		Math::float3	vertNormal;
+		ZMath::float3	vertNormal;
 	};
 
 #pragma pack(pop)
@@ -358,19 +358,19 @@ namespace ZenLoad
 		* @brief Returns the interpolated lighting value for the given position on the triangle
 		*/
 		
-                Math::float4 interpolateLighting(const Math::float3& position) const 
+                ZMath::float4 interpolateLighting(const ZMath::float3& position) const
 		{
 			/*float u,v,w;
-			Math::barycentric(position, vertices[0].Position, vertices[1].Position, vertices[2].Position, u, v, w);
+			ZMath::barycentric(position, vertices[0].Position, vertices[1].Position, vertices[2].Position, u, v, w);
 
-			Math::float4 c[3];
+			ZMath::float4 c[3];
 			c[0].fromABGR8(vertices[0].Color);
 			c[1].fromABGR8(vertices[1].Color);
 			c[2].fromABGR8(vertices[2].Color);
 
 			return u * c[0] + v * c[1] + w * c[2];*/
                         
-                        return Math::float4(1,1,1,1); // TODO: Implementation missing without GLM
+                        return ZMath::float4(1,1,1,1); // TODO: Implementation missing without GLM
 		}
 
 		/**
@@ -417,15 +417,15 @@ namespace ZenLoad
 
 	struct VobObjectInfo
 	{
-		Math::Matrix worldMatrix;
-		Math::float4 color;
+		ZMath::Matrix worldMatrix;
+		ZMath::float4 color;
 	};
 
 	struct SkeletalMeshInstanceInfo
 	{
-		Math::Matrix worldMatrix;
-		Math::Matrix nodeTransforms[MAX_NUM_SKELETAL_NODES];
-		Math::float4 color;
+		ZMath::Matrix worldMatrix;
+		ZMath::Matrix nodeTransforms[MAX_NUM_SKELETAL_NODES];
+		ZMath::float4 color;
 	};
 
 	struct zDate
@@ -441,14 +441,14 @@ namespace ZenLoad
 	struct zTPlane 
 	{
 		float distance;
-		Math::float3 normal;
+		ZMath::float3 normal;
 	};
 #pragma pack(pop)
 
 	struct zWedge 
 	{
-		Math::float3 m_Normal;
-		Math::float2 m_Texcoord;
+		ZMath::float3 m_Normal;
+		ZMath::float2 m_Texcoord;
 		uint16_t m_VertexIndex;
 	};
 
@@ -470,7 +470,7 @@ namespace ZenLoad
 #pragma pack(push, 4)
 	struct zTNodeWedgeNormal 
 	{
-		Math::float3	m_Normal;
+		ZMath::float3	m_Normal;
 		int				m_NodeIndex;
 	};
 
@@ -504,7 +504,7 @@ namespace ZenLoad
 		// Weight and position of the vertex.
 		// This vertexposition is in the local space of the joint-Matrix!
 		float weight;
-		Math::float3 localVertexPosition;
+		ZMath::float3 localVertexPosition;
 
 		// Nodeindex this belongs to
 		unsigned char nodeIndex;

@@ -212,13 +212,13 @@ void zCModelMeshLib::loadMDH(ZenParser& parser)
 					m_RootNodes.push_back(i);
 				}
 
-				parser.readBinaryRaw(&m_Nodes[i].transformLocal, sizeof(Math::Matrix));
+				parser.readBinaryRaw(&m_Nodes[i].transformLocal, sizeof(ZMath::Matrix));
 			}
 
-			Math::float3 bbox3d[2]; parser.readBinaryRaw(bbox3d, sizeof(bbox3d));
-			Math::float3 bbox3dCollision[2]; parser.readBinaryRaw(bbox3dCollision, sizeof(bbox3dCollision));
+			ZMath::float3 bbox3d[2]; parser.readBinaryRaw(bbox3d, sizeof(bbox3d));
+			ZMath::float3 bbox3dCollision[2]; parser.readBinaryRaw(bbox3dCollision, sizeof(bbox3dCollision));
 
-			Math::float3 rootNodeTrans; parser.readBinaryRaw(&rootNodeTrans, sizeof(rootNodeTrans));
+			ZMath::float3 rootNodeTrans; parser.readBinaryRaw(&rootNodeTrans, sizeof(rootNodeTrans));
 
 			m_NodeChecksum = parser.readBinaryDWord();
 

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-namespace Math
+namespace ZMath
 {    
 	static const float Pi = 3.14159265359; // TODO: Cant
 

@@ -10,8 +10,8 @@ namespace ZenLoad
 #pragma pack (push, 1)
 		struct packedVobData
 		{
-			Math::float3	bbox3DWS[2];
-			Math::float3	positionWS;
+			ZMath::float3	bbox3DWS[2];
+			ZMath::float3	positionWS;
 			zMAT3			trafoRotWS;
 
 			struct packedBitField
@@ -50,7 +50,7 @@ namespace ZenLoad
 
 			info.objectClass = "zCVob";
 
-			info.rotationMatrix = Math::Matrix::CreateIdentity();
+			info.rotationMatrix = ZMath::Matrix::CreateIdentity();
 
 			// Read how many vobs this one has as child
 			parser.getImpl()->readEntry("", &info.pack, sizeof(info.pack), ZenLoad::ParserImpl::ZVT_INT);

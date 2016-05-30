@@ -19,7 +19,7 @@ static const uint16_t MSID_MAN_ANIEVENTS = 0xA030;
 static const uint16_t MSID_MAN_RAWDATA = 0xA090;
 
 static const float SAMPLE_ROT_BITS			= float(1 << 16) - 1.0f;
-static const float SAMPLE_ROT_SCALER		= (float(1.0f) / SAMPLE_ROT_BITS) * 2.0f * Math::Pi;
+static const float SAMPLE_ROT_SCALER		= (float(1.0f) / SAMPLE_ROT_BITS) * 2.0f * ZMath::Pi;
 static const float SAMPLE_QUAT_SCALER		= (1.0f / SAMPLE_ROT_BITS) * 2.1f;
 static const uint16_t SAMPLE_QUAT_MIDDLE      = (1 << 15) - 1; 
 
@@ -38,14 +38,14 @@ void zCModelAni::zCModelAniEvent::load(ZenParser& parser)
 	prob = parser.readBinaryFloat();
 }
 
-void SampleUnpackTrans(const uint16_t* in, Math::float3& out, float samplePosScaler, float samplePosRangeMin)
+void SampleUnpackTrans(const uint16_t* in, ZMath::float3& out, float samplePosScaler, float samplePosRangeMin)
 {
 	out.x = float(in[0]) * samplePosScaler + samplePosRangeMin;
 	out.y = float(in[1]) * samplePosScaler + samplePosRangeMin;
 	out.z = float(in[2]) * samplePosScaler + samplePosRangeMin;
 };
 
-void SampleUnpackQuat(const uint16_t* in, Math::float4& out)
+void SampleUnpackQuat(const uint16_t* in, ZMath::float4& out)
 {
 	out.x = (int(in[0]) - SAMPLE_QUAT_MIDDLE) * SAMPLE_QUAT_SCALER;
 	out.y = (int(in[1]) - SAMPLE_QUAT_MIDDLE) * SAMPLE_QUAT_SCALER;

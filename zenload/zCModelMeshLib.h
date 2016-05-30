@@ -20,8 +20,8 @@ namespace ZenLoad
 
 		uint16_t parentIndex;
 		std::string name;
-		Math::Matrix transformLocal;
-		Math::Matrix transformBindPoseDebug; // "Global"
+		ZMath::Matrix transformLocal;
+		ZMath::Matrix transformBindPoseDebug; // "Global"
 
 		std::vector<uint16_t> childIndices;
 	};

@@ -54,7 +54,7 @@ namespace ZenLoad
     }
 
 	template<> 
-    inline void read<Math::float2>(ZenParser& p, std::string& outStr, Math::float2& outData)
+    inline void read<ZMath::float2>(ZenParser& p, std::string& outStr, ZMath::float2& outData)
 	{ 
 		p.getImpl()->readEntry("", &outData.x, sizeof(float), ParserImpl::ZVT_FLOAT);
 		p.getImpl()->readEntry("", &outData.y, sizeof(float), ParserImpl::ZVT_FLOAT);
@@ -62,7 +62,7 @@ namespace ZenLoad
     }
 
 	template<> 
-    inline void read<Math::float3>(ZenParser& p, std::string& outStr, Math::float3& outData)
+    inline void read<ZMath::float3>(ZenParser& p, std::string& outStr, ZMath::float3& outData)
 	{ 
 		p.getImpl()->readEntry("", &outData, sizeof(float) * 3, ParserImpl::ZVT_VEC3);
 		outStr = "[" + std::to_string(outData.x) 
@@ -71,7 +71,7 @@ namespace ZenLoad
     }
 
 	template<> 
-    inline void read<Math::float4>(ZenParser& p, std::string& outStr, Math::float4& outData)
+    inline void read<ZMath::float4>(ZenParser& p, std::string& outStr, ZMath::float4& outData)
 	{ 
 		p.getImpl()->readEntry("", &outData.x, sizeof(float), ParserImpl::ZVT_FLOAT);
 		p.getImpl()->readEntry("", &outData.y, sizeof(float), ParserImpl::ZVT_FLOAT);
@@ -84,7 +84,7 @@ namespace ZenLoad
     }
 
 	template<> 
-    inline void read<Math::Matrix>(ZenParser& p, std::string& outStr, Math::Matrix& outData)
+    inline void read<ZMath::Matrix>(ZenParser& p, std::string& outStr, ZMath::Matrix& outData)
 	{ 
 		float m[16];
 		p.getImpl()->readEntry("", m, sizeof(float) * 16, ParserImpl::ZVT_RAW_FLOAT);
