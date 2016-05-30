@@ -287,6 +287,8 @@ namespace ZenLoad
 			p.ghostOccluder = ghostOccluder;
 			p.noDynLightNear = noDynLightNear;
 			p.sectorIndex = sectorIndex;
+
+			return p;
 		}
 	};
 
@@ -328,6 +330,8 @@ namespace ZenLoad
             p.ghostOccluder = ghostOccluder;
             p.normalMainAxis = normalMainAxis;
             p.sectorIndex = sectorIndex;
+
+			return p;
         }
 	};
 

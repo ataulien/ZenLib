@@ -44,7 +44,7 @@ def makeLambda(rfn, arglist):
     elif rfn["rtype"] == "c_npc":
         ret = '\tvm.setReturnVar(0);'
     
-    return "[](ZenLoad::DaedalusVM& vm){\n" + "\n".join(args) + "\n " + ret + "\n}"
+    return "[](Daedalus::DaedalusVM& vm){\n" + "\n".join(args) + "\n " + ret + "\n}"
         
 
 f = open(sys.argv[1],"r", encoding='latin-1')
