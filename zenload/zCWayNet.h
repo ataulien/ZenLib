@@ -79,7 +79,7 @@ namespace ZenLoad
             {
                 size_t wp1, wp2;
 
-                size_t& tgt = wp1;
+                size_t* tgt = &wp1;
                 for(int i=0;i<2;i++)
                 {
                     ZenParser::ChunkHeader wph;
@@ -90,7 +90,7 @@ namespace ZenLoad
                     // Loading a reference?
                     if (wph.classname.empty())
                     {
-                        wp1 = wpRefMap[wph.objectID];
+                        *tgt = wpRefMap[wph.objectID];
                     } else
                     {
                         // Create new waypoint
@@ -98,15 +98,16 @@ namespace ZenLoad
                         info.waypoints.push_back(w);
 
                         // Save for later access
-                        wpRefMap[wph.objectID] = wp1 = info.waypoints.size() - 1;
+                        wpRefMap[wph.objectID] = info.waypoints.size() - 1;
+                        *tgt = info.waypoints.size() - 1;
                     }
 
                     parser.readChunkEnd();
 
-                    tgt = wp2;
+                    tgt = &wp2;
                 }
 
-
+                LogInfo() << "Edge: " << wp1 << " - " << wp2;
                 info.edges.push_back(std::make_pair(wp1, wp2));
             }
 
