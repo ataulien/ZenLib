@@ -44,7 +44,6 @@ struct MeshOffsetsSubMesh
 */
 zCProgMeshProto::zCProgMeshProto(const std::string& fileName, const VDFS::FileIndex& fileIndex)
 {
-
 	std::vector<uint8_t> data;
 	fileIndex.getFileData(fileName, data);
 
