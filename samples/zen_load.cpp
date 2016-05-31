@@ -68,6 +68,12 @@ int main(int argc, char** argv)
     // Print some sample-data for vobs which got a visual
     std::cout << "Listing vobs..." << std::endl;
     listVobInformation(world.rootVobs);
-    
+
+    std::cout << "Listing waypoints..." << std::endl;
+    for(const ZenLoad::zCWaypointData& v : world.waynet.waypoints)
+    {
+        std::cout << "Waypoint [" << v.wpName << "] at " << v.position.toString() << std::endl;
+    }
+
     return 0;
 }

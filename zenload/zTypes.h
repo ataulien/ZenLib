@@ -210,13 +210,32 @@ namespace ZenLoad
 	};
 
 
+
+	struct zCWaypointData : public ParsedZenObject
+	{
+		std::string wpName;
+		int32_t waterDepth;
+		bool underWater;
+		ZMath::float3 position;
+		ZMath::float3 direction;
+	};
+
+	struct zCWayNetData : public ParsedZenObject
+	{
+		uint32_t waynetVersion;
+		std::vector<zCWaypointData> waypoints;
+		std::vector<std::pair<size_t, size_t>> edges;
+	};
+
 	/**
 	* @brief All kinds of information found in a oCWorld
 	*/
 	struct oCWorldData : public ParsedZenObject
 	{
 		std::vector<zCVobData> rootVobs;
+		zCWayNetData waynet;
 	};
+
 
 #pragma pack(push, 1)
 	// Information about the whole file we are reading here

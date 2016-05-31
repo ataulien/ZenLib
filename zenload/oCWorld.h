@@ -2,6 +2,7 @@
 #include "zTypes.h"
 #include "zenParser.h"
 #include "zCVob.h"
+#include "zCWayNet.h"
 #include "utils/logger.h"
 
 namespace ZenLoad
@@ -86,6 +87,9 @@ namespace ZenLoad
 						readVobTree(parser, info.rootVobs);
 					}
 					parser.readChunkEnd();
+				}else if(header.name == "WayNet")
+				{
+					info.waynet = zCWayNet::readObjectData(parser);
 				}
 				else
 				{
