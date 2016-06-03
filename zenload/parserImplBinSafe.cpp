@@ -1,3 +1,4 @@
+#include <utils/logger.h>
 #include "parserImplBinSafe.h"
 
 using namespace ZenLoad;
@@ -297,7 +298,12 @@ void ParserImplBinSafe::readEntry(const std::string& expectedName, void* target,
 	// Read type and size of the entry
 	readTypeAndSizeBinSafe(type, size);
 
-	if(expectedType != ZVT_0 && type != expectedType)
+	LogInfo() << "Reading: " << expectedName;
+
+	// Ignore this as the size is the same
+	if((type == ZVT_INT && expectedType == ZVT_ENUM) || (type == ZVT_ENUM && expectedType == ZVT_INT))
+		type = expectedType;
+	else if(expectedType != ZVT_0 && type != expectedType)
 		throw std::runtime_error("Valuetype name does not match expected type. Value:" + expectedName);
 
 	switch(type)

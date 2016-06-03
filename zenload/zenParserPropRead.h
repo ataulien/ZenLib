@@ -9,74 +9,74 @@ namespace ZenLoad
 	*		  and convert it to a string for the given type
 	*/
 	template<typename T> 
-	static void read(ZenParser& p, std::string& outStr, T& outData){outStr = "INVALID DATATYPE";}
+	static void read(ZenParser& p, std::string& outStr, T& outData, const std::string& exName){outStr = "INVALID DATATYPE";}
 
 	template<> 
-    inline void read<float>(ZenParser& p, std::string& outStr, float& outData)
+    inline void read<float>(ZenParser& p, std::string& outStr, float& outData, const std::string& exName)
 	{ 
-		p.getImpl()->readEntry("", &outData, sizeof(float), ParserImpl::ZVT_FLOAT);
+		p.getImpl()->readEntry(exName, &outData, sizeof(float), ParserImpl::ZVT_FLOAT);
 		outStr = std::to_string(outData);
     }
 
 	template<> 
-    inline void read<bool>(ZenParser& p, std::string& outStr, bool& outData)
+    inline void read<bool>(ZenParser& p, std::string& outStr, bool& outData, const std::string& exName)
 	{ 
-		p.getImpl()->readEntry("", &outData, sizeof(bool), ParserImpl::ZVT_BOOL);
+		p.getImpl()->readEntry(exName, &outData, sizeof(bool), ParserImpl::ZVT_BOOL);
 		outStr = std::to_string(outData ? 1 : 0);
     }
 
 	template<> 
-    inline void read<uint32_t>(ZenParser& p, std::string& outStr, uint32_t& outData)
+    inline void read<uint32_t>(ZenParser& p, std::string& outStr, uint32_t& outData, const std::string& exName)
 	{ 
-		p.getImpl()->readEntry("", &outData, sizeof(uint32_t), ParserImpl::ZVT_INT);
+		p.getImpl()->readEntry(exName, &outData, sizeof(uint32_t), ParserImpl::ZVT_INT);
 		outStr = std::to_string(outData);
     }
 
 	template<> 
-    inline void read<int32_t>(ZenParser& p, std::string& outStr, int32_t& outData)
+    inline void read<int32_t>(ZenParser& p, std::string& outStr, int32_t& outData, const std::string& exName)
 	{ 
-		p.getImpl()->readEntry("", &outData, sizeof(int32_t), ParserImpl::ZVT_INT);
+		p.getImpl()->readEntry(exName, &outData, sizeof(int32_t), ParserImpl::ZVT_INT);
 		outStr = std::to_string(outData);
     }
 
 	template<> 
-    inline void read<uint16_t>(ZenParser& p, std::string& outStr, uint16_t& outData)
+    inline void read<uint16_t>(ZenParser& p, std::string& outStr, uint16_t& outData, const std::string& exName)
 	{ 
-		p.getImpl()->readEntry("", &outData, sizeof(uint16_t), ParserImpl::ZVT_WORD);
+		p.getImpl()->readEntry(exName, &outData, sizeof(uint16_t), ParserImpl::ZVT_WORD);
 		outStr = std::to_string(outData);
     }
 
 	template<> 
-    inline void read<uint8_t>(ZenParser& p, std::string& outStr, uint8_t& outData)
+    inline void read<uint8_t>(ZenParser& p, std::string& outStr, uint8_t& outData, const std::string& exName)
 	{ 
-		p.getImpl()->readEntry("", &outData, sizeof(uint16_t), ParserImpl::ZVT_BYTE);
+		p.getImpl()->readEntry(exName, &outData, sizeof(uint16_t), ParserImpl::ZVT_BYTE);
 		outStr = std::to_string(outData);
     }
 
 	template<> 
-    inline void read<ZMath::float2>(ZenParser& p, std::string& outStr, ZMath::float2& outData)
+    inline void read<ZMath::float2>(ZenParser& p, std::string& outStr, ZMath::float2& outData, const std::string& exName)
 	{ 
-		p.getImpl()->readEntry("", &outData.x, sizeof(float), ParserImpl::ZVT_FLOAT);
-		p.getImpl()->readEntry("", &outData.y, sizeof(float), ParserImpl::ZVT_FLOAT);
+		p.getImpl()->readEntry(exName, &outData.x, sizeof(float), ParserImpl::ZVT_FLOAT);
+		p.getImpl()->readEntry(exName, &outData.y, sizeof(float), ParserImpl::ZVT_FLOAT);
 		outStr = "[" + std::to_string(outData.x) + ", " + std::to_string(outData.y) + "]";
     }
 
 	template<> 
-    inline void read<ZMath::float3>(ZenParser& p, std::string& outStr, ZMath::float3& outData)
+    inline void read<ZMath::float3>(ZenParser& p, std::string& outStr, ZMath::float3& outData, const std::string& exName)
 	{ 
-		p.getImpl()->readEntry("", &outData, sizeof(float) * 3, ParserImpl::ZVT_VEC3);
+		p.getImpl()->readEntry(exName, &outData, sizeof(float) * 3, ParserImpl::ZVT_VEC3);
 		outStr = "[" + std::to_string(outData.x) 
 			+ ", " + std::to_string(outData.y)
 			+ ", " + std::to_string(outData.z) + "]";
     }
 
 	template<> 
-    inline void read<ZMath::float4>(ZenParser& p, std::string& outStr, ZMath::float4& outData)
+    inline void read<ZMath::float4>(ZenParser& p, std::string& outStr, ZMath::float4& outData, const std::string& exName)
 	{ 
-		p.getImpl()->readEntry("", &outData.x, sizeof(float), ParserImpl::ZVT_FLOAT);
-		p.getImpl()->readEntry("", &outData.y, sizeof(float), ParserImpl::ZVT_FLOAT);
-		p.getImpl()->readEntry("", &outData.z, sizeof(float), ParserImpl::ZVT_FLOAT);
-		p.getImpl()->readEntry("", &outData.w, sizeof(float), ParserImpl::ZVT_FLOAT);
+		p.getImpl()->readEntry(exName, &outData.x, sizeof(float), ParserImpl::ZVT_FLOAT);
+		p.getImpl()->readEntry(exName, &outData.y, sizeof(float), ParserImpl::ZVT_FLOAT);
+		p.getImpl()->readEntry(exName, &outData.z, sizeof(float), ParserImpl::ZVT_FLOAT);
+		p.getImpl()->readEntry(exName, &outData.w, sizeof(float), ParserImpl::ZVT_FLOAT);
 		outStr = "[" + std::to_string(outData.x) 
 			+ ", " + std::to_string(outData.y)
 			+ ", " + std::to_string(outData.z)
@@ -84,10 +84,10 @@ namespace ZenLoad
     }
 
 	template<> 
-    inline void read<ZMath::Matrix>(ZenParser& p, std::string& outStr, ZMath::Matrix& outData)
+    inline void read<ZMath::Matrix>(ZenParser& p, std::string& outStr, ZMath::Matrix& outData, const std::string& exName)
 	{ 
 		float m[16];
-		p.getImpl()->readEntry("", m, sizeof(float) * 16, ParserImpl::ZVT_RAW_FLOAT);
+		p.getImpl()->readEntry(exName, m, sizeof(float) * 16, ParserImpl::ZVT_RAW_FLOAT);
 		outData = m;
 
 		outStr = "[";
@@ -103,9 +103,9 @@ namespace ZenLoad
     }
 
 	template<> 
-    inline void read<std::string>(ZenParser& p, std::string& outStr, std::string& outData)
+    inline void read<std::string>(ZenParser& p, std::string& outStr, std::string& outData, const std::string& exName)
 	{ 
-		p.getImpl()->readEntry("", &outData, 0, ParserImpl::ZVT_STRING);
+		p.getImpl()->readEntry(exName, &outData, 0, ParserImpl::ZVT_STRING);
 		outStr = outData;
     }
 
@@ -118,7 +118,7 @@ namespace ZenLoad
 			std::string outStr;
 
 			// Read the given datatype from the file
-            read<typename std::remove_pointer<decltype(pair.second)>::type>(ZenParser, outStr, *pair.second);
+            read<typename std::remove_pointer<decltype(pair.second)>::type>(ZenParser, outStr, *pair.second, pair.first);
 
 			// Save the read value as string
 			rval[pair.first] = outStr; 

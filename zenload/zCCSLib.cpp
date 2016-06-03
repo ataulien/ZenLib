@@ -64,7 +64,7 @@ void zCCSLib::readObjectData(ZenParser& parser)
     uint32_t numItems;
     parser.getImpl()->readEntry("NumOfItems", &numItems, sizeof(numItems), ParserImpl::ZVT_INT);
 
-    //LogInfo() << "Reading " << numItems << " blocks";
+    LogInfo() << "Reading " << numItems << " blocks";
 
     for(uint32_t i = 0;i<numItems;i++)
     {
@@ -99,13 +99,14 @@ void zCCSLib::readObjectData(ZenParser& parser)
                                           Prop("text", blk.atomicBlockData.command.text),
                                           Prop("name", blk.atomicBlockData.command.name));
 
-                //LogInfo() << "Read message: " << blk.atomicBlockData.command.name;
+                LogInfo() << "Read message: " << blk.atomicBlockData.command.name;
 
-                parser.readChunkEnd();
+                parser.skipChunk();
             }
 
-            parser.readChunkEnd();
+            parser.skipChunk();
         }
+        parser.skipChunk();
 
         info.blocks.push_back(blk.atomicBlockData);
         m_MessagesByName[blk.blockName] = info.blocks.size()-1;

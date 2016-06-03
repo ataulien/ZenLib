@@ -4,8 +4,8 @@
 #include <utils/staticReferencedAllocator.h>
 #include <vector>
 
-const int MAX_NUM_NPCS = 2000;
-const int MAX_NUM_ITEMS = 4000;
+const int MAX_NUM_NPCS = 1 << 16;
+const int MAX_NUM_ITEMS = 1 << 16;
 
 namespace Daedalus
 {
