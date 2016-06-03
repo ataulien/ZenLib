@@ -170,7 +170,7 @@ namespace ZenLoad
 
 		int32_t dataOffset; // Not stored in files, only valid for classes to directly write to engine memory
 		void* instanceData; // Not stored in files, only valid for classes to directly write to engine memory
-		Memory::BigHandle instanceDataHandle;
+		ZMemory::BigHandle instanceDataHandle;
 		EInstanceClass instanceDataClass;
 
         uint32_t parent; // 0xFFFFFFFF (-1) = none

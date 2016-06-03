@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Memory
+namespace ZMemory
 {
     /**
      * Returns the number of bits needed to store the number x, at compile time

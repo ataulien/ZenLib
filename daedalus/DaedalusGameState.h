@@ -13,12 +13,12 @@ namespace Daedalus
 
     namespace GameState
     {
-        typedef Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Npc, MAX_NUM_NPCS>::Handle NpcHandle;
-        typedef Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Item, MAX_NUM_ITEMS>::Handle ItemHandle;
-        typedef Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Mission, MAX_NUM_ITEMS>::Handle MissionHandle;
-        typedef Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Focus, MAX_NUM_ITEMS>::Handle FocusHandle;
-        typedef Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_ItemReact, MAX_NUM_ITEMS>::Handle ItemReactHandle;
-        typedef Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Info, MAX_NUM_ITEMS>::Handle InfoHandle;
+        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Npc, MAX_NUM_NPCS>::Handle NpcHandle;
+        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Item, MAX_NUM_ITEMS>::Handle ItemHandle;
+        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Mission, MAX_NUM_ITEMS>::Handle MissionHandle;
+        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Focus, MAX_NUM_ITEMS>::Handle FocusHandle;
+        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_ItemReact, MAX_NUM_ITEMS>::Handle ItemReactHandle;
+        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Info, MAX_NUM_ITEMS>::Handle InfoHandle;
 
         struct LogTopic
         {
@@ -54,12 +54,12 @@ namespace Daedalus
 
             struct RegisteredObjects
             {
-                Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Npc, MAX_NUM_NPCS> NPCs;
-                Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Item, MAX_NUM_ITEMS> items;
-                Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_ItemReact, MAX_NUM_ITEMS> itemReacts;
-                Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Mission, MAX_NUM_ITEMS> missions;
-                Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Focus, MAX_NUM_ITEMS> focuses;
-                Memory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Info, MAX_NUM_ITEMS> infos;
+                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Npc, MAX_NUM_NPCS> NPCs;
+                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Item, MAX_NUM_ITEMS> items;
+                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_ItemReact, MAX_NUM_ITEMS> itemReacts;
+                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Mission, MAX_NUM_ITEMS> missions;
+                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Focus, MAX_NUM_ITEMS> focuses;
+                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Info, MAX_NUM_ITEMS> infos;
             };
 
             DaedalusGameState(Daedalus::DaedalusVM &vm);
@@ -105,7 +105,7 @@ namespace Daedalus
             Daedalus::GEngineClasses::C_Info &getInfo(InfoHandle h)
             { return m_RegisteredObjects.infos.getElement(h); };
 
-            Daedalus::GEngineClasses::Instance *getByClass(Memory::BigHandle h, EInstanceClass instClass);
+            Daedalus::GEngineClasses::Instance *getByClass(ZMemory::BigHandle h, EInstanceClass instClass);
 
             RegisteredObjects &getRegisteredObjects()
             { return m_RegisteredObjects; }

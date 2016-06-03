@@ -403,14 +403,14 @@ void DaedalusVM::pushString(const std::string& str)
     pushVar(symIdx, 0);
 }
 
-void DaedalusVM::setInstance(const std::string& instSymbol, Memory::BigHandle h, EInstanceClass instanceClass)
+void DaedalusVM::setInstance(const std::string& instSymbol, ZMemory::BigHandle h, EInstanceClass instanceClass)
 {
     PARSymbol& s = m_DATFile.getSymbolByName(instSymbol);
-    s.instanceDataHandle = Memory::toBigHandle(h);
+    s.instanceDataHandle = ZMemory::toBigHandle(h);
     s.instanceDataClass = instanceClass;
 }
 
-void DaedalusVM::initializeInstance(Memory::BigHandle instance, size_t symIdx, EInstanceClass classIdx)
+void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, EInstanceClass classIdx)
 {
     PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
 

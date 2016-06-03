@@ -8,7 +8,7 @@
 #include <cmath>
 #include <algorithm>
 
-namespace Memory
+namespace ZMemory
 {
     /**
      * Max size a GenericHandle can be in bits

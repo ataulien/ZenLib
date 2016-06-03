@@ -26,8 +26,8 @@ void DaedalusDialogManager::registerExternals(
 
         auto& message = m_MessageLib.getMessageByName(outputname);
 
-        NpcHandle hself = Memory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(self).instanceDataHandle);
-        NpcHandle htarget = Memory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(target).instanceDataHandle);
+        NpcHandle hself = ZMemory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(self).instanceDataHandle);
+        NpcHandle htarget = ZMemory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(target).instanceDataHandle);
 
         // Notify user
         m_OnAIOutput(hself, htarget, message);
@@ -36,7 +36,7 @@ void DaedalusDialogManager::registerExternals(
     m_VM.registerExternalFunction("AI_ProcessInfos", [&](ZenLoad::DaedalusVM& vm){
         uint32_t self = vm.popVar();
 
-        NpcHandle hself = Memory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(self).instanceDataHandle);
+        NpcHandle hself = ZMemory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(self).instanceDataHandle);
         ZenLoad::GEngineClasses::C_Npc& npc = m_VM.getGameState().getNpc(hself);
 
         // Notify user
@@ -53,7 +53,7 @@ void DaedalusDialogManager::registerExternals(
         int32_t infoinstance = vm.popDataValue();
         int32_t self = vm.popVar();
 
-        NpcHandle hself = Memory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(self).instanceDataHandle);
+        NpcHandle hself = ZMemory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(self).instanceDataHandle);
         ZenLoad::GEngineClasses::C_Npc& npc = m_VM.getGameState().getNpc(hself);
 
         auto& l = m_KnownNpcInfoSymbolsByNpcSymbols[npc.instanceSymbol];
@@ -72,7 +72,7 @@ void DaedalusDialogManager::gatherNpcInformation()
         // Create new info-object
         InfoHandle h = m_VM.getGameState().createInfo();
         ZenLoad::GEngineClasses::C_Info& info = m_VM.getGameState().getInfo(h);
-        m_VM.initializeInstance(Memory::toBigHandle(h), i, ZenLoad::IC_Info);
+        m_VM.initializeInstance(ZMemory::toBigHandle(h), i, ZenLoad::IC_Info);
 
         // Add to map
         m_NpcInfosByNpcSymbols[info.npc].push_back(h);

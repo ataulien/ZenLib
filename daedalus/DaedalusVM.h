@@ -68,7 +68,7 @@ namespace Daedalus
         /**
          * @brief Sets the datapointer for the given instance-symbol
          */
-        void setInstance(const std::string& instSymbol, Memory::BigHandle h, EInstanceClass instanceClass);
+        void setInstance(const std::string& instSymbol, ZMemory::BigHandle h, EInstanceClass instanceClass);
         void setCurrentInstance(size_t symIdx);
 
         /**
@@ -76,7 +76,7 @@ namespace Daedalus
           * @param instance Allocated instance of the right type
           * @param symIdx Script-Symbol of the instance to initialize
           */
-        void initializeInstance(Memory::BigHandle instance, size_t symIdx, EInstanceClass classIdx);
+        void initializeInstance(ZMemory::BigHandle instance, size_t symIdx, EInstanceClass classIdx);
 
         /**
          * @return all instances of the given class
@@ -119,7 +119,7 @@ namespace Daedalus
          * @brief instance set by SetInstance
          */
         size_t m_CurrentInstance;
-        Memory::BigHandle m_CurrentInstanceHandle;
+        ZMemory::BigHandle m_CurrentInstanceHandle;
         EInstanceClass m_CurrentInstanceClass;
 
         /**
@@ -139,7 +139,7 @@ namespace Daedalus
 
         struct VMState
         {
-            Memory::BigHandle m_CurrentInstanceHandle;
+            ZMemory::BigHandle m_CurrentInstanceHandle;
             EInstanceClass m_CurrentInstanceClass;
             size_t m_PC;
 

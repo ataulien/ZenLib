@@ -25,7 +25,7 @@ void DaedalusGameState::registerExternals()
 
         ItemHandle item = createItem();
         GEngineClasses::C_Item& itemData = getItem(item);
-        vm.initializeInstance(Memory::toBigHandle(item), iteminstance, IC_Item);
+        vm.initializeInstance(ZMemory::toBigHandle(item), iteminstance, IC_Item);
 
         LogInfo() << " ##### Created item: " << itemData.name;
     });
@@ -41,7 +41,7 @@ void DaedalusGameState::registerExternals()
         GEngineClasses::C_Npc& npcData = getNpc(npc);
         npcData.wp = spawnpoint;
 
-        vm.initializeInstance(Memory::toBigHandle(npc), npcinstance, IC_Npc);
+        vm.initializeInstance(ZMemory::toBigHandle(npc), npcinstance, IC_Npc);
 
         LogInfo() << " ##### Created NPC: " << npcData.name[0];
     });
@@ -53,12 +53,12 @@ void DaedalusGameState::registerExternals()
 
         ItemHandle h = createItem();
         GEngineClasses::C_Item& item = getItem(h);
-        vm.initializeInstance(Memory::toBigHandle(h), static_cast<size_t>(itemInstance), IC_Item);
+        vm.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(itemInstance), IC_Item);
 
         LogInfo() << "NPC Handle: " << vm.getDATFile().getSymbolByIndex(npc).instanceDataHandle.index;
 
         // TODO: Put into inventory
-        GEngineClasses::C_Npc& npcData = getNpc(Memory::handleCast<NpcHandle>(vm.getDATFile().getSymbolByIndex(npc).instanceDataHandle));
+        GEngineClasses::C_Npc& npcData = getNpc(ZMemory::handleCast<NpcHandle>(vm.getDATFile().getSymbolByIndex(npc).instanceDataHandle));
 
         LogInfo() << "1: " << item.name;
         LogInfo() << "2. " << npcData.name[0];
@@ -73,10 +73,10 @@ void DaedalusGameState::registerExternals()
         {
             NpcHandle h = createNPC();
             GEngineClasses::C_Npc& npc = getNpc(h);
-            vm.initializeInstance(Memory::toBigHandle(h), static_cast<size_t>(instancename), IC_Npc);
+            vm.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(instancename), IC_Npc);
         }else
         {
-            GEngineClasses::C_Npc& npcData = getNpc(Memory::handleCast<NpcHandle>(vm.getDATFile().getSymbolByIndex(instancename).instanceDataHandle));
+            GEngineClasses::C_Npc& npcData = getNpc(ZMemory::handleCast<NpcHandle>(vm.getDATFile().getSymbolByIndex(instancename).instanceDataHandle));
             if(l) LogInfo() << " [HLP_GETNPC] Name: "
                   << npcData.name[0];
         }
@@ -93,29 +93,29 @@ void DaedalusGameState::registerExternals()
 
 
 
-ZenLoad::GEngineClasses::Instance* DaedalusGameState::getByClass(Memory::BigHandle h, ZenLoad::EInstanceClass instClass)
+ZenLoad::GEngineClasses::Instance* DaedalusGameState::getByClass(ZMemory::BigHandle h, ZenLoad::EInstanceClass instClass)
 {
     if(!h.isValid()) return nullptr;
 
     switch(instClass)
     {
         case EInstanceClass::IC_Npc:
-            return &getNpc(Memory::handleCast<NpcHandle>(h));
+            return &getNpc(ZMemory::handleCast<NpcHandle>(h));
 
         case EInstanceClass::IC_Item:
-            return &getItem(Memory::handleCast<ItemHandle>(h));
+            return &getItem(ZMemory::handleCast<ItemHandle>(h));
 
         case IC_Mission:
-            return &getMission(Memory::handleCast<MissionHandle>(h));
+            return &getMission(ZMemory::handleCast<MissionHandle>(h));
 
         case IC_Info:
-            return &getInfo(Memory::handleCast<InfoHandle>(h));
+            return &getInfo(ZMemory::handleCast<InfoHandle>(h));
 
         case IC_ItemReact:
-            return &getItemReact(Memory::handleCast<ItemReactHandle>(h));
+            return &getItemReact(ZMemory::handleCast<ItemReactHandle>(h));
 
         case IC_Focus:
-            return &getFocus(Memory::handleCast<FocusHandle>(h));
+            return &getFocus(ZMemory::handleCast<FocusHandle>(h));
 
         default:
             return nullptr;

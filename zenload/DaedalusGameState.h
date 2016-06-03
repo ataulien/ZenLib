@@ -14,12 +14,12 @@ namespace ZenLoad
 
 namespace GameState
 {
-    typedef Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Npc, MAX_NUM_NPCS>::Handle NpcHandle;
-    typedef Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Item, MAX_NUM_ITEMS>::Handle ItemHandle;
-    typedef Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Mission, MAX_NUM_ITEMS>::Handle MissionHandle;
-    typedef Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Focus, MAX_NUM_ITEMS>::Handle FocusHandle;
-    typedef Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_ItemReact, MAX_NUM_ITEMS>::Handle ItemReactHandle;
-    typedef Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Info, MAX_NUM_ITEMS>::Handle InfoHandle;
+    typedef ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Npc, MAX_NUM_NPCS>::Handle NpcHandle;
+    typedef ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Item, MAX_NUM_ITEMS>::Handle ItemHandle;
+    typedef ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Mission, MAX_NUM_ITEMS>::Handle MissionHandle;
+    typedef ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Focus, MAX_NUM_ITEMS>::Handle FocusHandle;
+    typedef ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_ItemReact, MAX_NUM_ITEMS>::Handle ItemReactHandle;
+    typedef ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Info, MAX_NUM_ITEMS>::Handle InfoHandle;
 
     /**
      * Class holding the current engine-side gamestate of a daedalus-VM
@@ -30,12 +30,12 @@ namespace GameState
 
         struct RegisteredObjects
         {
-            Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Npc, MAX_NUM_NPCS> NPCs;
-            Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Item, MAX_NUM_ITEMS> items;
-            Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_ItemReact, MAX_NUM_ITEMS> itemReacts;
-            Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Mission, MAX_NUM_ITEMS> missions;
-            Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Focus, MAX_NUM_ITEMS> focuses;
-            Memory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Info, MAX_NUM_ITEMS> infos;
+            ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Npc, MAX_NUM_NPCS> NPCs;
+            ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Item, MAX_NUM_ITEMS> items;
+            ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_ItemReact, MAX_NUM_ITEMS> itemReacts;
+            ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Mission, MAX_NUM_ITEMS> missions;
+            ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Focus, MAX_NUM_ITEMS> focuses;
+            ZMemory::StaticReferencedAllocator<ZenLoad::GEngineClasses::C_Info, MAX_NUM_ITEMS> infos;
         };
 
         DaedalusGameState(ZenLoad::DaedalusVM& vm);
@@ -64,7 +64,7 @@ namespace GameState
         ZenLoad::GEngineClasses::C_Mission& getMission(MissionHandle h){return m_RegisteredObjects.missions.getElement(h);};
         ZenLoad::GEngineClasses::C_Focus& getFocus(FocusHandle h){return m_RegisteredObjects.focuses.getElement(h);};
         ZenLoad::GEngineClasses::C_Info& getInfo(InfoHandle h){return m_RegisteredObjects.infos.getElement(h);};
-        ZenLoad::GEngineClasses::Instance* getByClass(Memory::BigHandle h, ZenLoad::EInstanceClass instClass);
+        ZenLoad::GEngineClasses::Instance* getByClass(ZMemory::BigHandle h, ZenLoad::EInstanceClass instClass);
         RegisteredObjects& getRegisteredObjects(){return m_RegisteredObjects;}
 
     private:

@@ -1,7 +1,7 @@
 #pragma once
 #include <stddef.h>
 
-namespace Memory
+namespace ZMemory
 {
 /**
  * List supporting finding, obtaining and returning free list elements in O(1) time

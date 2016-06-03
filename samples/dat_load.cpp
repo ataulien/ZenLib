@@ -79,8 +79,8 @@ std::string join(const std::vector<std::string>& v, const std::string& delim)
 void createPlayer(Daedalus::DaedalusVM& vm)
 {
     GameState::NpcHandle hero = vm.getGameState().createNPC();
-    vm.initializeInstance(Memory::toBigHandle(hero), vm.getDATFile().getSymbolIndexByName("PC_Hero"), Daedalus::IC_Npc);
-    vm.setInstance("hero", Memory::toBigHandle(hero), Daedalus::IC_Npc);
+    vm.initializeInstance(ZMemory::toBigHandle(hero), vm.getDATFile().getSymbolIndexByName("PC_Hero"), Daedalus::IC_Npc);
+    vm.setInstance("hero", ZMemory::toBigHandle(hero), Daedalus::IC_Npc);
 }
 
 void runVM(Daedalus::DaedalusVM& vm, bool print = true)
@@ -336,7 +336,7 @@ int main(int argc, char** argv)
 
             auto onAIProcessInfos = [&](GameState::NpcHandle self, std::vector<GameState::InfoHandle> infos)
             {
-                GameState::NpcHandle target = Memory::handleCast<GameState::NpcHandle>(
+                GameState::NpcHandle target = ZMemory::handleCast<GameState::NpcHandle>(
                         vm.getDATFile().getSymbolByName("other").instanceDataHandle);
 
                 LogInfo() << "Started talking with: " << vm.getGameState().getNpc(self).name[0];
@@ -541,7 +541,7 @@ int main(int argc, char** argv)
                             continue;
                         }
 
-                        Memory::BigHandle h = vm.getDATFile().getSymbolByName(parts[1]).instanceDataHandle;
+                        ZMemory::BigHandle h = vm.getDATFile().getSymbolByName(parts[1]).instanceDataHandle;
                         vm.setInstance("self", h, Daedalus::IC_Npc);
                     } else if (parts[0] == "other")
                     {
@@ -551,7 +551,7 @@ int main(int argc, char** argv)
                             continue;
                         }
 
-                        Memory::BigHandle h = vm.getDATFile().getSymbolByName(parts[1]).instanceDataHandle;
+                        ZMemory::BigHandle h = vm.getDATFile().getSymbolByName(parts[1]).instanceDataHandle;
                         vm.setInstance("other", h, Daedalus::IC_Npc);
                     } else if (parts[0] == "exit")
                     {
@@ -561,7 +561,7 @@ int main(int argc, char** argv)
                             continue;
                         }
 
-                        Memory::BigHandle h = vm.getDATFile().getSymbolByName(parts[1]).instanceDataHandle;
+                        ZMemory::BigHandle h = vm.getDATFile().getSymbolByName(parts[1]).instanceDataHandle;
                         vm.setInstance("other", h, Daedalus::IC_Npc);
 
 
@@ -592,10 +592,10 @@ int main(int argc, char** argv)
                         {
                             vm.pushState();
                             // Set up self and other
-                            Memory::BigHandle s = vm.getDATFile().getSymbolByIndex(inst).instanceDataHandle;
+                            ZMemory::BigHandle s = vm.getDATFile().getSymbolByIndex(inst).instanceDataHandle;
                             vm.setInstance("self", s, Daedalus::IC_Npc);
 
-                            Memory::BigHandle o = vm.getDATFile().getSymbolByName("hero").instanceDataHandle;
+                            ZMemory::BigHandle o = vm.getDATFile().getSymbolByName("hero").instanceDataHandle;
                             vm.setInstance("other", o, Daedalus::IC_Npc);
 
                             vm.doCallOperation(vm.getDATFile().getSymbolByName("ZS_Talk").address);
@@ -633,7 +633,7 @@ int main(int argc, char** argv)
 
                         if(inst != static_cast<uint32_t>(-1))
                         {
-                            GameState::NpcHandle h = Memory::handleCast<GameState::NpcHandle>(vm.getDATFile().getSymbolByIndex(inst).instanceDataHandle);
+                            GameState::NpcHandle h = ZMemory::handleCast<GameState::NpcHandle>(vm.getDATFile().getSymbolByIndex(inst).instanceDataHandle);
 
                             //vm.getGameState().getInventory(h)
 
