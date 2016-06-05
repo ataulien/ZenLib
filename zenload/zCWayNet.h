@@ -106,8 +106,6 @@ namespace ZenLoad
 
                     tgt = &wp2;
                 }
-
-                LogInfo() << "Edge: " << wp1 << " - " << wp2;
                 info.edges.push_back(std::make_pair(wp1, wp2));
             }
 

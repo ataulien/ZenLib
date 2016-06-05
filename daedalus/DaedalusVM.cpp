@@ -425,6 +425,8 @@ void DaedalusVM::setInstance(const std::string& instSymbol, ZMemory::BigHandle h
 
 void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, EInstanceClass classIdx)
 {
+    pushState();
+
     PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
 
     // Enter address into instance-symbol
@@ -457,6 +459,8 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     m_DATFile.getSymbolByName("SELF").instanceDataClass = oldSelfClass;
     m_CurrentInstanceHandle = oldInstance;
     m_CurrentInstanceClass = oldClass;*/
+
+    popState();
 }
 
 void DaedalusVM::setCurrentInstance(size_t symIdx)

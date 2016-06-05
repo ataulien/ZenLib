@@ -31,6 +31,9 @@ void DaedalusGameState::registerExternals()
         vm.initializeInstance(ZMemory::toBigHandle(item), iteminstance, IC_Item);
 
         LogInfo() << " ##### Created item: " << itemData.name;
+
+        if(m_GameExternals.wld_insertitem)
+            m_GameExternals.wld_insertitem(item);
     });
 
     m_VM.registerExternalFunction("wld_insertnpc", [&](Daedalus::DaedalusVM& vm){
@@ -44,9 +47,22 @@ void DaedalusGameState::registerExternals()
         GEngineClasses::C_Npc& npcData = getNpc(npc);
         npcData.wp = spawnpoint;
 
-        vm.initializeInstance(ZMemory::toBigHandle(npc), npcinstance, IC_Npc);
+        // Setup basic class linkage. This is important here, as otherwise the wld_insertnpc-callback won't be
+        // able to work properly
+        npcData.instanceSymbol = npcinstance;
+
+        PARSymbol& s = vm.getDATFile().getSymbolByIndex(npcinstance);
+        s.instanceDataHandle = ZMemory::toBigHandle(npc);
+        s.instanceDataClass = IC_Npc;
 
         LogInfo() << " ##### Created NPC: " << npcData.name[0];
+
+        if(m_GameExternals.wld_insertnpc)
+            m_GameExternals.wld_insertnpc(npc, spawnpoint);
+
+        vm.initializeInstance(ZMemory::toBigHandle(npc), npcinstance, IC_Npc);
+
+
     });
 
     m_VM.registerExternalFunction("createinvitem", [&](Daedalus::DaedalusVM& vm){
@@ -92,8 +108,11 @@ void DaedalusGameState::registerExternals()
     });
 
     m_VM.registerExternalFunction("Wld_GetDay", [&](Daedalus::DaedalusVM& vm){
-        // TODO: Implement this
-        vm.setReturn(0);
+
+        if(m_GameExternals.wld_GetDay)
+            vm.setReturn(m_GameExternals.wld_GetDay());
+        else
+            vm.setReturn(0);
     });
 
     m_VM.registerExternalFunction("log_createtopic", [&](Daedalus::DaedalusVM& vm){
@@ -101,6 +120,9 @@ void DaedalusGameState::registerExternals()
         std::string name = vm.popString();
         m_PlayerLog[name].section = static_cast<LogTopic::ESection>(section);
         m_PlayerLog[name].topic = name;
+
+        if(m_GameExternals.log_createtopic)
+            m_GameExternals.log_createtopic(name);
     });
 
     m_VM.registerExternalFunction("log_settopicstatus", [&](Daedalus::DaedalusVM& vm){
@@ -108,6 +130,9 @@ void DaedalusGameState::registerExternals()
         std::string name = vm.popString();
 
         m_PlayerLog[name].status = static_cast<LogTopic::ELogStatus>(status);
+
+        if(m_GameExternals.log_settopicstatus)
+            m_GameExternals.log_settopicstatus(name);
     });
 
     m_VM.registerExternalFunction("log_addentry", [&](Daedalus::DaedalusVM& vm){
@@ -119,6 +144,9 @@ void DaedalusGameState::registerExternals()
         LogInfo() << "";
 
         m_PlayerLog[topic].entries.push_back(entry);
+
+        if(m_GameExternals.log_addentry)
+            m_GameExternals.log_addentry(topic, entry);
     });
 }
 
@@ -157,31 +185,43 @@ Daedalus::GEngineClasses::Instance* DaedalusGameState::getByClass(ZMemory::BigHa
 NpcHandle DaedalusGameState::createNPC()
 {
     NpcHandle h = m_RegisteredObjects.NPCs.createObject();
-    LogInfo() << "Created NPC: " << h.index;
+    getNpc(h).userPtr = nullptr;
     return h;
 }
 
 ItemHandle DaedalusGameState::createItem()
 {
-    return m_RegisteredObjects.items.createObject();
+    auto h = m_RegisteredObjects.items.createObject();
+
+    getItem(h).userPtr = nullptr;
+
+    return h;
 }
 
 ItemReactHandle DaedalusGameState::createItemReact()
 {
-    return m_RegisteredObjects.itemReacts.createObject();
+    auto h = m_RegisteredObjects.itemReacts.createObject();
+    getItemReact(h).userPtr = nullptr;
+    return h;
 }
 
 MissionHandle DaedalusGameState::createMission()
 {
-    return m_RegisteredObjects.missions.createObject();
+    auto h = m_RegisteredObjects.missions.createObject();
+    getMission(h).userPtr = nullptr;
+    return h;
 }
 
 InfoHandle DaedalusGameState::createInfo()
 {
-    return m_RegisteredObjects.infos.createObject();
+    auto h = m_RegisteredObjects.infos.createObject();
+    getInfo(h).userPtr = nullptr;
+    return h;
 }
 
 FocusHandle DaedalusGameState::createFocus()
 {
-    return m_RegisteredObjects.focuses.createObject();
+    auto h = m_RegisteredObjects.focuses.createObject();
+    getFocus(h).userPtr = nullptr;
+    return h;
 }

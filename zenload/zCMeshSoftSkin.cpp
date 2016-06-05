@@ -114,8 +114,6 @@ void zCMeshSoftSkin::packMesh(PackedSkeletalMesh& mesh, float scale) const
 	std::vector<uint32_t> indices;
 	std::vector<SkeletalVertex> vertices(m_Mesh.getVertices().size());
 
-	LogInfo() << "########## START";
-
 	// Extract weights and local positions
 	const uint8_t* stream = m_VertexWeightStream.data();
 	LogInfo() << "Stream size: " << m_VertexWeightStream.size();
@@ -129,12 +127,8 @@ void zCMeshSoftSkin::packMesh(PackedSkeletalMesh& mesh, float scale) const
 		uint32_t numWeights = *reinterpret_cast<const uint32_t*>(stream);
 		stream += 4;
 
-		LogInfo() << "Vertex: " << i;
-
 		for(size_t j = 0; j < numWeights; j++)
 		{
-			LogInfo() << "Weight: " << j;
-
 			// Note: Using zTWeightEntry here causes a SIGBUS on ARM because of packing!
 			float weight; Utils::getUnaligned(&weight, stream); stream += sizeof(float);
 
@@ -152,8 +146,6 @@ void zCMeshSoftSkin::packMesh(PackedSkeletalMesh& mesh, float scale) const
 
 		}
 	}
-
-	LogInfo() << "########## 2";
 
 	for(size_t s=0;s<m_Mesh.getNumSubmeshes();s++)
 	{
@@ -189,8 +181,6 @@ void zCMeshSoftSkin::packMesh(PackedSkeletalMesh& mesh, float scale) const
 			}
 		}		
 	}
-
-	LogInfo() << "########## 3";
 
 	// Create objects for all submeshes
 	for(size_t i=0;i<m_Mesh.getNumSubmeshes();i++)

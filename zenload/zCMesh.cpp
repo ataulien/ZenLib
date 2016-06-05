@@ -202,7 +202,7 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
 					std::string classname = p2.readLine();
 
 					// Save into vector
-					m_Materials.emplace_back(zCMaterial::readObjectData(p2));
+					m_Materials.emplace_back(zCMaterial::readObjectData(p2, version));
 				}
 
 				// Note: There is a bool stored here in the G2-Formats, which says whether to use alphatesting or not
@@ -290,7 +290,8 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
                     }
 
 					// TODO: Store these somewhere else
-					if(!p.flags.ghostOccluder && !p.flags.portalPoly && !p.flags.lodFlag)
+					// TODO: lodFlag isn't set to something useful in Gothic 1. Also the portal-flags aren't set? Investigate!
+					if(!p.flags.ghostOccluder && !p.flags.portalPoly/* && p.flags.lodFlag*/)
 					{
                         if(p.polyNumVertices != 0) {
 

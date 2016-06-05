@@ -135,7 +135,7 @@ void zCProgMeshProto::readObjectData(ZenParser& parser)
 						std::string classname = p2.readLine();
 
 						// Save into vector
-						m_Materials.emplace_back(zCMaterial::readObjectData(p2));
+						m_Materials.emplace_back(zCMaterial::readObjectData(p2, version));
 					}
 				
 

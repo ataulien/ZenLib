@@ -1,4 +1,7 @@
 #pragma once
+#include <stdint.h>
+#include <stdlib.h>
+#include <string>
 
 namespace Daedalus
 {
@@ -35,6 +38,12 @@ namespace Daedalus
         struct Instance
         {
             size_t instanceSymbol;
+
+            /**
+             * Space for the user to save something. Will not be touched at all by ZenLib.
+             * Note: This is set to nullptr after creation.
+             */
+            void* userPtr;
         };
 
         struct C_Npc : Instance

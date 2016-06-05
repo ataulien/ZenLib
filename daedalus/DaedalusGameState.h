@@ -69,6 +69,22 @@ namespace Daedalus
 			 */
             void registerExternals();
 
+            struct GameExternals
+            {
+                // These will all be executed with the content already created
+                std::function<void(NpcHandle, std::string)> wld_insertnpc;
+                std::function<void(ItemHandle)> wld_insertitem;
+                std::function<void(ItemHandle)> createinvitem;
+                std::function<int(void)> wld_GetDay;
+                std::function<void(std::string)> log_createtopic;
+                std::function<void(std::string)> log_settopicstatus;
+                std::function<void(std::string, std::string)> log_addentry;
+            };
+            void setGameExternals(const GameExternals& ext)
+            {
+                m_GameExternals = ext;
+            }
+
             /**
 			 * Creates scripting relevant objects
 			 */
@@ -136,7 +152,10 @@ namespace Daedalus
              */
             std::map<NpcHandle, std::vector<ItemHandle>> m_NpcInventories;
 
-
+            /**
+             * External-callback set by the user
+             */
+            GameExternals m_GameExternals;
         };
     }
 
