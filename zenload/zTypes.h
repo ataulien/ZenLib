@@ -157,7 +157,7 @@ namespace ZenLoad
 
 	struct oCMsgConversationData : public ParsedZenObject
 	{
-		uint32_t subType;
+		uint8_t subType;
 		std::string text;
 		std::string name;
 	};
@@ -166,7 +166,7 @@ namespace ZenLoad
 	{
 		bool mustBeAlive;
 		std::string roleName;
-		uint32_t roleType;
+		uint8_t roleType;
 	};
 
 	struct zCCSBlockSyncData : public ParsedZenObject

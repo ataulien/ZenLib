@@ -101,12 +101,14 @@ void zCCSLib::readObjectData(ZenParser& parser)
 
                 LogInfo() << "Read message: " << blk.atomicBlockData.command.name;
 
-                parser.skipChunk();
+                parser.readChunkEnd();
+                //parser.skipChunk();
             }
 
-            parser.skipChunk();
+            parser.readChunkEnd();
+            //parser.skipChunk();
         }
-        parser.skipChunk();
+        //parser.skipChunk();
 
         info.blocks.push_back(blk.atomicBlockData);
         m_MessagesByName[blk.blockName] = info.blocks.size()-1;
