@@ -145,6 +145,8 @@ namespace Daedalus
 
             std::stack<uint32_t> m_Stack;
             std::stack<size_t> m_RetStack;
+
+            PARSymbol m_Self;
         };
         std::stack<VMState> m_StateStack;
     };

@@ -435,6 +435,9 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 
     setCurrentInstance(symIdx);
 
+    // Set self
+    setInstance("self", instance, classIdx);
+
     // Place the assigning symbol into the instance
     GEngineClasses::Instance* instData = m_GameState.getByClass(instance, classIdx);
     instData->instanceSymbol = symIdx;
@@ -483,6 +486,7 @@ void DaedalusVM::pushState()
     s.m_PC = m_PC;
     s.m_RetStack = m_RetStack;
     s.m_Stack = m_Stack;
+    s.m_Self = m_DATFile.getSymbolByName("self");
 
     m_PC = 0;
     m_RetStack = std::stack<size_t>();
@@ -499,6 +503,8 @@ void DaedalusVM::popState()
     m_Stack = m_StateStack.top().m_Stack;
     m_CurrentInstanceHandle = m_StateStack.top().m_CurrentInstanceHandle;
     m_CurrentInstanceClass= m_StateStack.top().m_CurrentInstanceClass;
+
+    m_DATFile.getSymbolByName("self") = m_StateStack.top().m_Self;
 
     m_StateStack.pop();
 }

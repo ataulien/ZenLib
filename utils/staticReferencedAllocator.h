@@ -30,7 +30,7 @@ namespace ZMemory
             generation = 0;
         }
 
-        bool isValid()
+        bool isValid() const
         {
             // Index != -1
             return index != INVALID_HANDLE;
@@ -49,7 +49,11 @@ namespace ZMemory
     {
         HT b;
         b.generation = h.generation;
-        b.index = h.index;
+
+        if(!h.isValid())
+            b.invalidate();
+        else
+            b.index = h.index;
 
         return b;
     }

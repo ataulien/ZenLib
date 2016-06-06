@@ -55,14 +55,14 @@ void DaedalusGameState::registerExternals()
         s.instanceDataHandle = ZMemory::toBigHandle(npc);
         s.instanceDataClass = IC_Npc;
 
-        LogInfo() << " ##### Created NPC: " << npcData.name[0];
+        LogInfo() << "NpcInstance: " << npcinstance << ", " << s.name;
 
         if(m_GameExternals.wld_insertnpc)
             m_GameExternals.wld_insertnpc(npc, spawnpoint);
 
         vm.initializeInstance(ZMemory::toBigHandle(npc), npcinstance, IC_Npc);
 
-
+        LogInfo() << " ##### Created NPC: " << npcData.name[0];
     });
 
     m_VM.registerExternalFunction("createinvitem", [&](Daedalus::DaedalusVM& vm){
