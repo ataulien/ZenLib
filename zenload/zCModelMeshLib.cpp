@@ -101,7 +101,7 @@ void zCModelMeshLib::loadMDM(ZenParser& parser)
 			for(uint16_t i = 0; i < numNodes; i++)
 			{
 				std::string nodeName = parser.readLine(true);
-				LogInfo() << "Loading node: " << nodeName;
+				//LogInfo() << "Loading node: " << nodeName;
 			}
 
 			for(uint16_t i = 0; i < numNodes; i++)

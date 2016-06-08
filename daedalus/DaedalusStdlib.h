@@ -98,8 +98,8 @@ namespace Daedalus
         {
             std::string name;        //	Name des Auftrages
             std::string description;
-            int duration;        //	Max. Dauer in Tageszeiten
-            int important;
+            int32_t duration;        //	Max. Dauer in Tageszeiten
+            int32_t important;
 
             uint32_t offerConditions;
             uint32_t offer;
@@ -114,33 +114,49 @@ namespace Daedalus
 
         struct C_Item : Instance
         {
-            // Für alle Items
-            int id;
-            std::string name, nameID;
-            int hp, hp_max;
+            // Categories, found in the "mainflag"-field
+            enum Categories
+            {
+                ITM_CAT_NONE			= 1<<0,
+                ITM_CAT_NF			    = 1<<1,
+                ITM_CAT_FF			    = 1<<2,
+                ITM_CAT_MUN			    = 1<<3,
+                ITM_CAT_ARMOR			= 1<<4,
+                ITM_CAT_FOOD			= 1<<5,
+                ITM_CAT_DOCS			= 1<<6,
+                ITM_CAT_POTION		    = 1<<7,
+                ITM_CAT_LIGHT			= 1<<8,
+                ITM_CAT_RUNE			= 1<<9,
+                ITM_CAT_MAGIC			= 1<<31,
+            };
 
-            int mainflag, flags;        //	Hauptflag und weitere Flags
-            int weight, value;
+            // Für alle Items
+            int32_t id;
+            std::string name, nameID;
+            int32_t hp, hp_max;
+
+            int32_t mainflag, flags;        //	Hauptflag und weitere Flags
+            int32_t weight, value;
 
             // Für Waffen
-            int damageType;        //	Welche Schadensarten
-            int damageTotal;
-            int damage[DAM_INDEX_MAX];
+            int32_t damageType;        //	Welche Schadensarten
+            int32_t damageTotal;
+            int32_t damage[DAM_INDEX_MAX];
 
             // Für Rüstungen
-            int wear;
-            int protection[PROT_INDEX_MAX];
+            int32_t wear;
+            int32_t protection[PROT_INDEX_MAX];
 
             // Für Nahrung
-            int nutrition;        //	HP-Steigerung bei Nahrung
+            int32_t nutrition;        //	HP-Steigerung bei Nahrung
 
             // Benötigte Attribute zum Benutzen des Items
-            int cond_atr[3];
-            int cond_value[3];
+            int32_t cond_atr[3];
+            int32_t cond_value[3];
 
             // Attribute, die bei anlegen des Items verändert werden
-            int change_atr[3];
-            int change_value[3];
+            int32_t change_atr[3];
+            int32_t change_value[3];
 
             // Parserfunktionen
             uint32_t magic;        //	Parserfunktion zum "Magie Header"
@@ -150,29 +166,29 @@ namespace Daedalus
 
             // Besitzer
             uint32_t owner;        //	Besitzer : Instanz-Name
-            int ownerGuild;        //	Besitzer : Gilde
-            int disguiseGuild;        //	Zur Schau getragene Gilde durch Verkleidung
+            int32_t ownerGuild;        //	Besitzer : Gilde
+            int32_t disguiseGuild;        //	Zur Schau getragene Gilde durch Verkleidung
 
             // Die 3DS-Datei
             std::string visual;
 
             // Veränderung des NSC-Meshes beim Anlegen dieses Gegenstandes
             std::string visual_change;        //	ASC - File
-            int visual_skin;
+            int32_t visual_skin;
 
             std::string scemeName;
-            int material;
+            int32_t material;
             // std::string	pfx								;		//	Magic Weapon PFX
-            int munition;        //	Instance of Munition
+            int32_t munition;        //	Instance of Munition
 
-            int spell;
-            int range;
+            int32_t spell;
+            int32_t range;
 
-            int mag_circle;
+            int32_t mag_circle;
 
             std::string description;
             std::string text[ITM_TEXT_MAX];
-            int count[ITM_TEXT_MAX];
+            int32_t count[ITM_TEXT_MAX];
         };
 
         struct C_Focus : Instance
@@ -182,41 +198,41 @@ namespace Daedalus
             float npc_range1, npc_range2;        //	Reichweite
             float npc_azi;        //	Azimuth		( Seitenwinkel )
             float npc_elevdo, npc_elevup;        //	Elevation	( Höhenwinkel  )
-            int npc_prio;        //	Priorität
+            int32_t npc_prio;        //	Priorität
 
             /// für ITEMs
             float item_range1, item_range2;        //	Reichweite
             float item_azi;        //	Azimuth		( Seitenwinkel )
             float item_elevdo, item_elevup;        //	Elevation	( Höhenwinkel  )
-            int item_prio;        //	Priorität
+            int32_t item_prio;        //	Priorität
 
             /// für MOBs
             float mob_range1, mob_range2;        //	Reichweite
             float mob_azi;        //	Azimuth		( Seitenwinkel )
             float mob_elevdo, mob_elevup;        //	Elevation	( Höhenwinkel  )
-            int mob_prio;        //	Priorität
+            int32_t mob_prio;        //	Priorität
         };
 
         struct C_Info : Instance
         {
-            int npc;
-            int nr;
-            int important;        //	Wichtig Flag -> ansprechen
+            int32_t npc;
+            int32_t nr;
+            int32_t important;        //	Wichtig Flag -> ansprechen
             uint32_t condition;
             uint32_t information;
             std::string description;
-            int trade;
-            int permanent;
+            int32_t trade;
+            int32_t permanent;
         };
 
         struct C_ItemReact : Instance
         {
-            int npc;
-            int trade_item;
-            int trade_amount;
-            int requested_cat;
-            int requested_item;
-            int requested_amount;
+            int32_t npc;
+            int32_t trade_item;
+            int32_t trade_amount;
+            int32_t requested_cat;
+            int32_t requested_item;
+            int32_t requested_amount;
             uint32_t reaction;
         };
     }

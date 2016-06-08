@@ -116,7 +116,7 @@ void zCMeshSoftSkin::packMesh(PackedSkeletalMesh& mesh, float scale) const
 
 	// Extract weights and local positions
 	const uint8_t* stream = m_VertexWeightStream.data();
-	LogInfo() << "Stream size: " << m_VertexWeightStream.size();
+	//LogInfo() << "Stream size: " << m_VertexWeightStream.size();
 
 	for(size_t i = 0, end = m_Mesh.getVertices().size(); i < end; i++)
 	{

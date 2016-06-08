@@ -3,6 +3,7 @@
 #include "DATFile.h"
 #include <utils/staticReferencedAllocator.h>
 #include <vector>
+#include <list>
 
 const int MAX_NUM_NPCS = 1 << 16;
 const int MAX_NUM_ITEMS = 1 << 16;
@@ -73,8 +74,9 @@ namespace Daedalus
             {
                 // These will all be executed with the content already created
                 std::function<void(NpcHandle, std::string)> wld_insertnpc;
+                std::function<void(NpcHandle)> post_wld_insertnpc;
                 std::function<void(ItemHandle)> wld_insertitem;
-                std::function<void(ItemHandle)> createinvitem;
+                std::function<void(ItemHandle, NpcHandle)> createinvitem;
                 std::function<int(void)> wld_GetDay;
                 std::function<void(std::string)> log_createtopic;
                 std::function<void(std::string)> log_settopicstatus;
@@ -86,18 +88,24 @@ namespace Daedalus
             }
 
             /**
+             * Adds the given item to the inventory of the given NPC
+             */
+            ItemHandle addInventoryItem(size_t itemSymbol, NpcHandle npc);
+
+            /**
+             * Removes one of the items matching the given instance from the NPCs inventory
+             * @return True, if such an instance was found and removed, false otherwise
+             */
+            bool removeInventoryItem(size_t itemSymbol, NpcHandle npc);
+
+            /**
 			 * Creates scripting relevant objects
 			 */
             NpcHandle createNPC();
-
             ItemHandle createItem();
-
             ItemReactHandle createItemReact();
-
             MissionHandle createMission();
-
             InfoHandle createInfo();
-
             FocusHandle createFocus();
 
             /**
@@ -129,7 +137,7 @@ namespace Daedalus
             const std::map<std::string, LogTopic>& getPlayerLog()
             { return m_PlayerLog; };
 
-            const std::vector<ItemHandle>& getInventoryOf(NpcHandle npc)
+            const std::list<ItemHandle>& getInventoryOf(NpcHandle npc)
             { return m_NpcInventories[npc]; }
 
         private:
@@ -150,7 +158,7 @@ namespace Daedalus
             /**
              * Inventories by npc handle
              */
-            std::map<NpcHandle, std::vector<ItemHandle>> m_NpcInventories;
+            std::map<NpcHandle, std::list<ItemHandle>> m_NpcInventories;
 
             /**
              * External-callback set by the user

@@ -5,6 +5,7 @@
 #include <string>
 #include <functional>
 #include <stdio.h>
+#include <list>
 
 #define USE_LOG
 
@@ -114,6 +115,34 @@ namespace Utils
 		inline Log& operator << (const T &obj)
 		{
 			m_Message << obj;
+			return *this;
+		}
+
+		template< typename T >
+		inline Log& operator << (const std::list<T> &obj)
+		{
+			m_Message << "[";
+
+			for(const T& s : obj)
+			{
+				m_Message << s;
+			}
+
+			m_Message << "]";
+			return *this;
+		}
+
+		template< typename T >
+		inline Log& operator << (const std::vector<T> &obj)
+		{
+			m_Message << "[";
+
+			for(const T& s : obj)
+			{
+				m_Message << s;
+			}
+
+			m_Message << "]";
 			return *this;
 		}
 
