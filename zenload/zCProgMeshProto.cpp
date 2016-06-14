@@ -157,8 +157,8 @@ void zCProgMeshProto::readObjectData(ZenParser& parser)
 				m_Normals.resize(mainOffsets.normal.size);
 
 				// Copy vertex-data
-				memcpy(m_Vertices.data(), &dataPool[mainOffsets.position.offset], sizeof(ZMath::float3) * mainOffsets.position.size);
-				memcpy(m_Normals.data(), &dataPool[mainOffsets.normal.offset], sizeof(ZMath::float3) * mainOffsets.normal.size);
+				memcpy(m_Vertices.data(), &dataPool[mainOffsets.position.offset], sizeof(float) * 3 * mainOffsets.position.size);
+				memcpy(m_Normals.data(), &dataPool[mainOffsets.normal.offset], sizeof(float) * 3 * mainOffsets.normal.size);
 			
 				// Copy submesh-data
 				m_SubMeshes.resize(numSubmeshes);
@@ -177,15 +177,32 @@ void zCProgMeshProto::readObjectData(ZenParser& parser)
 					m_SubMeshes[i].m_EdgeScoreList.resize(d.edgeScoreList.size);
 					m_SubMeshes[i].m_WedgeMap.resize(d.wedgeMap.size);
 
-					memcpy(m_SubMeshes[i].m_TriangleList.data(), &dataPool[d.triangleList.offset], sizeof(zTriangle) * d.triangleList.size);
-					memcpy(m_SubMeshes[i].m_WedgeList.data(), &dataPool[d.wedgeList.offset], sizeof(zWedge) * d.wedgeList.size);
-					memcpy(m_SubMeshes[i].m_ColorList.data(), &dataPool[d.colorList.offset], sizeof(float) * d.colorList.size);
-					memcpy(m_SubMeshes[i].m_TrianglePlaneIndexList.data(), &dataPool[d.trianglePlaneIndexList.offset], sizeof(uint16_t) * d.trianglePlaneIndexList.size);
-					memcpy(m_SubMeshes[i].m_TrianglePlaneList.data(), &dataPool[d.trianglePlaneList.offset], sizeof(zTPlane) * d.trianglePlaneList.size);
-					memcpy(m_SubMeshes[i].m_TriEdgeList.data(), &dataPool[d.triangleEdgeList.offset], sizeof(zTriangleEdges) * d.triangleEdgeList.size);
-					memcpy(m_SubMeshes[i].m_EdgeList.data(), &dataPool[d.edgeList.offset], sizeof(zEdge) * d.edgeList.size);
-					memcpy(m_SubMeshes[i].m_EdgeScoreList.data(), &dataPool[d.edgeScoreList.offset], sizeof(float) * d.edgeScoreList.size);
-					memcpy(m_SubMeshes[i].m_WedgeMap.data(), &dataPool[d.wedgeMap.offset], sizeof(uint16_t) * d.wedgeMap.size);
+					if(!m_SubMeshes[i].m_TriangleList.empty())
+						memcpy(m_SubMeshes[i].m_TriangleList.data(), &dataPool[d.triangleList.offset], sizeof(zTriangle) * d.triangleList.size);
+					
+					if(!m_SubMeshes[i].m_WedgeList.empty())
+						memcpy(m_SubMeshes[i].m_WedgeList.data(), &dataPool[d.wedgeList.offset], sizeof(zWedge) * d.wedgeList.size);
+					
+					if(!m_SubMeshes[i].m_ColorList.empty())
+						memcpy(m_SubMeshes[i].m_ColorList.data(), &dataPool[d.colorList.offset], sizeof(float) * d.colorList.size);
+					
+					if(!m_SubMeshes[i].m_TrianglePlaneIndexList.empty())
+						memcpy(m_SubMeshes[i].m_TrianglePlaneIndexList.data(), &dataPool[d.trianglePlaneIndexList.offset], sizeof(uint16_t) * d.trianglePlaneIndexList.size);
+					
+					if(!m_SubMeshes[i].m_TrianglePlaneList.empty())
+						memcpy(m_SubMeshes[i].m_TrianglePlaneList.data(), &dataPool[d.trianglePlaneList.offset], sizeof(zTPlane) * d.trianglePlaneList.size);
+					
+					if(!m_SubMeshes[i].m_TriEdgeList.empty())
+						memcpy(m_SubMeshes[i].m_TriEdgeList.data(), &dataPool[d.triangleEdgeList.offset], sizeof(zTriangleEdges) * d.triangleEdgeList.size);
+					
+					if(!m_SubMeshes[i].m_EdgeList.empty())
+						memcpy(m_SubMeshes[i].m_EdgeList.data(), &dataPool[d.edgeList.offset], sizeof(zEdge) * d.edgeList.size);
+					
+					if(!m_SubMeshes[i].m_EdgeScoreList.empty())
+						memcpy(m_SubMeshes[i].m_EdgeScoreList.data(), &dataPool[d.edgeScoreList.offset], sizeof(float) * d.edgeScoreList.size);
+					
+					if(!m_SubMeshes[i].m_WedgeMap.empty())
+						memcpy(m_SubMeshes[i].m_WedgeMap.data(), &dataPool[d.wedgeMap.offset], sizeof(uint16_t) * d.wedgeMap.size);
 
 				}
 			}

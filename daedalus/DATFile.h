@@ -219,7 +219,7 @@ namespace Daedalus
 					floatData[idx] = *reinterpret_cast<float*>(&v);
 
 					if(baseAddr && dataOffset != -1)
-						*reinterpret_cast<float*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(float) * idx)) = v;
+						*reinterpret_cast<float*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(float) * idx)) = *reinterpret_cast<float*>(&v);
 					break;
 
 				case EParType_Func:

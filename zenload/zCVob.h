@@ -111,8 +111,8 @@ namespace ZenLoad
 				ReadObjectProperties(parser, info.properties,
 					Prop("PresetName", info.presetName));
 
-				parser.getImpl()->readEntry("", info.bbox, sizeof(info.bbox), ZenLoad::ParserImpl::ZVT_RAW_FLOAT);
-				parser.getImpl()->readEntry("", &info.rotationMatrix3x3, sizeof(info.rotationMatrix3x3), ZenLoad::ParserImpl::ZVT_RAW);
+				parser.getImpl()->readEntry("", info.bbox, sizeof(float) * 6, ZenLoad::ParserImpl::ZVT_RAW_FLOAT);
+				parser.getImpl()->readEntry("", &info.rotationMatrix3x3, sizeof(float) * 9, ZenLoad::ParserImpl::ZVT_RAW);
 				
 				ReadObjectProperties(parser, info.properties,
 					Prop("Position", info.position),

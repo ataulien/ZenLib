@@ -48,6 +48,34 @@ namespace Daedalus
 
         struct C_Npc : Instance
         {
+			C_Npc()
+			{
+				id = 0;
+				npcType = 0;
+				flags = 0;
+				memset(attribute, 0, sizeof(attribute));
+				memset(protection, 0, sizeof(protection));
+				memset(damage, 0, sizeof(damage));
+				memset(mission, 0, sizeof(mission));
+				damagetype = 0;
+				guild = 0;
+				level = 0;
+				fight_tactic = 0;
+				weapon = 0;
+				voice = 0;
+				voicePitch = 0;
+				bodymass = 0;
+				daily_routine = 0;
+				start_aistate = 0;
+				spawnDelay = 0;
+				senses = 0;
+				senses_range = 0;
+				memset(ai, 0, sizeof(ai));
+				exp = 0;
+				exp_next = 0;
+				lp = 0;
+			}
+
             int32_t id;
             std::string name[5];
             std::string slot;

@@ -29,7 +29,7 @@ bool ParserImplBinSafe::readChunkStart(ZenParser::ChunkHeader& header)
 		std::string vobDescriptor = readString();
 
 		// Early exit if this is a chunk-end or not a chunk header
-		if(vobDescriptor.front() != '[' && vobDescriptor.back() != ']' || vobDescriptor.size() <= 2)
+		if(vobDescriptor.empty() || vobDescriptor.front() != '[' && vobDescriptor.back() != ']' || vobDescriptor.size() <= 2)
 		{
 			m_pParser->setSeek(seek);
 			return false;
