@@ -40,11 +40,16 @@ namespace ZenLoad
 		};
 #pragma pack (pop)
 
+		enum {
+			VERSION_G1_08k = 12289,
+			VERSION_G26fix = 0 // TODO
+		};
+
 	public:
 		/**
 		* Reads this object from an internal zen
 		*/
-		static zCVobData readObjectData(ZenParser& parser)
+		static zCVobData readObjectData(ZenParser& parser, WorldVersion version)
 		{
 			zCVobData info;
 
@@ -113,22 +118,39 @@ namespace ZenLoad
 
 				parser.getImpl()->readEntry("", info.bbox, sizeof(info.bbox), ZenLoad::ParserImpl::ZVT_RAW_FLOAT);
 				parser.getImpl()->readEntry("", &info.rotationMatrix3x3, sizeof(info.rotationMatrix3x3), ZenLoad::ParserImpl::ZVT_RAW);
-				
-				ReadObjectProperties(parser, info.properties,
-					Prop("Position", info.position),
-					Prop("VobName", info.vobName),
-					Prop("VisualName", info.visual),
-					Prop("ShowVisual", info.showVisual),
-					Prop("VisualCamAlign", info.visualCamAlign),
-					Prop("VisualAniMode", info.visualAniMode),
-					Prop("VisualAniModeStrength", info.visualAniModeStrength),
-					Prop("VobFarClipScale", info.vobFarClipScale),
-					Prop("CollisionDetectionStatic", info.cdStatic),
-					Prop("CollisionDetectionDyn", info.cdDyn),
-					Prop("StaticVob", info.staticVob),
-					Prop("DynamicShadow", info.dynamicShadow),
-					Prop("zBias", info.zBias),
-					Prop("IsAmbient", info.isAmbient)); // TODO: References!
+
+				parser.getImpl()->readEntry("", &info.position, sizeof(float) * 3, ZenLoad::ParserImpl::ZVT_VEC3);
+
+				info.rotationMatrix = info.rotationMatrix3x3.toMatrix();
+
+				if(version != WorldVersion::VERSION_G1_08k)
+				{
+					ReadObjectProperties(parser, info.properties,
+										 Prop("vobName", info.vobName),
+										 Prop("visual", info.visual),
+										 Prop("showVisual", info.showVisual),
+										 Prop("visualCamAlign", info.visualCamAlign),
+										 Prop("visualAniMode", info.visualAniMode),
+										 Prop("visualAniModeStrength", info.visualAniModeStrength),
+										 Prop("vobFarClipScale", info.vobFarClipScale),
+										 Prop("cdStatic", info.cdStatic),
+										 Prop("cdDyn", info.cdDyn),
+										 Prop("staticVob", info.staticVob),
+										 Prop("dynShadow", info.dynamicShadow),
+										 Prop("zBias", info.zBias),
+										 Prop("isAmbient", info.isAmbient)); // TODO: References!
+				} else
+				{
+					ReadObjectProperties(parser, info.properties,
+										 Prop("vobName", info.vobName),
+										 Prop("visual", info.visual),
+										 Prop("showVisual", info.showVisual),
+										 Prop("visualCamAlign", info.visualCamAlign),
+										 Prop("cdStatic", info.cdStatic),
+										 Prop("cdDyn", info.cdDyn),
+										 Prop("staticVob", info.staticVob),
+										 Prop("dynShadow", info.dynamicShadow)); // TODO: References!
+				}
 			}
 			parser.skipChunk();
 

@@ -232,6 +232,27 @@ namespace ZMath
             m[3][3] = m33;
         }
 
+        void Transpose()
+        {
+            Matrix mm = *this;
+
+            m[0][0] = mm.m[0][0];
+            m[0][1] = mm.m[1][0];
+            m[0][2] = mm.m[2][0];
+            m[0][3] = mm.m[3][0];
+            m[1][0] = mm.m[0][1];
+            m[1][1] = mm.m[1][1];
+            m[1][2] = mm.m[2][1];
+            m[1][3] = mm.m[3][1];
+            m[2][0] = mm.m[0][2];
+            m[2][1] = mm.m[1][2];
+            m[2][2] = mm.m[2][2];
+            m[2][3] = mm.m[3][2];
+            m[3][0] = mm.m[0][3];
+            m[3][1] = mm.m[1][3];
+            m[3][2] = mm.m[2][3];
+            m[3][3] = mm.m[3][3];
+        }
 
         // Properties
         float3 Up() const { return float3( _21, _22, _23); }

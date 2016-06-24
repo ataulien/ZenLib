@@ -318,7 +318,11 @@ void ParserImplBinSafe::readEntry(const std::string& expectedName, void* target,
 	case ZVT_BYTE: *reinterpret_cast<uint8_t*>(target) = m_pParser->readBinaryByte(); break;
 	case ZVT_WORD: *reinterpret_cast<int16_t*>(target) = m_pParser->readBinaryWord(); break;
 	case ZVT_BOOL: *reinterpret_cast<bool*>(target) = m_pParser->readBinaryDWord() != 0; break;
-	case ZVT_VEC3: *reinterpret_cast<ZMath::float3*>(target) = ZMath::float3(m_pParser->readBinaryFloat(), m_pParser->readBinaryFloat(), m_pParser->readBinaryFloat()); break;
+	case ZVT_VEC3:
+			reinterpret_cast<ZMath::float3*>(target)->x = m_pParser->readBinaryFloat();
+			reinterpret_cast<ZMath::float3*>(target)->y = m_pParser->readBinaryFloat();
+			reinterpret_cast<ZMath::float3*>(target)->z = m_pParser->readBinaryFloat();
+			break;
 
 	case ZVT_COLOR: 
 		reinterpret_cast<uint8_t*>(target)[0] = m_pParser->readBinaryByte(); // FIXME: These are may ordered wrong

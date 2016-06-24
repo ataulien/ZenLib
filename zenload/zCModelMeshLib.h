@@ -36,7 +36,7 @@ namespace ZenLoad
 		/**
 		 * @brief Loads the mesh from the given VDF-Archive
 		 */
-		zCModelMeshLib(const std::string& fileName, const VDFS::FileIndex& fileIndex);
+		zCModelMeshLib(const std::string& fileName, const VDFS::FileIndex& fileIndex, float scale = 1.0f);
 
 		/**
 		 * @brief Reads the mesh-object from the given binary stream
@@ -47,12 +47,12 @@ namespace ZenLoad
 		/**
 		* @brief Reads the model hierachy from a file (MDH-File)
 		*/
-		void loadMDH(ZenParser& parser);
+		void loadMDH(ZenParser& parser, float scale = 1.0f);
 
 		/**
 		* @brief reads this lib as MDL
 		*/
-		void loadMDL(ZenParser& parser);
+		void loadMDL(ZenParser& parser, float scale = 1.0f);
 
 		/**
 		 * @brief Creates packed submesh-data
@@ -70,9 +70,29 @@ namespace ZenLoad
 		const std::vector<ModelNode>& getNodes() const { return m_Nodes; }
 
 		/**
+		 * @return List of attached meshes
+		 */
+		const std::vector<std::pair<std::string, zCProgMeshProto>>& getAttachments() const { return m_NodeAttachments; }
+
+		/**
 		 * @return Checksum for this node hierachy 
 		 */
 		uint32_t getNodeChecksum() const { return m_NodeChecksum; }
+
+		/**
+		 * @return The index of the node with the given name
+		 */
+		size_t findNodeIndex(const std::string& nodeName) const;
+
+		/**
+		 * @return Whether this was loaded correctly
+		 */
+		bool isValid()
+		{
+			return !m_Meshes.empty()
+				|| !m_NodeAttachments.empty()
+				|| !m_Nodes.empty();
+		}
 	private:
 		/**
 		 * @brief List of meshes registered in this library
@@ -82,7 +102,7 @@ namespace ZenLoad
 		/** 
 		 * @brief Node-Attachments
 		 */
-		std::vector<zCProgMeshProto> m_NodeAttachments;
+		std::vector<std::pair<std::string, zCProgMeshProto>> m_NodeAttachments;
 
 		/**
 		 * @brief Model hierachy
