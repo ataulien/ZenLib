@@ -123,28 +123,40 @@ namespace Utils
 		template< typename T >
 		inline Log& operator << (const std::list<T> &obj)
 		{
-			m_Message << "[";
+			if(obj.empty())
+			{
+				m_Message << "[]";
+				return *this;
+			}
+
+			m_Message << "[\n";
 
 			for(const T& s : obj)
 			{
-				m_Message << s;
+				m_Message << "\n - " << s;
 			}
 
-			m_Message << "]";
+			m_Message << "\n]";
 			return *this;
 		}
 
 		template< typename T >
 		inline Log& operator << (const std::vector<T> &obj)
 		{
-			m_Message << "[";
+			if(obj.empty())
+			{
+				m_Message << "[]";
+				return *this;
+			}
+
+			m_Message << "[\n";
 
 			for(const T& s : obj)
 			{
-				m_Message << s;
+				m_Message << "\n - " << s;
 			}
 
-			m_Message << "]";
+			m_Message << "\n]";
 			return *this;
 		}
 

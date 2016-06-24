@@ -211,7 +211,7 @@ namespace ZenLoad
 		/**
 		* @brief reads the worldmesh-chunk
 		*/
-		void readWorldMesh();
+		void readWorldMesh(oCWorldData& info);
         
 	private:	
 

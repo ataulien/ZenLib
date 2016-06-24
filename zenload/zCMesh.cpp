@@ -44,7 +44,7 @@ zCMesh::zCMesh(const std::string& fileName, VDFS::FileIndex& fileIndex)
 		ZenLoad::ZenParser parser(data.data(), data.size());
 		
 		// .MSH-Files are just saved zCMeshes
-		readObjectData(parser, false);
+		readObjectData(parser);
 	}
 	catch(std::exception &e)
 	{
@@ -105,35 +105,18 @@ struct polyData2 : public polyData1<FT>
 /**
 * @brief Reads the mesh-object from the given binary stream
 */
-void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
+void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPolys, bool forceG132bitIndices)
 {
-	// Information about the whole file we are reading here
-	BinaryFileInfo fileInfo;
-	uint32_t version = 0;
+    uint16_t version;
 
-	// Information about a single chunk 
-	BinaryChunkInfo chunkInfo;
-
-	size_t binFileEnd; // Ending location of the binary file
-
-	if(fromZen)
-	{
-		// Read information about the current file. Mainly size is important here.
-		parser.readStructure(fileInfo);
-
-		// Calculate ending location and thus, the filesize
-		binFileEnd = parser.getSeek() + fileInfo.size;
-	}
-	else
-	{
-		binFileEnd = parser.getFileSize();
-	}
+    // Information about a single chunk
+    BinaryChunkInfo chunkInfo;
 
 	// Read chunks until we left the virtual binary file or got to the end-chunk
 	// Each chunk starts with a header (BinaryChunkInfo) which gives information
 	// about what to do and how long the chunk is
 	bool doneReadingChunks = false;
-	while(!doneReadingChunks && parser.getSeek() <= binFileEnd)
+	while(!doneReadingChunks)
 	{
 		// Read chunk header and calculate position of next chunk
 		parser.readStructure(chunkInfo);
@@ -257,6 +240,9 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
 
 		case MSID_POLYLIST:
 			{
+                // Current entry of the skip list. This is increased as we go.
+                size_t skipListEntry = 0;
+
 				// Read number of polys
 				int numPolys = parser.readBinaryDWord();
 
@@ -274,11 +260,17 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
                                      ? sizeof(polyData2<uint32_t, PolyFlags2_6fix>::Index)
                                      : sizeof(polyData2<uint16_t, PolyFlags1_08k>::Index);
 
+                if(forceG132bitIndices)
+                {
+                    indicesSize = sizeof(polyData2<uint32_t, PolyFlags1_08k>::Index);
+                }
+
 				// Iterate throuh every poly
 				for(int i = 0; i < numPolys; i++)
 				{
 					polyData2<uint32_t, PolyFlags2_6fix>* p26 = (polyData2<uint32_t, PolyFlags2_6fix> *)blockPtr;
                     polyData2<uint16_t, PolyFlags1_08k>* p18k = (polyData2<uint16_t, PolyFlags1_08k> *)blockPtr;
+                    polyData2<uint32_t, PolyFlags1_08k>* p18k_32 = (polyData2<uint32_t, PolyFlags1_08k> *)blockPtr;
 
                     // Convert to a generic version
                     polyData2<uint32_t, PolyFlags> p;
@@ -286,78 +278,96 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
                         p.from(*p26);
                     }
                     else {
-                        p.from(*p18k);
+                        if(forceG132bitIndices)
+                            p.from(*p18k_32);
+                        else
+                            p.from(*p18k);
                     }
 
-					// TODO: Store these somewhere else
-					// TODO: lodFlag isn't set to something useful in Gothic 1. Also the portal-flags aren't set? Investigate!
-					if(!p.flags.ghostOccluder && !p.flags.portalPoly/* && p.flags.lodFlag*/)
-					{
-                        if(p.polyNumVertices != 0) {
+                    if(skipPolys.empty() || skipPolys[skipListEntry] == i)
+                    {
+                        // TODO: Store these somewhere else
+                        // TODO: lodFlag isn't set to something useful in Gothic 1. Also the portal-flags aren't set? Investigate!
+                        if (!p.flags.ghostOccluder && !p.flags.portalPoly && !p.flags.ghostOccluder &&
+                            !p.flags.portalIndoorOutdoor)
+                        {
+                            if (p.polyNumVertices != 0)
+                            {
 
-                            if (p.polyNumVertices == 3) {
+                                if (p.polyNumVertices == 3)
+                                {
 
-                                // Write indices directly to a vector
-                                WorldVertex vx[3];
-                                for (int v = 0; v < 3; v++) {
-                                    m_Indices.emplace_back(p.indices[v].VertexIndex);
-                                    m_FeatureIndices.emplace_back(p.indices[v].FeatIndex);
+                                    // Write indices directly to a vector
+                                    WorldVertex vx[3];
+                                    for (int v = 0; v < 3; v++)
+                                    {
+                                        m_Indices.emplace_back(p.indices[v].VertexIndex);
+                                        m_FeatureIndices.emplace_back(p.indices[v].FeatIndex);
 
-                                    // Gather vertex information
-                                    vx[v].Position = m_Vertices[p.indices[v].VertexIndex];
-                                    vx[v].Color = m_Features[p.indices[v].FeatIndex].lightStat;
+                                        // Gather vertex information
+                                        vx[v].Position = m_Vertices[p.indices[v].VertexIndex];
+                                        vx[v].Color = m_Features[p.indices[v].FeatIndex].lightStat;
 
-                                    vx[v].TexCoord = ZMath::float2(m_Features[p.indices[v].FeatIndex].uv[0],
-                                                                  m_Features[p.indices[v].FeatIndex].uv[1]);
-                                    vx[v].Normal = m_Features[p.indices[v].FeatIndex].vertNormal;
-                                }
-
-                                // Save material index for the written triangle
-                                m_TriangleMaterialIndices.emplace_back(p.materialIndex);
-
-                                WorldTriangle triangle;
-                                triangle.flags = p.flags;
-                                memcpy(triangle.vertices, vx, sizeof(vx));
-
-                                // Save triangle
-                                m_Triangles.push_back(triangle);
-                            }
-                            else {
-                                // Triangulate a triangle-fan
-                                //for(unsigned int i = p.polyNumVertices - 2; i >= 1; i--)
-                                for (unsigned int i = 1; i < p.polyNumVertices - 1; i++) {
-                                    m_Indices.emplace_back(p.indices[0].VertexIndex);
-                                    m_Indices.emplace_back(p.indices[i].VertexIndex);
-                                    m_Indices.emplace_back(p.indices[i + 1].VertexIndex);
-
-                                    m_FeatureIndices.emplace_back(p.indices[0].FeatIndex);
-                                    m_FeatureIndices.emplace_back(p.indices[i].FeatIndex);
-                                    m_FeatureIndices.emplace_back(p.indices[i + 1].FeatIndex);
+                                        vx[v].TexCoord = ZMath::float2(m_Features[p.indices[v].FeatIndex].uv[0],
+                                                                       m_Features[p.indices[v].FeatIndex].uv[1]);
+                                        vx[v].Normal = m_Features[p.indices[v].FeatIndex].vertNormal;
+                                    }
 
                                     // Save material index for the written triangle
                                     m_TriangleMaterialIndices.emplace_back(p.materialIndex);
 
                                     WorldTriangle triangle;
                                     triangle.flags = p.flags;
+                                    memcpy(triangle.vertices, vx, sizeof(vx));
 
-                                    uint32_t idx[] = {p.indices[0].VertexIndex, p.indices[i].VertexIndex,
-                                                      p.indices[i + 1].VertexIndex};
-
-                                    // Gather vertex information
-                                    for (int v = 0; v < 3; v++) {
-                                        triangle.vertices[v].Position = m_Vertices[idx[v]];
-                                        triangle.vertices[v].Color = m_Features[idx[v]].lightStat;
-                                        triangle.vertices[v].TexCoord = ZMath::float2(m_Features[idx[v]].uv[0],
-                                                                                     m_Features[idx[v]].uv[1]);
-                                        triangle.vertices[v].Normal = m_Features[idx[v]].vertNormal;
-                                    }
-
-                                    // Start filling in the flags
+                                    // Save triangle
                                     m_Triangles.push_back(triangle);
+                                }
+                                else
+                                {
+                                    // Triangulate a triangle-fan
+                                    //for(unsigned int i = p.polyNumVertices - 2; i >= 1; i--)
+                                    for (unsigned int i = 1; i < p.polyNumVertices - 1; i++)
+                                    {
+                                        m_Indices.emplace_back(p.indices[0].VertexIndex);
+                                        m_Indices.emplace_back(p.indices[i].VertexIndex);
+                                        m_Indices.emplace_back(p.indices[i + 1].VertexIndex);
+
+                                        m_FeatureIndices.emplace_back(p.indices[0].FeatIndex);
+                                        m_FeatureIndices.emplace_back(p.indices[i].FeatIndex);
+                                        m_FeatureIndices.emplace_back(p.indices[i + 1].FeatIndex);
+
+                                        // Save material index for the written triangle
+                                        m_TriangleMaterialIndices.emplace_back(p.materialIndex);
+
+                                        WorldTriangle triangle;
+                                        triangle.flags = p.flags;
+
+                                        uint32_t idx[] = {p.indices[0].VertexIndex, p.indices[i].VertexIndex,
+                                                          p.indices[i + 1].VertexIndex};
+
+                                        // Gather vertex information
+                                        for (int v = 0; v < 3; v++)
+                                        {
+                                            triangle.vertices[v].Position = m_Vertices[idx[v]];
+                                            triangle.vertices[v].Color = m_Features[idx[v]].lightStat;
+                                            triangle.vertices[v].TexCoord = ZMath::float2(m_Features[idx[v]].uv[0],
+                                                                                          m_Features[idx[v]].uv[1]);
+                                            triangle.vertices[v].Normal = m_Features[idx[v]].vertNormal;
+                                        }
+
+                                        // Start filling in the flags
+                                        m_Triangles.push_back(triangle);
+                                    }
                                 }
                             }
                         }
-					}
+
+                        skipListEntry++;
+                    } else
+                    {
+
+                    }
 
 					// Goto next polygon using this weird shit
 					blockPtr += blockSize + indicesSize * p.polyNumVertices;
@@ -375,9 +385,6 @@ void zCMesh::readObjectData(ZenParser& parser, bool fromZen)
 			parser.setSeek(chunkEnd); // Skip chunk
 		}
 	}
-
-	// Skip to possible next section of the underlaying file, in case there is more data we don't process
-	parser.setSeek(binFileEnd);
 }
 
 
@@ -475,4 +482,31 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale)
 		for(int v = 0; v < 3; v++)
 			mesh.triangles.back().vertices[v].Position = mesh.triangles.back().vertices[v].Position * scale;
 	}
+}
+
+void zCMesh::skip(ZenParser &parser)
+{
+    // Information about a single chunk
+    BinaryChunkInfo chunkInfo;
+
+    // Read chunks until we left the virtual binary file or got to the end-chunk
+    // Each chunk starts with a header (BinaryChunkInfo) which gives information
+    // about what to do and how long the chunk is
+    while(true)
+    {
+        // Read chunk header and calculate position of next chunk
+        parser.readStructure(chunkInfo);
+
+        size_t chunkEnd = parser.getSeek() + chunkInfo.length;
+
+        // Just skip all of it
+        switch(chunkInfo.id)
+        {
+            case MSID_MESH_END:
+                return;
+
+            default:
+                parser.setSeek(chunkEnd); // Skip chunk
+        }
+    }
 }
