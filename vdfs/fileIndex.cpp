@@ -144,7 +144,7 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
 	if(getFileByName(upper, &inf))
 		return inf.targetArchive->extractFile(inf, data);
 
-	LogError() << "File not found: " << file;
+	//LogError() << "File not found: " << file;
 
 	return false;
 }
