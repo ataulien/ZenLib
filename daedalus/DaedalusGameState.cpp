@@ -22,7 +22,7 @@ void DaedalusGameState::registerExternals()
 {
     bool l = false;
 
-    m_VM.registerExternalFunction("wld_insertitem", [&](Daedalus::DaedalusVM& vm){
+    m_VM.registerExternalFunction("wld_insertitem", [=](Daedalus::DaedalusVM& vm){
         std::string spawnpoint = vm.popString(); if(l) LogInfo() << "spawnpoint: " << spawnpoint;
         uint32_t iteminstance = vm.popDataValue(); if(l) LogInfo() << "iteminstance: " << iteminstance;
 
@@ -36,7 +36,7 @@ void DaedalusGameState::registerExternals()
             m_GameExternals.wld_insertitem(item);
     });
 
-    m_VM.registerExternalFunction("wld_insertnpc", [&](Daedalus::DaedalusVM& vm){
+    m_VM.registerExternalFunction("wld_insertnpc", [=](Daedalus::DaedalusVM& vm){
         std::string spawnpoint = vm.popString(); if(l) LogInfo() << "spawnpoint: " << spawnpoint;
         uint32_t npcinstance = vm.popDataValue(); if(l) LogInfo() << "npcinstance: " << npcinstance;
 
@@ -81,7 +81,7 @@ void DaedalusGameState::registerExternals()
         //LogInfo() << " ##### Created Inventory-Item '" << item.name << "' for NPC: " << npcData.name[0];
     });
 
-    m_VM.registerExternalFunction("createinvitems", [&](Daedalus::DaedalusVM& vm){
+    m_VM.registerExternalFunction("createinvitems", [=](Daedalus::DaedalusVM& vm){
         int32_t num = vm.popDataValue();
         int32_t itemInstance = vm.popDataValue(); if(l) LogInfo() << "itemInstance: " << itemInstance;
         uint32_t arr_n0;
@@ -99,7 +99,7 @@ void DaedalusGameState::registerExternals()
         //LogInfo() << " ##### Created Inventory-Item '" << item.name << "' for NPC: " << npcData.name[0];
     });
 
-    m_VM.registerExternalFunction("hlp_getnpc", [&](Daedalus::DaedalusVM& vm){
+    m_VM.registerExternalFunction("hlp_getnpc", [=](Daedalus::DaedalusVM& vm){
         int32_t instancename = vm.popDataValue(); if(l) LogInfo() << "instancename: " << instancename;
 
         if(!vm.getDATFile().getSymbolByIndex(instancename).instanceDataHandle.isValid())
@@ -118,7 +118,7 @@ void DaedalusGameState::registerExternals()
         vm.setReturnVar(instancename);
     });
 
-    m_VM.registerExternalFunction("Wld_GetDay", [&](Daedalus::DaedalusVM& vm){
+    m_VM.registerExternalFunction("Wld_GetDay", [=](Daedalus::DaedalusVM& vm){
 
         if(m_GameExternals.wld_GetDay)
             vm.setReturn(m_GameExternals.wld_GetDay());
@@ -126,7 +126,7 @@ void DaedalusGameState::registerExternals()
             vm.setReturn(0);
     });
 
-    m_VM.registerExternalFunction("log_createtopic", [&](Daedalus::DaedalusVM& vm){
+    m_VM.registerExternalFunction("log_createtopic", [=](Daedalus::DaedalusVM& vm){
         int32_t section = vm.popDataValue();
         std::string name = vm.popString();
         m_PlayerLog[name].section = static_cast<LogTopic::ESection>(section);
@@ -136,7 +136,7 @@ void DaedalusGameState::registerExternals()
             m_GameExternals.log_createtopic(name);
     });
 
-    m_VM.registerExternalFunction("log_settopicstatus", [&](Daedalus::DaedalusVM& vm){
+    m_VM.registerExternalFunction("log_settopicstatus", [=](Daedalus::DaedalusVM& vm){
         int32_t status = vm.popDataValue();
         std::string name = vm.popString();
 
@@ -146,7 +146,7 @@ void DaedalusGameState::registerExternals()
             m_GameExternals.log_settopicstatus(name);
     });
 
-    m_VM.registerExternalFunction("log_addentry", [&](Daedalus::DaedalusVM& vm){
+    m_VM.registerExternalFunction("log_addentry", [=](Daedalus::DaedalusVM& vm){
         std::string entry = vm.popString();
         std::string topic = vm.popString();
 
