@@ -8,7 +8,7 @@
 #include "utils/logger.h"
 #include "oCWorld.h"
 #include "zCMesh.h"
-
+#include "zCBspTree.h"
 using namespace ZenLoad;
 
 #ifdef __ANDROID__
@@ -145,7 +145,6 @@ void ZenParser::readHeader()
 oCWorldData ZenParser::readWorld()
 {
     LogInfo() << "ZEN: Reading world...";
-	oCWorldData worldData;
 
 	ChunkHeader header;
 	readChunkStart(header);
@@ -153,10 +152,10 @@ oCWorldData ZenParser::readWorld()
 	if(header.classname != "oCWorld:zCWorld")
 		ERROR("Expected oCWorld:zCWorld-Chunk not found!");
 
-	return oCWorld::readObjectData(*this);
+    return oCWorld::readObjectData(*this, header.version);
 }
 
-void ZenParser::readWorldMesh()
+void ZenParser::readWorldMesh(oCWorldData& info)
 {
 	LogInfo() << "ZEN: Reading mesh...";
 	m_pWorldMesh = new zCMesh;
@@ -164,7 +163,18 @@ void ZenParser::readWorldMesh()
 	// Read worldmesh, if needed
 	if(m_pWorldMesh)
 	{
-		m_pWorldMesh->readObjectData(*this, true);
+        /*size_t totalStart = m_Seek;
+        readBinaryDWord();
+        size_t size = readBinaryDWord();
+        size_t start = m_Seek;
+        m_pWorldMesh->readObjectData(*this);
+
+        m_Seek = start + size;
+
+        m_Seek = totalStart;*/
+        info.bspTree = zCBspTree::readObjectData(*this, m_pWorldMesh);
+
+		//m_pWorldMesh->readObjectData(*this);
 	}
 	else
 	{
@@ -181,7 +191,7 @@ void ZenParser::readWorldMesh()
 */
 void ZenParser::readChunkTest()
 {
-	ChunkHeader header;
+	/*ChunkHeader header;
 	m_pParserImpl->readChunkStart(header);
 
 	if(header.name == "MeshAndBsp")
@@ -223,7 +233,7 @@ void ZenParser::readChunkTest()
 				return;
 			}
 		}
-	}while(str != "[]");
+	}while(str != "[]");*/
 }
 
 /**

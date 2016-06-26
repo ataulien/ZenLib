@@ -28,7 +28,7 @@ const uint16_t MLID_MDH_END	= 0xD120;
 /**
 * @brief Loads the lib from the given VDF-Archive
 */
-zCModelMeshLib::zCModelMeshLib(const std::string& fileName, const VDFS::FileIndex& fileIndex)
+zCModelMeshLib::zCModelMeshLib(const std::string& fileName, const VDFS::FileIndex& fileIndex, float scale)
 {
 	std::vector<uint8_t> data;
 	fileIndex.getFileData(fileName, data);
@@ -45,9 +45,9 @@ zCModelMeshLib::zCModelMeshLib(const std::string& fileName, const VDFS::FileInde
 		if(fileName.find(".MDM") != std::string::npos)
 			loadMDM(parser);
 		else if(fileName.find(".MDH") != std::string::npos)
-			loadMDH(parser);
+			loadMDH(parser, scale);
 		else if(fileName.find(".MDL") != std::string::npos)
-			loadMDL(parser);
+			loadMDL(parser, scale);
 	}
 	catch(std::exception &e)
 	{
@@ -96,41 +96,15 @@ void zCModelMeshLib::loadMDM(ZenParser& parser)
 		case MLID_MDM_NODEMESHES: {
 			uint16_t numNodes = parser.readBinaryWord();
 
-			std::vector<zCModelNodeInst> nodeList(numNodes);
+			//std::vector<zCModelNodeInst> nodeList(numNodes);
+			m_NodeAttachments.resize(numNodes);
 
 			for(uint16_t i = 0; i < numNodes; i++)
-			{
-				std::string nodeName = parser.readLine(true);
-				//LogInfo() << "Loading node: " << nodeName;
-			}
+				m_NodeAttachments[i].first = parser.readLine(true);
 
 			for(uint16_t i = 0; i < numNodes; i++)
-			{
-				m_NodeAttachments.emplace_back();
-				m_NodeAttachments.back().readObjectData(parser);
-			}
+				m_NodeAttachments[i].second.readObjectData(parser);
 
-			/*if (meshLib) meshLib->AllocNumNodeVisuals(num);
-			for (i=0; i<num; i++) {
-			zCProgMeshProto *pmesh = zNEW(zCProgMeshProto);
-			if (!pmesh->Load (file)) goto convertASC;
-			pmesh->PackStaticVertexBuffers();				// FIXME: ist wahrscheinlich nicht der richtige Ort dafuer!!
-			if (destModel) {
-			if (nodeList[i]) {
-			int nodeIndex	= destModel->GetNodeList().Search (nodeList[i]);
-			//						if (meshLib)	meshLib->AddNodeVisual		(nodeList[i], mesh);
-			if (meshLib)	meshLib->AddNodeVisual		(nodeIndex, pmesh);
-			else			nodeList[i]->SetNodeVisualS	(pmesh, TRUE);
-			};
-			} else {
-			if (nodeProtoList[i]) {
-			nodeProtoList[i]->SetNodeVisualS	(pmesh);
-			};
-			};
-			// Dieser Kontext benoetigt das Mesh nicht mehr
-			pmesh->Release();
-			};
-			};*/
 		}
 		break;
 
@@ -160,7 +134,7 @@ void zCModelMeshLib::loadMDM(ZenParser& parser)
 /**
 * @brief Reads the model hierachy from a file (MDH-File)
 */
-void zCModelMeshLib::loadMDH(ZenParser& parser)
+void zCModelMeshLib::loadMDH(ZenParser& parser, float scale)
 {
 	// Information about the whole file we are reading here
 	BinaryFileInfo fileInfo;
@@ -213,6 +187,11 @@ void zCModelMeshLib::loadMDH(ZenParser& parser)
 				}
 
 				parser.readBinaryRaw(&m_Nodes[i].transformLocal, sizeof(ZMath::Matrix));
+				m_Nodes[i].transformLocal.Transpose();
+
+				ZMath::float3 t = m_Nodes[i].transformLocal.Translation();
+				m_Nodes[i].transformLocal.Translation(ZMath::float3(t.x * scale, t.y * scale, t.z * scale));
+
 			}
 
 			ZMath::float3 bbox3d[2]; parser.readBinaryRaw(bbox3d, sizeof(bbox3d));
@@ -245,9 +224,9 @@ void zCModelMeshLib::loadMDH(ZenParser& parser)
 /**
 * @brief reads this lib as MDL
 */
-void zCModelMeshLib::loadMDL(ZenParser& parser)
+void zCModelMeshLib::loadMDL(ZenParser& parser, float scale)
 {
-	loadMDH(parser);
+	loadMDH(parser, scale);
 	loadMDM(parser);
 }
 
@@ -268,4 +247,15 @@ void zCModelMeshLib::packMesh(PackedSkeletalMesh& mesh, float scale) const
 	}*/
 
 	
+}
+
+size_t zCModelMeshLib::findNodeIndex(const std::string &nodeName) const
+{
+	for(size_t i=0;i<m_Nodes.size();i++)
+	{
+		if(m_Nodes[i].name == nodeName)
+			return i;
+	}
+
+	return static_cast<size_t>(-1);
 }

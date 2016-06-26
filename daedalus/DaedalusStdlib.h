@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string>
+#include <string.h>
 
 namespace Daedalus
 {
@@ -156,6 +157,18 @@ namespace Daedalus
                 ITM_CAT_LIGHT			= 1<<8,
                 ITM_CAT_RUNE			= 1<<9,
                 ITM_CAT_MAGIC			= 1<<31,
+            };
+
+            enum Flags
+            {
+                ITEM_SWD	  = 1 << 14,		//	Waffe wird wie ein Schwert behandelt
+                ITEM_AXE	  = 1 << 15,		//	Waffe wird wie eine Axt behandelt
+                ITEM_2HD_SWD  = 1 << 16,		//	Waffe wird wie ein Zweihänder behandelt
+                ITEM_2HD_AXE  = 1 << 17,		//	Waffe wird wie eine Streitaxt behandelt
+                ITEM_BOW	  = 1 << 19,		//	Waffe wird wie ein Bogen behandelt
+                ITEM_CROSSBOW = 1 << 20,		//	Waffe wird wie eine Armbrust behandelt
+                ITEM_AMULET	  = 1 << 22,
+                ITEM_RING	  = 1 << 11,
             };
 
             // Für alle Items

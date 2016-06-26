@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "parserImplASCII.h"
 #include "utils/logger.h"
 
@@ -180,8 +181,12 @@ std::string ParserImplASCII::readString()
 /**
  * @brief Reads data of the expected type. Throws if the read type is not the same as specified and not 0
  */
-void ParserImplASCII::readEntry(const std::string& expectedName, void* target, size_t targetSize, EZenValueType expectedType)
+void ParserImplASCII::readEntry(const std::string& _expectedName, void* target, size_t targetSize, EZenValueType expectedType)
 {
+	// Some tools write
+	std::string expectedName = _expectedName;
+	std::transform(expectedName.begin(), expectedName.end(),expectedName.begin(), ::toupper);
+
 	m_pParser->skipSpaces();
 	std::string line = m_pParser->readLine();
 
@@ -199,7 +204,10 @@ void ParserImplASCII::readEntry(const std::string& expectedName, void* target, s
 	if(parts.size() < 2)
 		throw std::runtime_error("Failed to parse property: " + expectedName);
 
-	const std::string& valueName = parts[0];
+	std::string valueName = parts[0];
+	std::transform(valueName.begin(), valueName.end(),valueName.begin(), ::toupper);
+
+	//const std::string& valueName = parts[0];
 	const std::string& type = parts[1];
 	const std::string& value = parts.size() > 2 ? parts[2] : "";
 

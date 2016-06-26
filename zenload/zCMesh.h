@@ -2,6 +2,7 @@
 #include <vector>
 #include "utils/mathlib.h"
 #include "zTypes.h"
+#include "zenParser.h"
 
 namespace VDFS
 {
@@ -25,8 +26,17 @@ namespace ZenLoad
 		/**
 		 * @brief Reads the mesh-object from the given binary stream
 		 * @param fromZen Whether this mesh is supposed to be read from a zenfile. In this case, information about the binary chunk is also read.
+		 * @param skipPolys These polygons will be skipped while loading. These need to be ordered! (Used to load world witout LOD in G1)
+		 * @param force32bitIndices Loads all indices as 32-bit, even though the ZEN may come from Gothic 1
 		 */
-		void readObjectData(ZenParser& parser, bool fromZen);
+		void readObjectData(ZenParser& parser, const std::vector<size_t>& skipPolys = std::vector<size_t>(),
+							bool forceG132bitIndices = false);
+
+		/**
+		 * Simply skips all data found here
+		 * @param parser
+		 */
+		static void skip(ZenParser& parser);
 
 		/**
 		@ brief returns the vector of vertex-positions

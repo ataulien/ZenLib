@@ -7,6 +7,12 @@
 
 namespace ZenLoad
 {
+	enum class WorldVersion
+	{
+		VERSION_G1_08k = 1,
+		VERSION_G26fix = 2
+	};
+
 	/**
 	 * @brief Maximum amount of nodes a skeletal mesh can render
 	 */
@@ -153,6 +159,61 @@ namespace ZenLoad
 
 		std::vector<zCVobData> childVobs;
 	};
+
+	struct zCBspNode
+	{
+		enum : size_t { INVALID_NODE = static_cast<size_t>(-1) };
+
+		ZMath::float4 plane;
+		size_t front, back;
+		size_t parent;
+
+		ZMath::float3 bbox3dMin, bbox3dMax;
+
+		size_t treePolyIndex;
+		size_t numPolys;
+
+		bool isLeaf()
+		{
+			return front == INVALID_NODE && back == INVALID_NODE;
+		}
+	};
+
+	struct zCBspTreeData
+	{
+		enum TreeMode
+		{
+			Indoor = 0,
+			Outdoor = 1
+		};
+
+		/**
+		 * Whether this tree is an indoor or outdoor location
+		 */
+		TreeMode mode;
+
+		std::vector<zCBspNode> nodes;
+		std::vector<uint32_t > leafIndices;
+		std::vector<uint32_t> treePolyIndices;
+	};
+
+	struct zCBspTreeData2
+	{
+		enum TreeMode
+		{
+			Indoor = 0,
+			Outdoor = 1
+		};
+
+		/**
+		 * Whether this tree is an indoor or outdoor location
+		 */
+		TreeMode mode;
+
+		std::vector<zCBspNode> nodes;
+		std::vector<uint8_t > leafIndices;
+		std::vector<uint16_t> treePolyIndices;
+	};
 //#pragma pack(pop)
 
 	struct oCMsgConversationData : public ParsedZenObject
@@ -234,6 +295,7 @@ namespace ZenLoad
 	{
 		std::vector<zCVobData> rootVobs;
 		zCWayNetData waynet;
+		zCBspTreeData bspTree;
 	};
 
 
