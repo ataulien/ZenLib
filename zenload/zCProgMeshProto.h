@@ -82,6 +82,12 @@ namespace ZenLoad
 		*/
 		void packVertices(std::vector<WorldVertex>& vxs, std::vector<uint32_t>& ixs, uint32_t indexStart, std::vector<uint32_t>& submeshIndexStarts, float scale = 1.0f) const;
 
+		/**
+		 * @return BBox min/max
+		 */
+		ZMath::float3 getBBoxMin(){return m_BBMin;}
+		ZMath::float3 getBBoxMax(){return m_BBMax;}
+
 	private:
 
 

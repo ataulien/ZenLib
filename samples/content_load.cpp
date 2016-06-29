@@ -1,5 +1,6 @@
 #include <zenload/zCProgMeshProto.h>
 #include <vdfs/fileIndex.h>
+#include <utils/export.h>
 #include <iostream>
 
 /**
@@ -29,6 +30,18 @@ int main(int argc, char** argv)
     mesh.packMesh(packedMesh);
     
     std::cout << "Loaded Mesh with " << packedMesh.vertices.size() << " vertices and " << packedMesh.subMeshes.size() << " submeshes" << std::endl;
-    
+
+
+    std::string name = argv[2];
+    name = name.substr(0, name.find_last_of('.'));
+    std::string objfile = name + ".obj";
+
+    std::cout << "Exporting to '" << objfile << ".obj'" << std::endl;
+
+    if(!Utils::exportPackedMeshToObj(packedMesh, objfile, name))
+        std::cout << "Export failed!";
+    else
+        std::cout << "Export succeeded!";
+
     return 0;
 }

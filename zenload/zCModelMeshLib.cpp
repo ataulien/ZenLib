@@ -194,10 +194,17 @@ void zCModelMeshLib::loadMDH(ZenParser& parser, float scale)
 
 			}
 
-			ZMath::float3 bbox3d[2]; parser.readBinaryRaw(bbox3d, sizeof(bbox3d));
-			ZMath::float3 bbox3dCollision[2]; parser.readBinaryRaw(bbox3dCollision, sizeof(bbox3dCollision));
+			parser.readBinaryRaw(m_BBox, sizeof(m_BBox));
+			parser.readBinaryRaw(m_BBoxCollision, sizeof(m_BBoxCollision));
 
-			ZMath::float3 rootNodeTrans; parser.readBinaryRaw(&rootNodeTrans, sizeof(rootNodeTrans));
+            m_BBox[0] *= scale;
+			m_BBox[1] *= scale;
+			m_BBoxCollision[0] *= scale;
+			m_BBoxCollision[1] *= scale;
+
+			parser.readBinaryRaw(&m_RootNodeTranslation, sizeof(m_RootNodeTranslation));
+
+            m_RootNodeTranslation *= scale;
 
 			m_NodeChecksum = parser.readBinaryDWord();
 

@@ -91,8 +91,8 @@ namespace ZenLoad
 		float			texAniFPS;
 		uint8_t			texAniMapMode;
 		std::string		texAniMapDir;
-		uint8_t			noCollDet;
-		uint8_t			noLighmap;
+		bool			noCollDet;
+		bool			noLighmap;
 		uint8_t			loadDontCollapse;
 		std::string		detailObject;
 		float			detailTextureScale;

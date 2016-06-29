@@ -35,8 +35,6 @@ namespace ZenLoad
                                      Prop("NoLightmap", materialInfo.noLighmap),
                                      Prop("LoadDontCollapse", materialInfo.loadDontCollapse),
                                      Prop("DetailObject", materialInfo.detailObject),
-                                     Prop("IgnoreSun", materialInfo.ignoreSun),
-                                     Prop("AlphaFunc", materialInfo.alphaFunc),
                                      Prop("DefaultMapping", materialInfo.defaultMapping));
             } else
             {

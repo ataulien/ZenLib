@@ -177,17 +177,19 @@ namespace ZMath
             return !(*this == v);
         }
 
-         t_vector<T,S...> operator *(float s) const
+        t_vector<T,S...> operator *(float s) const
         {
             t_vector<T,S...> rs;
-            
-            for(int i=0;i<sizeof(T) / sizeof(float);i++) // Fixme: Doesn't work for double, vectors! Also, not very nice solution.
+
+            for(int i=0;i<sizeof(T) / sizeof(float);i++) // Fixme: Doesn't work for double-vectors! Also, not very nice solution.
             {
                 rs.v[i] = T::v[i] * s;
             }
-            
+
             return rs;
         }
+
+        t_vector<T, S...>& operator*= (float s) { *this = (*this) * s; return *this; }
         
     };
 

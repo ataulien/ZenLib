@@ -271,16 +271,23 @@ void zCProgMeshProto::packMesh(PackedMesh& mesh, float scale) const
 	std::vector<uint32_t> indices;
 	packVertices(mesh.vertices, indices, 0, submeshIndexStarts, scale);
 
+	// Put in all materials. There could be more than there are submeshes for animated textures or headmeshes
+	mesh.subMeshes.resize(std::max(m_Materials.size(), m_SubMeshes.size()));
+	for(size_t i=0;i<m_SubMeshes.size();i++)
+	{
+		auto &sm = mesh.subMeshes[i];
+		sm.material = m_SubMeshes[i].m_Material;
+	}
+
 	// Create objects for all submeshes
 	for(size_t i=0;i<m_SubMeshes.size();i++)
-	{		
-		mesh.subMeshes.emplace_back();
-		mesh.subMeshes.back().material = m_SubMeshes[i].m_Material;
+	{
+		auto& sm = mesh.subMeshes[i];
 
 		// Get indices
 		for(size_t j = submeshIndexStarts[i]; j < submeshIndexStarts[i] + m_SubMeshes[i].m_TriangleList.size() * 3; j++)
 		{
-			mesh.subMeshes.back().indices.push_back(indices[j]);
+			sm.indices.push_back(indices[j]);
 		}
 	}
 }

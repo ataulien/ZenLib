@@ -93,6 +93,15 @@ namespace ZenLoad
 				|| !m_NodeAttachments.empty()
 				|| !m_Nodes.empty();
 		}
+
+		/**
+		 * @return BBox min/max
+		 */
+		ZMath::float3 getBBoxMin()const{return m_BBox[0];}
+		ZMath::float3 getBBoxMax()const{return m_BBox[1];}
+		ZMath::float3 getBBoxCollisionMin()const{return m_BBoxCollision[0];}
+		ZMath::float3 getBBoxCollisionMax()const{return m_BBoxCollision[1];}
+		ZMath::float3 getRootNodeTranslation()const{return m_RootNodeTranslation;}
 	private:
 		/**
 		 * @brief List of meshes registered in this library
@@ -114,5 +123,9 @@ namespace ZenLoad
 		 * @brief Checksum for this node hierachy
 		 */
 		uint32_t m_NodeChecksum;
+
+		ZMath::float3 m_BBox[2];
+		ZMath::float3 m_BBoxCollision[2];
+		ZMath::float3 m_RootNodeTranslation;
 	};
 }
