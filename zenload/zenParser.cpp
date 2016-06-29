@@ -72,7 +72,7 @@ bool ZenParser::readFile(const std::string& fileName, std::vector<uint8_t>& data
 */
 bool ZenParser::isNumber(const std::string &expr)
 {
-	return !expr.empty() && std::find_if(expr.begin(), expr.end(), [](char c){return !std::isdigit(c); }) == expr.end();
+	return !expr.empty() && std::find_if(expr.begin(), expr.end(), [](unsigned char c){return !std::isdigit(c); }) == expr.end();
 }
 
 /**

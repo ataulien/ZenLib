@@ -132,7 +132,7 @@ namespace ZenLoad
 										 Prop("visualCamAlign", info.visualCamAlign),
 										 Prop("visualAniMode", info.visualAniMode),
 										 Prop("visualAniModeStrength", info.visualAniModeStrength),
-										 Prop("vobFarClipScale", info.vobFarClipScale),
+										 Prop("vobFarClipZScale", info.vobFarClipScale),
 										 Prop("cdStatic", info.cdStatic),
 										 Prop("cdDyn", info.cdDyn),
 										 Prop("staticVob", info.staticVob),

@@ -5,6 +5,7 @@
 #include <string>
 #include "vdfs/fileIndex.h"
 #include "zCMaterial.h"
+#include <algorithm>
 
 using namespace ZenLoad;
 
