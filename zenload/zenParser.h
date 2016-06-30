@@ -99,7 +99,7 @@ namespace ZenLoad
 		/**
 		 * @brief reads the main oCWorld-Object, found in the level-zens
 		 */
-		oCWorldData readWorld();
+		void readWorld(oCWorldData& info);
         
         /****************************************************************************************************************/
         /* ############### Note: Rest of the methods are to be used only if you know what you are doing ############### */

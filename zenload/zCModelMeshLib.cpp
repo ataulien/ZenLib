@@ -30,6 +30,9 @@ const uint16_t MLID_MDH_END	= 0xD120;
 */
 zCModelMeshLib::zCModelMeshLib(const std::string& fileName, const VDFS::FileIndex& fileIndex, float scale)
 {
+	memset(m_BBox, 0, sizeof(m_BBox));
+	memset(m_BBoxCollision, 0, sizeof(m_BBoxCollision));
+
 	std::vector<uint8_t> data;
 	fileIndex.getFileData(fileName, data);
 

@@ -142,7 +142,7 @@ void ZenParser::readHeader()
 /**
 * @brief reads the main oCWorld-Object, found in the level-zens
 */
-oCWorldData ZenParser::readWorld()
+void ZenParser::readWorld(oCWorldData& info)
 {
     LogInfo() << "ZEN: Reading world...";
 
@@ -152,7 +152,7 @@ oCWorldData ZenParser::readWorld()
 	if(header.classname != "oCWorld:zCWorld")
 		ERROR("Expected oCWorld:zCWorld-Chunk not found!");
 
-    return oCWorld::readObjectData(*this, header.version);
+    oCWorld::readObjectData(info, *this, header.version);
 }
 
 void ZenParser::readWorldMesh(oCWorldData& info)

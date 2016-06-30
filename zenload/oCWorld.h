@@ -37,13 +37,14 @@ namespace ZenLoad
 			i++;
 
 			// Read vob data, followed by the count of the children of this vob
-			zCVobData v = zCVob::readObjectData(parser, worldversion);
+			target.emplace_back();
+			zCVob::readObjectData(target.back(), parser, worldversion);
 
 			// Read how many vobs this one has as child
 			parser.getImpl()->readEntry("", &numChildren, sizeof(numChildren), ZenLoad::ParserImpl::ZVT_INT);
 
 			// Add to parent
-			target.push_back(v);
+			
 
 			// Read children
 			target.back().childVobs.reserve(numChildren);
@@ -58,7 +59,7 @@ namespace ZenLoad
 		/**
 		* Reads this object from an internal zen
 		*/
-		static oCWorldData readObjectData(ZenParser& parser, uint32_t versionInternal)
+		static void readObjectData(oCWorldData& info, ZenParser& parser, uint32_t versionInternal)
 		{
 			WorldVersion version;
 			if(versionInternal == static_cast<uint32_t>(WorldVersionInternal::VERSION_G1_08k))
@@ -66,7 +67,6 @@ namespace ZenLoad
 			else
 				version = WorldVersion::VERSION_G26fix;
 
-			oCWorldData info;
 			info.objectClass = "oCWorld";
 
 			while(!parser.readChunkEnd())
@@ -100,15 +100,13 @@ namespace ZenLoad
 					parser.readChunkEnd();
 				}else if(header.name == "WayNet")
 				{
-					info.waynet = zCWayNet::readObjectData(parser);
+					zCWayNet::readObjectData(info.waynet, parser);
 				}
 				else
 				{
 					parser.skipChunk();
 				}
 			}
-
-			return info;
 		}
 
 	private:

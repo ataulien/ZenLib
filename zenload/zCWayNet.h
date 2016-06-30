@@ -30,10 +30,8 @@ namespace ZenLoad
         /**
          * Reads this object from an internal zen
          */
-        static zCWayNetData readObjectData(ZenParser& parser)
+        static void readObjectData(zCWayNetData& info, ZenParser& parser)
         {
-            zCWayNetData info;
-
             ZenParser::ChunkHeader waynetHeader;
             parser.readChunkStart(waynetHeader);
 
@@ -44,7 +42,7 @@ namespace ZenLoad
             {
                 // TODO: Implement old waynet format
                 LogWarn() << "Old waynet-format not yet supported!";
-                return zCWayNetData();
+                return;
             }
 
             // First, read the waypoints array
@@ -109,9 +107,9 @@ namespace ZenLoad
                 info.edges.push_back(std::make_pair(wp1, wp2));
             }
 
-            parser.readChunkEnd();
+			LogInfo() << "Done loading edges!";
 
-            return info;
+            parser.readChunkEnd();
         }
 
     private:

@@ -49,10 +49,8 @@ namespace ZenLoad
 		/**
 		* Reads this object from an internal zen
 		*/
-		static zCVobData readObjectData(ZenParser& parser, WorldVersion version)
+		static void readObjectData(zCVobData& info, ZenParser& parser, WorldVersion version)
 		{
-			zCVobData info;
-
 			info.objectClass = "zCVob";
 
 			info.rotationMatrix = ZMath::Matrix::CreateIdentity();
@@ -156,8 +154,6 @@ namespace ZenLoad
 
 			// Generate world-matrix
 			info.worldMatrix = info.rotationMatrix3x3.toMatrix(info.position);
-
-			return info;
 		}
 
 	private:
