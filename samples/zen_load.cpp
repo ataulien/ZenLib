@@ -61,7 +61,8 @@ int main(int argc, char** argv)
               << "Object-count (optional): " << parser.getZenHeader().objectCount << std::endl;
     
     // Read the rest of the ZEN-file
-    ZenLoad::oCWorldData world = parser.readWorld();
+    ZenLoad::oCWorldData world;
+	parser.readWorld(world);
     
     std::cout << "Done reading ZEN!" << std::endl;
     
