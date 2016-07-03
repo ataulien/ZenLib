@@ -58,16 +58,23 @@ namespace ZenLoad
 		 * @brief returns the vector of triangle-indices
 		 */
 		const std::vector<uint32_t>& getFeatureIndices() const { return m_FeatureIndices; }
-		
+
+		/**
+		 * @brief returns the vector of triangle-material-indices
+		 */
+		const std::vector<int16_t>& getTriangleMaterialIndices() const { return m_TriangleMaterialIndices; }
+
 		/**
 		* @brief returns the vector of triangle-material-indices
 		*/
-		const std::vector<uint32_t>& getTriangleMaterialIndices() const { return m_TriangleMaterialIndices; }
+		const std::vector<int16_t>& getTriangleLightmapIndices() const { return m_TriangleLightmapIndices; }
 
 		/**
 		 * @brief returns the vector of the materials used by this mesh
 		 */
 		const std::vector<zCMaterialData>& getMaterials() const { return m_Materials; }
+
+
 
 		/**
 		 * @brief getter for the boudingboxes
@@ -104,7 +111,12 @@ namespace ZenLoad
 		 * @brief Textures for the triangles. Divide index-position by 3 to get the 
 		 * corresponding material-info 
 		 */
-		std::vector<uint32_t> m_TriangleMaterialIndices;
+		std::vector<int16_t> m_TriangleMaterialIndices;
+
+		/**
+		 * @brief Index of the lightmap used by the triangles in order. -1 of no lightmap registered.
+		 */
+		std::vector<int16_t> m_TriangleLightmapIndices;
 
 		/**
 		 * @brief All materials used by this mesh

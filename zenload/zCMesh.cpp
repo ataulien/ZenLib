@@ -61,8 +61,8 @@ zCMesh::zCMesh(const std::string& fileName, VDFS::FileIndex& fileIndex)
 template<typename FT>
 struct polyData1
 {
-    int16_t	materialIndex;
-    int16_t	lightmapIndex;
+    int16_t	materialIndex; // -1 if none
+    int16_t	lightmapIndex; // -1 if none
     zTPlane		polyPlane;
     FT          flags;
     uint8_t		polyNumVertices;
@@ -314,7 +314,10 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
                                     }
 
                                     // Save material index for the written triangle
-                                    m_TriangleMaterialIndices.emplace_back(p.materialIndex);
+                                    m_TriangleMaterialIndices.push_back(p.materialIndex);
+
+									// Save lightmap-index
+									m_TriangleLightmapIndices.push_back(p.lightmapIndex);
 
                                     WorldTriangle triangle;
                                     triangle.flags = p.flags;
@@ -338,7 +341,10 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
                                         m_FeatureIndices.emplace_back(p.indices[i + 1].FeatIndex);
 
                                         // Save material index for the written triangle
-                                        m_TriangleMaterialIndices.emplace_back(p.materialIndex);
+                                        m_TriangleMaterialIndices.push_back(p.materialIndex);
+
+										// Save lightmap-index
+										m_TriangleLightmapIndices.push_back(p.lightmapIndex);
 
                                         WorldTriangle triangle;
                                         triangle.flags = p.flags;
