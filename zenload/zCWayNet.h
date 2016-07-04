@@ -59,6 +59,7 @@ namespace ZenLoad
                 // These are always new ones
                 parser.readChunkStart(wph);
                 zCWaypointData w = readWaypoint(parser);
+                w.objectClass = wph.classname;
                 info.waypoints.push_back(w);
 
                 parser.readChunkEnd();
@@ -93,6 +94,7 @@ namespace ZenLoad
                     {
                         // Create new waypoint
                         zCWaypointData w = readWaypoint(parser);
+                        w.objectClass = wph.classname;
                         info.waypoints.push_back(w);
 
                         // Save for later access

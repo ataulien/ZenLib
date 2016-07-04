@@ -40,31 +40,7 @@ void DaedalusGameState::registerExternals()
         std::string spawnpoint = vm.popString(); if(l) LogInfo() << "spawnpoint: " << spawnpoint;
         uint32_t npcinstance = vm.popDataValue(); if(l) LogInfo() << "npcinstance: " << npcinstance;
 
-        NpcHandle npc = createNPC();
-
-        if(l) LogInfo() << "Created npc idx: " << npc.index;
-
-        GEngineClasses::C_Npc& npcData = getNpc(npc);
-        npcData.wp = spawnpoint;
-
-        // Setup basic class linkage. This is important here, as otherwise the wld_insertnpc-callback won't be
-        // able to work properly
-        npcData.instanceSymbol = npcinstance;
-
-        PARSymbol& s = vm.getDATFile().getSymbolByIndex(npcinstance);
-        s.instanceDataHandle = ZMemory::toBigHandle(npc);
-        s.instanceDataClass = IC_Npc;
-
-        if(m_GameExternals.wld_insertnpc)
-            m_GameExternals.wld_insertnpc(npc, spawnpoint);
-
-        vm.initializeInstance(ZMemory::toBigHandle(npc), npcinstance, IC_Npc);
-
-        // Init complete, notify the engine
-        if(m_GameExternals.post_wld_insertnpc)
-            m_GameExternals.post_wld_insertnpc(npc);
-
-        if(l) LogInfo() << " ##### Created NPC: " << npcData.name[0];
+        insertNPC(npcinstance, spawnpoint);
     });
 
     m_VM.registerExternalFunction("createinvitem", [&](Daedalus::DaedalusVM& vm){
@@ -272,4 +248,36 @@ bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc)
     }
 
     return false;
+}
+
+NpcHandle DaedalusGameState::insertNPC(size_t instance, const std::string &waypoint)
+{
+    NpcHandle npc = createNPC();
+
+    GEngineClasses::C_Npc& npcData = getNpc(npc);
+    npcData.wp = waypoint;
+
+    // Setup basic class linkage. This is important here, as otherwise the wld_insertnpc-callback won't be
+    // able to work properly
+    npcData.instanceSymbol = instance;
+
+    PARSymbol& s = m_VM.getDATFile().getSymbolByIndex(instance);
+    s.instanceDataHandle = ZMemory::toBigHandle(npc);
+    s.instanceDataClass = IC_Npc;
+
+    if(m_GameExternals.wld_insertnpc)
+        m_GameExternals.wld_insertnpc(npc, waypoint);
+
+    m_VM.initializeInstance(ZMemory::toBigHandle(npc), instance, IC_Npc);
+
+    // Init complete, notify the engine
+    if(m_GameExternals.post_wld_insertnpc)
+        m_GameExternals.post_wld_insertnpc(npc);
+
+    return npc;
+}
+
+NpcHandle DaedalusGameState::insertNPC(const std::string &instance, const std::string& waypoint)
+{
+    return insertNPC(m_VM.getDATFile().getSymbolIndexByName(instance), waypoint);
 }

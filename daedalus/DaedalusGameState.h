@@ -99,6 +99,15 @@ namespace Daedalus
             bool removeInventoryItem(size_t itemSymbol, NpcHandle npc);
 
             /**
+             * Creates a new NPC-Instance, just as Wld_InsertNPC was called from script
+             * @param instance Instance-Index of the NPC to create
+             * @param waypoint Waypoint to place the newly created npc on
+             * @return Handle to the script-instance created
+             */
+            NpcHandle insertNPC(size_t instance, const std::string& waypoint);
+            NpcHandle insertNPC(const std::string& instance, const std::string& waypoint);
+
+            /**
 			 * Creates scripting relevant objects
 			 */
             NpcHandle createNPC();

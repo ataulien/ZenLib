@@ -7,7 +7,7 @@ namespace ZenLoad
 	/**
 	* @brief Modified ZTEX to DDS conversion
 	*/
-	int convertZTEX2DDS( const std::vector<uint8_t>& ztexData, std::vector<uint8_t>& ddsData, bool optionForceARGB = false);
+	int convertZTEX2DDS( const std::vector<uint8_t>& ztexData, std::vector<uint8_t>& ddsData, bool optionForceARGB = false, int* pOutWidth = nullptr, int* pOutHeight = nullptr);
 
 	/**
 	 * @brief Convert dds to RGBA8

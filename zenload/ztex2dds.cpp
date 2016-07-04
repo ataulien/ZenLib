@@ -108,7 +108,7 @@ namespace ZenLoad
 	/**
 	 * @brief Modified ZTEX to DDS conversion
 	 */
-	int convertZTEX2DDS(const std::vector<uint8_t>& ztexData, std::vector<uint8_t>& ddsData, bool optionForceARGB)
+	int convertZTEX2DDS(const std::vector<uint8_t>& ztexData, std::vector<uint8_t>& ddsData, bool optionForceARGB, int* pOutWidth, int* pOutHeight)
 	{
 		ZTEX_FILE_HEADER ZTexHeader;
 		uint32_t BytesRead = 0;
@@ -130,6 +130,12 @@ namespace ZenLoad
 		// Read header
 		if(!readVectorData(&ZTexHeader, 0, sizeof(ZTexHeader), ztexData))
 			return ZTEX2DDS_ERROR_READ;
+
+		if(pOutWidth)
+			*pOutWidth = ZTexHeader.TexInfo.Width;
+
+		if(pOutHeight)
+			*pOutHeight = ZTexHeader.TexInfo.Height;
 
 		BytesRead += sizeof(ZTexHeader);
 
