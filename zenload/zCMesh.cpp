@@ -403,7 +403,7 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale)
 	std::vector<uint32_t> newIndices;
 
 	// Map of vertex-indices and their used feature-indices to a vertex in "newVertices"
-	std::map<std::pair<uint32_t, uint32_t>, uint32_t> vfToNewVx;
+	std::map<std::tuple<uint32_t, uint32_t, int16_t>, size_t> vfToNewVx;
 
 	// Map of the new indices and the old indices to the index-vector
 	std::unordered_map<uint32_t, uint32_t> newToOldIdxIdx;
@@ -413,13 +413,14 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale)
 	{
 		uint32_t featidx = m_FeatureIndices[i];
 		uint32_t vertidx = m_Indices[i];
+		int16_t lightmap = m_TriangleLightmapIndices[i/3];
 
 		// Check if we already got this pair of vertex/feature
-		auto it = vfToNewVx.find(std::make_pair(vertidx, featidx));
+		auto it = vfToNewVx.find(std::make_tuple(vertidx, featidx, lightmap));
 		if(it == vfToNewVx.end())
 		{
 			// Add new entry
-			vfToNewVx[std::make_pair(vertidx, featidx)] = newVertices.size();
+			vfToNewVx[std::make_tuple(vertidx, featidx, lightmap)] = newVertices.size();
 			WorldVertex vx;
 
 			// Extract vertex information
@@ -465,6 +466,7 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale)
 
 	mesh.subMeshes.resize(materialsByTexture.size());
 
+
 	// Add triangles
 	for(size_t i = 0, end = newIndices.size(); i < end; i += 3)
 	{
@@ -473,6 +475,9 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale)
 
 		// Find texture of this material
 		matIdx = newMaterialSlotsByMatIndex[materialsByTexture[m_Materials[matIdx].texture]];
+
+		// Copy lightmap index
+		mesh.subMeshes[matIdx].triangleLightmapIndices.push_back(m_TriangleLightmapIndices[i/3]);
 
 		// Add this triangle to its submesh
 		for(size_t j = 0; j < 3; j++)

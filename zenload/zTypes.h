@@ -464,6 +464,11 @@ namespace ZenLoad
 		PolyFlags flags;
 
 		/**
+		 * @brief Index to the lightmap stored in the zCMesh
+		 */
+		int16_t lightmapIndex;
+
+		/**
 		* @brief Vertices belonging to this triangle
 		*/
 		WorldVertex vertices[3];
@@ -478,7 +483,8 @@ namespace ZenLoad
 		struct SubMesh
 		{
 			zCMaterialData material;			
-			std::vector<uint32_t> indices;		
+			std::vector<uint32_t> indices;
+			std::vector<int16_t> triangleLightmapIndices; // Index values to the texture found in zCMesh
 		};
 
 		std::vector<WorldTriangle> triangles; // Use index / 3 to access these
