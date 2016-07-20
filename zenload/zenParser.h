@@ -8,6 +8,11 @@
 #include "utils/split.h"
 #include "zTypes.h"
 
+namespace VDFS
+{
+	class FileIndex;
+}
+
 namespace ZenLoad
 {
 	class ParserImpl;
@@ -67,11 +72,12 @@ namespace ZenLoad
 		 * @brief reads a zen from a file
 		 */
 		ZenParser(const std::string& file);
+		ZenParser(const std::string& file, const VDFS::FileIndex& vdfs);
 
 		/**
 		* @brief reads a zen from memory
 		*/
-		ZenParser(const void* data, size_t size);
+		ZenParser(const uint8_t* data, size_t size);
 
 		ZenParser(){}
 		~ZenParser();
@@ -95,6 +101,16 @@ namespace ZenLoad
 		 * @brief Reads the main ZEN-Header
 		 */
 		void readHeader();
+		
+		/**
+		 * @brief Reads the main ZEN-Header
+		 */
+		void readHeader(ZenHeader& header, ParserImpl*& impl);
+
+		/**
+		 * @brief Skips the main header
+		 */
+		void skipHeader();
 
 		/**
 		 * @brief reads the main oCWorld-Object, found in the level-zens
@@ -173,7 +189,7 @@ namespace ZenLoad
 		/**
 		 * @brief Returns the data-array
 		 */
-		const std::vector<uint8_t> getData(){ return m_Data; }
+		const std::vector<uint8_t>& getData(){ return m_Data; }
 
 		/**
 		* @brief Reads one structure of type T. Watch for alignment!

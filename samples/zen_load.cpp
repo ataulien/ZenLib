@@ -38,43 +38,42 @@ int main(int argc, char** argv)
     VDFS::FileIndex vdf;
     vdf.loadVDF(argv[1]);
     
-    // Load zen from archive
-    std::vector<uint8_t> data;
-    vdf.getFileData(argv[2], data);
-    
-    if(data.empty())
-    {
-        std::cout << "Error: ZEN-File either not found or empty!" << std::endl;
-        return 0;
-    }
-    
-    // Initialize parser with the loaded data
-    ZenLoad::ZenParser parser(data.data(), data.size());
-    
-    // Since this is a usual level-zen, read the file header
-    // You will most likely allways need to do that
-    parser.readHeader();
-    
-    // Do something with the header, if you want.
-    std::cout << "Author: " << parser.getZenHeader().user << std::endl
-              << "Date: " << parser.getZenHeader().date << std::endl
-              << "Object-count (optional): " << parser.getZenHeader().objectCount << std::endl;
-    
-    // Read the rest of the ZEN-file
-    ZenLoad::oCWorldData world;
-	parser.readWorld(world);
-    
-    std::cout << "Done reading ZEN!" << std::endl;
-    
+	while(true)
+	{
+		// Initialize parser with zenfile from vdf
+		ZenLoad::ZenParser parser(argv[2], vdf);
+
+		if(parser.getFileSize() == 0)
+		{
+			std::cout << "Error: ZEN-File either not found or empty!" << std::endl;
+			return 0;
+		}
+
+		// Since this is a usual level-zen, read the file header
+		// You will most likely allways need to do that
+		parser.readHeader();
+
+		// Do something with the header, if you want.
+		std::cout << "Author: " << parser.getZenHeader().user << std::endl
+			<< "Date: " << parser.getZenHeader().date << std::endl
+			<< "Object-count (optional): " << parser.getZenHeader().objectCount << std::endl;
+
+		// Read the rest of the ZEN-file
+		ZenLoad::oCWorldData world;
+		parser.readWorld(world);
+
+		std::cout << "Done reading ZEN!" << std::endl;
+	}
+
     // Print some sample-data for vobs which got a visual
-    std::cout << "Listing vobs..." << std::endl;
+    /*std::cout << "Listing vobs..." << std::endl;
     listVobInformation(world.rootVobs);
 
     std::cout << "Listing waypoints..." << std::endl;
     for(const ZenLoad::zCWaypointData& v : world.waynet.waypoints)
     {
         std::cout << "Waypoint [" << v.wpName << "] at " << v.position.toString() << std::endl;
-    }
+    }*/
 
     return 0;
 }

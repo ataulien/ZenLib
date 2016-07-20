@@ -9,6 +9,8 @@
 #include "oCWorld.h"
 #include "zCMesh.h"
 #include "zCBspTree.h"
+#include <vdfs/fileIndex.h>
+
 using namespace ZenLoad;
 
 #ifdef __ANDROID__
@@ -16,9 +18,10 @@ using namespace ZenLoad;
 #else 
 #define ERROR(msg) do{ throw std::runtime_error(msg); }while(0)
 #endif
+
 /**
-* @brief reads a zen from a file
-*/
+ * @brief reads a zen from a file
+ */
 ZenParser::ZenParser(const std::string& file) :
 	m_Seek(0),
 	m_pWorldMesh(0)
@@ -28,14 +31,23 @@ ZenParser::ZenParser(const std::string& file) :
 }
 
 /**
- * @brief reads a zen from memory
+ * @brief reads a zen from a vdf
  */
-ZenParser::ZenParser(const void* data, size_t size) :
+ZenParser::ZenParser(const std::string& file, const VDFS::FileIndex& vdfs) :
 	m_Seek(0),
 	m_pWorldMesh(0)
 {
-	m_Data.resize(size);
-	memcpy(m_Data.data(), data, size);
+	vdfs.getFileData(file, m_Data);
+}
+
+/**
+ * @brief reads a zen from memory
+ */
+ZenParser::ZenParser(const uint8_t* data, size_t size) :
+	m_Seek(0),
+	m_pWorldMesh(0)
+{
+	m_Data.assign(data, data + size);
 }
 
 ZenLoad::ZenParser::~ZenParser()
@@ -80,6 +92,26 @@ bool ZenParser::isNumber(const std::string &expr)
 */
 void ZenParser::readHeader()
 {
+	readHeader(m_Header, m_pParserImpl);
+}
+
+/**
+* @brief Skips the main header
+*/
+void ZenParser::skipHeader()
+{
+	ZenHeader header;
+	ParserImpl* impl = nullptr;
+	readHeader(m_Header, m_pParserImpl);
+
+	delete impl;
+}
+
+/**
+* @brief Skipts the ZEN-Header
+*/
+void ZenParser::readHeader(ZenHeader& header, ParserImpl*& impl)
+{
 	if(!skipString("ZenGin Archive"))
 		ERROR("Not a valid format");
 
@@ -87,7 +119,7 @@ void ZenParser::readHeader()
 		ERROR("Not a valid header");
 
 	// Version should be always 1...
-	m_Header.version = readIntASCII();
+	header.version = readIntASCII();
 
 	// Skip archiver type
 	skipString();
@@ -96,18 +128,18 @@ void ZenParser::readHeader()
 	std::string fileType = readLine();
 	if(fileType == "ASCII")
 	{
-		m_Header.fileType = FT_ASCII;
-		m_pParserImpl = new ParserImplASCII(this);
+		header.fileType = FT_ASCII;
+		impl = new ParserImplASCII(this);
 	}
 	else if(fileType == "BINARY")
 	{
-		m_Header.fileType = FT_BINARY;
-		m_pParserImpl = new ParserImplBinary(this);
+		header.fileType = FT_BINARY;
+		impl = new ParserImplBinary(this);
 	}
 	else if(fileType == "BIN_SAFE")
 	{
-		m_Header.fileType = FT_BINSAFE;
-		m_pParserImpl = new ParserImplBinSafe(this);
+		header.fileType = FT_BINSAFE;
+		impl = new ParserImplBinSafe(this);
 	}
 	else
 		ERROR("Unsupported file format");
@@ -116,18 +148,18 @@ void ZenParser::readHeader()
 	if(!skipString("saveGame"))
 		ERROR("Unsupported file format");
 
-	m_Header.saveGame = readBoolASCII();
+	header.saveGame = readBoolASCII();
 
 	// Read possible date
 	if(skipString("date"))
 	{
-		m_Header.date = readString() + " ";
-		m_Header.date += readString();
+		header.date = readString() + " ";
+		header.date += readString();
 	}
 
 	// Skip possible user
 	if(skipString("user"))
-		m_Header.user = readLine();
+		header.user = readLine();
 
 	// Reached the end of the main header
 	if(!skipString("END"))
@@ -136,7 +168,7 @@ void ZenParser::readHeader()
 	// Continue with the implementationspecific header
 	skipSpaces();
 
-	m_pParserImpl->readImplHeader();
+	impl->readImplHeader();
 }
 
 /**

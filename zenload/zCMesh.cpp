@@ -162,30 +162,32 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 				//  - String - Name
 				//  - zCMaterial-Chunk
 
-				ZenParser p2(&parser.getData()[parser.getSeek()], parser.getData().size() - parser.getSeek());
-				p2.readHeader();
+				//ZenParser p2(&parser.getData()[parser.getSeek()], parser.getData().size() - parser.getSeek());
+				//p2.readHeader();
+
+				parser.skipHeader();
 
 				// Read number of materials
-				uint32_t numMaterials = p2.readBinaryDWord();
+				uint32_t numMaterials = parser.readBinaryDWord();
 
 				// Read every stored material
 				for(uint32_t i = 0; i < numMaterials; i++)
 				{
-					p2.readLine(false); // Read unused material name (Stored a second time later)
+					parser.readLine(false); // Read unused material name (Stored a second time later)
 
 										// Skip chunk headers - we know these are zCMaterial
-					uint32_t chunksize = p2.readBinaryDWord();
-					uint16_t version = p2.readBinaryWord();
-					uint32_t objectIndex = p2.readBinaryDWord();
+					uint32_t chunksize = parser.readBinaryDWord();
+					uint16_t version = parser.readBinaryWord();
+					uint32_t objectIndex = parser.readBinaryDWord();
 
-					p2.skipSpaces();
+					parser.skipSpaces();
 
 					// Skip chunk-header
-					std::string name = p2.readLine();
-					std::string classname = p2.readLine();
+					std::string name = parser.readLine();
+					std::string classname = parser.readLine();
 
 					// Save into vector
-					m_Materials.emplace_back(zCMaterial::readObjectData(p2, version));
+					m_Materials.emplace_back(zCMaterial::readObjectData(parser, version));
 				}
 
 				// Note: There is a bool stored here in the G2-Formats, which says whether to use alphatesting or not
@@ -247,11 +249,14 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 				int numPolys = parser.readBinaryDWord();
 
 				// Read block of data
-				std::vector<uint8_t> dataBlock;
-				dataBlock.resize(chunkInfo.length);
-				parser.readBinaryRaw(dataBlock.data(), chunkInfo.length);
+				//std::vector<uint8_t> dataBlock;
+				//dataBlock.resize(chunkInfo.length);
+				//parser.readBinaryRaw(dataBlock.data(), chunkInfo.length);
 
-				uint8_t* blockPtr = dataBlock.data();
+				// Fake a read here, to get around an additional copy of the data
+				const uint8_t* blockPtr = &parser.getData()[parser.getSeek()];
+				parser.setSeek(parser.getSeek() + chunkInfo.length);
+
                 size_t blockSize = version == EVersion::G2_2_6fix
                                    ? sizeof(polyData1<PolyFlags2_6fix>)
                                    : sizeof(polyData1<PolyFlags1_08k>);
@@ -264,6 +269,10 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
                 {
                     indicesSize = sizeof(polyData2<uint32_t, PolyFlags1_08k>::Index);
                 }
+
+				// Preallocate some memory for the triangles
+				// Note: There will be some more triangles, since not all polys have 3 vertices. Times 2 could be a little bit too hugh, though.
+				m_Triangles.reserve(numPolys * 2);
 
 				// Iterate throuh every poly
 				for(int i = 0; i < numPolys; i++)
