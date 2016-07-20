@@ -15,42 +15,42 @@ namespace ZenLoad
     inline void read<float>(ZenParser& p, std::string& outStr, float& outData, const std::string& exName)
 	{ 
 		p.getImpl()->readEntry(exName, &outData, sizeof(float), ParserImpl::ZVT_FLOAT);
-		outStr = std::to_string(outData);
+		//outStr = std::to_string(outData);
     }
 
 	template<> 
     inline void read<bool>(ZenParser& p, std::string& outStr, bool& outData, const std::string& exName)
 	{ 
 		p.getImpl()->readEntry(exName, &outData, sizeof(bool), ParserImpl::ZVT_BOOL);
-		outStr = std::to_string(outData ? 1 : 0);
+		//outStr = std::to_string(outData ? 1 : 0);
     }
 
 	template<> 
     inline void read<uint32_t>(ZenParser& p, std::string& outStr, uint32_t& outData, const std::string& exName)
 	{ 
 		p.getImpl()->readEntry(exName, &outData, sizeof(uint32_t), ParserImpl::ZVT_INT);
-		outStr = std::to_string(outData);
+		//outStr = std::to_string(outData);
     }
 
 	template<> 
     inline void read<int32_t>(ZenParser& p, std::string& outStr, int32_t& outData, const std::string& exName)
 	{ 
 		p.getImpl()->readEntry(exName, &outData, sizeof(int32_t), ParserImpl::ZVT_INT);
-		outStr = std::to_string(outData);
+		//outStr = std::to_string(outData);
     }
 
 	template<> 
     inline void read<uint16_t>(ZenParser& p, std::string& outStr, uint16_t& outData, const std::string& exName)
 	{ 
 		p.getImpl()->readEntry(exName, &outData, sizeof(uint16_t), ParserImpl::ZVT_WORD);
-		outStr = std::to_string(outData);
+		//outStr = std::to_string(outData);
     }
 
 	template<> 
     inline void read<uint8_t>(ZenParser& p, std::string& outStr, uint8_t& outData, const std::string& exName)
 	{ 
 		p.getImpl()->readEntry(exName, &outData, sizeof(uint16_t), ParserImpl::ZVT_BYTE);
-		outStr = std::to_string(outData);
+		//outStr = std::to_string(outData);
     }
 
 	template<> 
@@ -58,16 +58,16 @@ namespace ZenLoad
 	{ 
 		p.getImpl()->readEntry(exName, &outData.x, sizeof(float), ParserImpl::ZVT_FLOAT);
 		p.getImpl()->readEntry(exName, &outData.y, sizeof(float), ParserImpl::ZVT_FLOAT);
-		outStr = "[" + std::to_string(outData.x) + ", " + std::to_string(outData.y) + "]";
+		//outStr = "[" + std::to_string(outData.x) + ", " + std::to_string(outData.y) + "]";
     }
 
 	template<> 
     inline void read<ZMath::float3>(ZenParser& p, std::string& outStr, ZMath::float3& outData, const std::string& exName)
 	{ 
 		p.getImpl()->readEntry(exName, &outData, sizeof(float) * 3, ParserImpl::ZVT_VEC3);
-		outStr = "[" + std::to_string(outData.x) 
+		/*outStr = "[" + std::to_string(outData.x) 
 			+ ", " + std::to_string(outData.y)
-			+ ", " + std::to_string(outData.z) + "]";
+			+ ", " + std::to_string(outData.z) + "]";*/
     }
 
 	template<> 
@@ -77,10 +77,10 @@ namespace ZenLoad
 		p.getImpl()->readEntry(exName, &outData.y, sizeof(float), ParserImpl::ZVT_FLOAT);
 		p.getImpl()->readEntry(exName, &outData.z, sizeof(float), ParserImpl::ZVT_FLOAT);
 		p.getImpl()->readEntry(exName, &outData.w, sizeof(float), ParserImpl::ZVT_FLOAT);
-		outStr = "[" + std::to_string(outData.x) 
+		/*outStr = "[" + std::to_string(outData.x) 
 			+ ", " + std::to_string(outData.y)
 			+ ", " + std::to_string(outData.z)
-			+ ", " + std::to_string(outData.w) + "]";
+			+ ", " + std::to_string(outData.w) + "]";*/
     }
 
 	template<> 
@@ -90,7 +90,7 @@ namespace ZenLoad
 		p.getImpl()->readEntry(exName, m, sizeof(float) * 16, ParserImpl::ZVT_RAW_FLOAT);
 		outData = m;
 
-		outStr = "[";
+		/*outStr = "[";
 		for(size_t i = 0; i < 16; i++)
 		{
 			outStr += std::to_string(m[i]);
@@ -99,7 +99,7 @@ namespace ZenLoad
 			if(i != 15)
 				outStr += ", ";
 		}
-		outStr += "]";
+		outStr += "]";*/
     }
 
 	template<> 
@@ -121,7 +121,7 @@ namespace ZenLoad
             read<typename std::remove_pointer<decltype(pair.second)>::type>(ZenParser, outStr, *pair.second, pair.first);
 
 			// Save the read value as string
-			rval[pair.first] = outStr; 
+			//rval[pair.first] = outStr; 
 		});
 	}
 

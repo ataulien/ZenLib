@@ -90,7 +90,7 @@ namespace ZenLoad
 				if(pd.bitfield.hasVisualName)
 					parser.getImpl()->readEntry("", &info.visual, 0, ZenLoad::ParserImpl::ZVT_STRING);
 	
-				info.properties.insert(std::make_pair("PresetName", info.presetName));
+				/*info.properties.insert(std::make_pair("PresetName", info.presetName));
 				info.properties.insert(std::make_pair("BBoxMin", info.bbox[0].toString()));
 				info.properties.insert(std::make_pair("BBoxMax", info.bbox[1].toString()));
 				info.properties.insert(std::make_pair("RotationMatrix", info.rotationMatrix.toString()));
@@ -107,7 +107,7 @@ namespace ZenLoad
 				info.properties.insert(std::make_pair("StaticVob", std::to_string(info.staticVob ? 1 : 0)));
 				info.properties.insert(std::make_pair("DynamicShadow", std::to_string(info.dynamicShadow ? 1 : 0)));
 				info.properties.insert(std::make_pair("zBias", std::to_string(info.zBias)));
-				info.properties.insert(std::make_pair("IsAmbient", std::to_string(info.isAmbient ? 1 : 0)));
+				info.properties.insert(std::make_pair("IsAmbient", std::to_string(info.isAmbient ? 1 : 0)));*/
 			}
 			else
 			{
