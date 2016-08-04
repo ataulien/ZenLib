@@ -84,7 +84,7 @@ namespace ZenLoad
 		/**
 		 * @brief Creates packed submesh-data
 		 */
-		void packMesh(PackedMesh& mesh, float scale = 1.0f);
+		void packMesh(PackedMesh& mesh, float scale = 1.0f, bool removeDoubles=true);
 	private:
 
 		/**

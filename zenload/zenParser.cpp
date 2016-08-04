@@ -102,7 +102,7 @@ void ZenParser::skipHeader()
 {
 	ZenHeader header;
 	ParserImpl* impl = nullptr;
-	readHeader(m_Header, m_pParserImpl);
+	readHeader(header, impl);
 
 	delete impl;
 }

@@ -1,5 +1,6 @@
 #include <vdfs/fileIndex.h>
 #include <zenload/zenParser.h>
+#include <zenload/zCMesh.h>
 #include <iostream>
 
 /**
@@ -38,31 +39,35 @@ int main(int argc, char** argv)
     VDFS::FileIndex vdf;
     vdf.loadVDF(argv[1]);
     
+
+	// Initialize parser with zenfile from vdf
+	ZenLoad::ZenParser parser(argv[2], vdf);
+
+	if(parser.getFileSize() == 0)
+	{
+		std::cout << "Error: ZEN-File either not found or empty!" << std::endl;
+		return 0;
+	}
+
+	// Since this is a usual level-zen, read the file header
+	// You will most likely allways need to do that
+	parser.readHeader();
+
+	// Do something with the header, if you want.
+	std::cout << "Author: " << parser.getZenHeader().user << std::endl
+		<< "Date: " << parser.getZenHeader().date << std::endl
+		<< "Object-count (optional): " << parser.getZenHeader().objectCount << std::endl;
+
+	// Read the rest of the ZEN-file
+	ZenLoad::oCWorldData world;
+	parser.readWorld(world);
+
+	std::cout << "Done reading ZEN!" << std::endl;
+	
 	while(true)
 	{
-		// Initialize parser with zenfile from vdf
-		ZenLoad::ZenParser parser(argv[2], vdf);
-
-		if(parser.getFileSize() == 0)
-		{
-			std::cout << "Error: ZEN-File either not found or empty!" << std::endl;
-			return 0;
-		}
-
-		// Since this is a usual level-zen, read the file header
-		// You will most likely allways need to do that
-		parser.readHeader();
-
-		// Do something with the header, if you want.
-		std::cout << "Author: " << parser.getZenHeader().user << std::endl
-			<< "Date: " << parser.getZenHeader().date << std::endl
-			<< "Object-count (optional): " << parser.getZenHeader().objectCount << std::endl;
-
-		// Read the rest of the ZEN-file
-		ZenLoad::oCWorldData world;
-		parser.readWorld(world);
-
-		std::cout << "Done reading ZEN!" << std::endl;
+		ZenLoad::PackedMesh packedWorldMesh;
+		parser.getWorldMesh()->packMesh(packedWorldMesh, 0.01f);
 	}
 
     // Print some sample-data for vobs which got a visual

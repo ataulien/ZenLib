@@ -86,6 +86,7 @@ namespace ZenLoad
          * @brief Returns the file-header
          */
         const ZenHeader& getZenHeader(){ return m_Header; }
+		void setZenHeader(const ZenHeader& header){ m_Header = header; }
         
 		/**
 		 * @brief Returns the parsed world-mesh
@@ -170,6 +171,7 @@ namespace ZenLoad
 		 * @brief returns the current implementatio
 		 */
 		ParserImpl* getImpl() { return m_pParserImpl; }
+		void setImpl(ParserImpl* impl){ m_pParserImpl = impl; }
 
 		/**
 		 * @brief reads a full chunk (TESTING ONLY)

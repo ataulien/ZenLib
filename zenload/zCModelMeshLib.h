@@ -31,7 +31,12 @@ namespace ZenLoad
 	{
 	public:
 
-		zCModelMeshLib(){}
+		zCModelMeshLib()
+		{
+			memset(m_BBox, 0, sizeof(m_BBox));
+			memset(m_BBoxCollision, 0, sizeof(m_BBoxCollision));
+			memset(&m_RootNodeTranslation, 0, sizeof(m_RootNodeTranslation));
+		}
 
 		/**
 		 * @brief Loads the mesh from the given VDF-Archive

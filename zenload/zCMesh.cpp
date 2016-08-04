@@ -165,7 +165,12 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 				//ZenParser p2(&parser.getData()[parser.getSeek()], parser.getData().size() - parser.getSeek());
 				//p2.readHeader();
 
-				parser.skipHeader();
+				ZenLoad::ParserImpl* oldImpl = parser.getImpl();
+				ZenLoad::ZenParser::ZenHeader oldHeader = parser.getZenHeader();
+
+				// These are binary, init the 'new' header
+				parser.readHeader();
+				
 
 				// Read number of materials
 				uint32_t numMaterials = parser.readBinaryDWord();
@@ -192,6 +197,11 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 
 				// Note: There is a bool stored here in the G2-Formats, which says whether to use alphatesting or not
 				// 		 We just skip this for now
+
+				// Restore old header and impl
+				delete parser.getImpl();
+				parser.setImpl(oldImpl);
+				parser.setZenHeader(oldHeader);
 
 				parser.setSeek(chunkEnd); // Skip chunk
 			}
@@ -406,30 +416,67 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 /**
 * @brief Creates packed submesh-data
 */
-void zCMesh::packMesh(PackedMesh& mesh, float scale)
+void zCMesh::packMesh(PackedMesh& mesh, float scale, bool removeDoubles)
 {
 	std::vector<WorldVertex>& newVertices = mesh.vertices;
 	std::vector<uint32_t> newIndices;
+	newIndices.reserve(m_Indices.size());
 
 	// Map of vertex-indices and their used feature-indices to a vertex in "newVertices"
 	std::map<std::tuple<uint32_t, uint32_t, int16_t>, size_t> vfToNewVx;
 
 	// Map of the new indices and the old indices to the index-vector
-	std::unordered_map<uint32_t, uint32_t> newToOldIdxIdx;
+	//std::unordered_map<uint32_t, uint32_t> newToOldIdxIdx;
 
-	// Get vertices
-	for(size_t i = 0, end = m_Indices.size(); i < end; i++)
+	if(removeDoubles)
 	{
-		uint32_t featidx = m_FeatureIndices[i];
-		uint32_t vertidx = m_Indices[i];
-		int16_t lightmap = m_TriangleLightmapIndices[i/3];
-
-		// Check if we already got this pair of vertex/feature
-		auto it = vfToNewVx.find(std::make_tuple(vertidx, featidx, lightmap));
-		if(it == vfToNewVx.end())
+		// Get vertices
+		for(size_t i = 0, end = m_Indices.size(); i < end; i++)
 		{
-			// Add new entry
-			vfToNewVx[std::make_tuple(vertidx, featidx, lightmap)] = newVertices.size();
+			uint32_t featidx = m_FeatureIndices[i];
+			uint32_t vertidx = m_Indices[i];
+			int16_t lightmap = m_TriangleLightmapIndices[i / 3];
+
+			// Check if we already got this pair of vertex/feature
+			auto it = vfToNewVx.find(std::make_tuple(vertidx, featidx, lightmap));
+			if(it == vfToNewVx.end())
+			{
+				// Add new entry
+				vfToNewVx[std::make_tuple(vertidx, featidx, lightmap)] = newVertices.size();
+				WorldVertex vx;
+
+				// Extract vertex information
+				vx.Position = m_Vertices[vertidx] * scale;
+				vx.Color = m_Features[featidx].lightStat;
+				vx.TexCoord = ZMath::float2(m_Features[featidx].uv[0], m_Features[featidx].uv[1]);
+				vx.Normal = m_Features[featidx].vertNormal;
+
+				// Add index to this very vertex
+				newIndices.push_back(newVertices.size());
+
+				newVertices.push_back(vx);
+			}
+			else
+			{
+				// Simply put an index to the existing new vertex
+				newIndices.push_back((*it).second);
+			}
+
+			// Store what this new index was before
+			//newToOldIdxIdx[newIndices.back()] = i;
+		}
+	}
+	else
+	{
+		// Just add them as triangles
+		newIndices = m_Indices;
+		newVertices.reserve(m_Indices.size());
+		for(size_t i = 0, end = m_Indices.size(); i < end; i++)
+		{
+			uint32_t featidx = m_FeatureIndices[i];
+			uint32_t vertidx = m_Indices[i];
+			int16_t lightmap = m_TriangleLightmapIndices[i / 3];
+
 			WorldVertex vx;
 
 			// Extract vertex information
@@ -438,19 +485,8 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale)
 			vx.TexCoord = ZMath::float2(m_Features[featidx].uv[0], m_Features[featidx].uv[1]);
 			vx.Normal = m_Features[featidx].vertNormal;
 
-			// Add index to this very vertex
-			newIndices.push_back(newVertices.size());
-
 			newVertices.push_back(vx);
 		}
-		else
-		{
-			// Simply put an index to the existing new vertex
-			newIndices.push_back((*it).second);
-		}
-
-		// Store what this new index was before
-		newToOldIdxIdx[newIndices.back()] = i;
 	}
 
 	
