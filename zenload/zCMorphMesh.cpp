@@ -65,7 +65,7 @@ void zCMorphMesh::readObjectData(ZenParser& parser)
                 uint32_t version = parser.readBinaryDWord();
 
                 std::string morphProtoName = parser.readLine(true);
-                LogInfo() << "MorphProtoName: " << morphProtoName;
+                //LogInfo() << "MorphProtoName: " << morphProtoName;
 
                 // Read source-mesh
                 m_Mesh.readObjectData(parser);

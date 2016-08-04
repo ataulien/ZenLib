@@ -20,6 +20,11 @@ namespace ZMemory
     {
         enum : uint32_t { INVALID_HANDLE = static_cast<uint32_t>(-1) >> (32 - N1) };
 
+        GenericHandle()
+        {
+            invalidate();
+        }
+
         uint32_t index : N1;
         uint32_t generation : N2;
 
