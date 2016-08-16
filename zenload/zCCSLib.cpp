@@ -99,7 +99,7 @@ void zCCSLib::readObjectData(ZenParser& parser)
                                           Prop("text", blk.atomicBlockData.command.text),
                                           Prop("name", blk.atomicBlockData.command.name));
 
-                LogInfo() << "Read message: " << blk.atomicBlockData.command.name;
+                //LogInfo() << "Read message: " << blk.atomicBlockData.command.name;
 
                 parser.readChunkEnd();
                 //parser.skipChunk();

@@ -128,6 +128,7 @@ void DaedalusGameState::registerExternals()
 
         LogInfo() << "";
         LogInfo() << " ########### New Log Entry: " << topic << " ########### ";
+        LogInfo() << entry;
         LogInfo() << "";
 
         m_PlayerLog[topic].entries.push_back(entry);
