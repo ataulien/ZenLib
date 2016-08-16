@@ -538,6 +538,9 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale, bool removeDoubles)
 		for(int v = 0; v < 3; v++)
 			mesh.triangles.back().vertices[v].Position = mesh.triangles.back().vertices[v].Position * scale;
 	}
+
+	mesh.bbox[0] = m_BBMin * scale;
+	mesh.bbox[1] = m_BBMax * scale;
 }
 
 void zCMesh::skip(ZenParser &parser)

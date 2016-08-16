@@ -291,4 +291,7 @@ void zCProgMeshProto::packMesh(PackedMesh& mesh, float scale) const
 			sm.indices.push_back(indices[j]);
 		}
 	}
+
+	mesh.bbox[0] = m_BBMin * scale;
+	mesh.bbox[1] = m_BBMax * scale;
 }
