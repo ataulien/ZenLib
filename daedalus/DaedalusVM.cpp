@@ -30,9 +30,6 @@ DaedalusVM::DaedalusVM(Daedalus::DATFile& dat, const std::string& main)
 
         LogInfo() << "Found main-function at Address: " << s.address;
         m_PC = s.address;
-    }else
-    {
-        LogInfo() << "Did not find main-function!";
     }
 
     // Make fake-strings
@@ -300,6 +297,11 @@ void DaedalusVM::pushInt(int32_t value)
 
 int32_t DaedalusVM::popDataValue()
 {
+    // Default behavior of the ZenGin is to pop a 0, if nothing is on the stack.
+    if(m_Stack.empty())
+        return 0;
+
+
     assert(!m_Stack.empty());
 
     uint32_t tok = m_Stack.top();

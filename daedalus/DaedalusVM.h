@@ -98,7 +98,10 @@ namespace Daedalus
          */
         GameState::DaedalusGameState& getGameState() { return m_GameState; }
 
-
+        /**
+         * @return Whether the stack is currently empty
+         */
+        bool isStackEmpty(){ return m_Stack.empty(); }
 
     private:
 
