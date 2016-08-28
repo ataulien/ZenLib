@@ -2,6 +2,7 @@
 #include <zenload/zenParser.h>
 #include <zenload/zCMesh.h>
 #include <iostream>
+#include <utils/export.h>
 
 /**
  * Recursive function to list some data about the zen-file
@@ -64,12 +65,9 @@ int main(int argc, char** argv)
 
 	std::cout << "Done reading ZEN!" << std::endl;
 	
-	while(true)
-	{
-		ZenLoad::PackedMesh packedWorldMesh;
-		parser.getWorldMesh()->packMesh(packedWorldMesh, 0.01f);
-	}
-
+    ZenLoad::PackedMesh packedWorldMesh;
+    parser.getWorldMesh()->packMesh(packedWorldMesh, 0.01f);
+	
     // Print some sample-data for vobs which got a visual
     /*std::cout << "Listing vobs..." << std::endl;
     listVobInformation(world.rootVobs);
@@ -78,7 +76,12 @@ int main(int argc, char** argv)
     for(const ZenLoad::zCWaypointData& v : world.waynet.waypoints)
     {
         std::cout << "Waypoint [" << v.wpName << "] at " << v.position.toString() << std::endl;
-    }*/
+    }
+    */
+    
+    std::cout << "Exporting obj..." << std::endl;
+    
+    Utils::exportPackedMeshToObj(packedWorldMesh, (argv[2] + std::string(".OBJ")));
 
     return 0;
 }
