@@ -76,11 +76,16 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
     REGISTER("C_Npc", npc, voicePitch);
     REGISTER("C_Npc", npc, bodymass);
     REGISTER("C_Npc", npc, daily_routine);
-    REGISTER("C_Npc", npc, spawnPoint32_t);
+    REGISTER("C_Npc", npc, start_aistate);
+    REGISTER("C_Npc", npc, spawnPoint);
     REGISTER("C_Npc", npc, spawnDelay);
     REGISTER("C_Npc", npc, senses);
     REGISTER("C_Npc", npc, senses_range);
     REGISTER("C_Npc", npc, ai);
+    REGISTER("C_Npc", npc, wp);
+    REGISTER("C_Npc", npc, exp);
+    REGISTER("C_Npc", npc, exp_next);
+    REGISTER("C_Npc", npc, lp);
 
     REGISTER("C_Focus", focus, npc_longrange);
     REGISTER("C_Focus", focus, npc_range1);

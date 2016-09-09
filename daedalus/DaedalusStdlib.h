@@ -100,7 +100,7 @@ namespace Daedalus
             // **********************
             // Spawn
             // **********************
-            std::string spawnPoint32_t;
+            std::string spawnPoint;
             int32_t spawnDelay;
 
             // **********************
