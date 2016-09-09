@@ -318,7 +318,7 @@ int32_t DaedalusVM::popDataValue()
         case EParOp_PushVar:
             arrIdx = m_Stack.top();
             m_Stack.pop(); // Pop array index
-            return m_DATFile.getSymbolByIndex(v).getIntValue(arrIdx);
+            return m_DATFile.getSymbolByIndex(v).getIntValue(arrIdx, getCurrentInstanceDataPtr());
 
         default:
             return 0;
@@ -338,7 +338,6 @@ uint32_t DaedalusVM::popVar(uint32_t& arrIdx)
 	if(m_Stack.empty())
 		return 0;
 
-    assert(m_Stack.size() >= 3);
     // Stack:
     //  - Token
     //  - Var-Index
@@ -376,7 +375,7 @@ std::string DaedalusVM::popString()
     uint32_t arr;
     uint32_t idx = popVar(arr);
 
-    return *m_DATFile.getSymbolByIndex(idx).getStrAddr(arr);
+    return *m_DATFile.getSymbolByIndex(idx).getStrAddr(arr, getCurrentInstanceDataPtr());
 }
 
 void DaedalusVM::setReturn(int32_t v)
