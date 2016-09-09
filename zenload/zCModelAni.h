@@ -31,11 +31,6 @@ namespace ZenLoad
 
 		struct ModelAniHeader
 		{
-			ModelAniHeader()
-			{
-				version = 0;
-			}
-
 			uint16_t version;
 
 			std::string aniName;
@@ -88,11 +83,6 @@ namespace ZenLoad
 		 * @return Indices of the samples to the actual nodes
 		 */
 		const std::vector<uint32_t>& getNodeIndexList() const { return m_NodeIndexList; }
-
-		/**
-		 * @return Whether the loaded animation is valid (ie. correctly loaded)
-		 */
-		bool isValid(){ return m_ModelAniHeader.version != 0; }
 
 	private:
 		/**
