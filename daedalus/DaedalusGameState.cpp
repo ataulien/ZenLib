@@ -43,7 +43,7 @@ void DaedalusGameState::registerExternals()
         insertNPC(npcinstance, spawnpoint);
     });
 
-    m_VM.registerExternalFunction("createinvitem", [&](Daedalus::DaedalusVM& vm){
+    m_VM.registerExternalFunction("createinvitem", [=](Daedalus::DaedalusVM& vm){
         int32_t itemInstance = vm.popDataValue(); if(l) LogInfo() << "itemInstance: " << itemInstance;
         uint32_t arr_n0;
         int32_t npc = vm.popVar(arr_n0);

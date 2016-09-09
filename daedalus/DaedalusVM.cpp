@@ -301,9 +301,6 @@ int32_t DaedalusVM::popDataValue()
     if(m_Stack.empty())
         return 0;
 
-
-    assert(!m_Stack.empty());
-
     uint32_t tok = m_Stack.top();
     m_Stack.pop(); // Pop token
 
@@ -338,6 +335,9 @@ void DaedalusVM::pushVar(size_t index, uint32_t arrIdx)
 
 uint32_t DaedalusVM::popVar(uint32_t& arrIdx)
 {
+	if(m_Stack.empty())
+		return 0;
+
     assert(m_Stack.size() >= 3);
     // Stack:
     //  - Token
@@ -356,6 +356,12 @@ uint32_t DaedalusVM::popVar(uint32_t& arrIdx)
             arrIdx = static_cast<uint32_t>(m_Stack.top());
             m_Stack.pop();
             break;
+
+		case EParOp_PushInt:
+			// popVar and popInt don't seem to be right in some cases
+			m_Stack.pop();
+			arrIdx = 0;
+			break;
 
         default:
             return 0xFFFFFFFF;

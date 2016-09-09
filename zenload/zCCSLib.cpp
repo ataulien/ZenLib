@@ -94,6 +94,10 @@ void zCCSLib::readObjectData(ZenParser& parser)
                 ZenParser::ChunkHeader messageHeader;
                 parser.readChunkStart(messageHeader);
 
+				/*parser.getImpl()->readEntry("subtype", &blk.atomicBlockData.command.subType, 1, ZenLoad::ParserImpl::ZVT_ENUM);
+				parser.getImpl()->readEntry("text", &blk.atomicBlockData.command.text, 0, ZenLoad::ParserImpl::ZVT_STRING);
+				parser.getImpl()->readEntry("name", &blk.atomicBlockData.command.name, 0, ZenLoad::ParserImpl::ZVT_STRING);*/
+
                 ReadObjectProperties(parser, blk.atomicBlockData.properties,
                                      Prop("subType", blk.atomicBlockData.command.subType),
                                           Prop("text", blk.atomicBlockData.command.text),
