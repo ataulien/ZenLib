@@ -72,6 +72,8 @@ void SampleUnpackQuat(const uint16_t* in, ZMath::float4& out)
 */
 zCModelAni::zCModelAni(const std::string& fileName, const VDFS::FileIndex& fileIndex, float scale)
 {
+    
+    m_ModelAniHeader.version = 0;
 
 	std::vector<uint8_t> data;
 	fileIndex.getFileData(fileName, data);

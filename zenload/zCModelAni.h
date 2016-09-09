@@ -83,6 +83,11 @@ namespace ZenLoad
 		 * @return Indices of the samples to the actual nodes
 		 */
 		const std::vector<uint32_t>& getNodeIndexList() const { return m_NodeIndexList; }
+		
+		/**
+         * @return Whether the animation was correctly loaded
+         */
+        bool isValid(){ return m_ModelAniHeader.version != 0; }
 
 	private:
 		/**
