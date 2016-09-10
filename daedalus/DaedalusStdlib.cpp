@@ -44,7 +44,13 @@ void Daedalus::registerDaedalusStdLib(Daedalus::DaedalusVM& vm, bool enableVerbo
         vm.setReturn(r);
     });
 
+    vm.registerExternalFunction("hlp_strcmp", [l](Daedalus::DaedalusVM& vm){
+        uint32_t arr1, arr2;
+        std::string s1 = vm.popString();
+        std::string s2 = vm.popString();
 
+        vm.setReturn(s1 == s2 ? 1 : 0);
+    });
 
     //
 }

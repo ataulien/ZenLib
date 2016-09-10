@@ -138,13 +138,16 @@ bool DaedalusVM::doStack(bool verbose)
 
             m_PC = static_cast<uint32_t>(m_RetStack.top());
             m_RetStack.pop();
+            m_CallStack.pop_back();
             break;
         case EParOp_Call:
         {
             if(log) LogInfo() << oldPC <<" - CALL: " << op.address;
 
             m_RetStack.push(m_PC);
-            m_PC = op.address;
+            m_PC = (size_t)op.address;
+
+            m_CallStack.push_back((size_t)op.address);
         }
             break;
 
@@ -273,6 +276,7 @@ void DaedalusVM::doCallOperation(uint32_t target)
 {
     m_RetStack.push(m_PC);
     m_PC = target;
+    m_CallStack.push_back(target);
 }
 
 void DaedalusVM::registerExternalFunction(const std::string& symName, const std::function<void(DaedalusVM&)>& fn)
@@ -494,6 +498,7 @@ void DaedalusVM::pushState()
     s.m_RetStack = m_RetStack;
     s.m_Stack = m_Stack;
     s.m_Self = m_DATFile.getSymbolByName("self");
+    s.m_CallStack = m_CallStack;
 
     m_PC = 0;
     m_RetStack = std::stack<size_t>();
@@ -508,12 +513,33 @@ void DaedalusVM::popState()
     m_PC = m_StateStack.top().m_PC;
     m_RetStack = m_StateStack.top().m_RetStack;
     m_Stack = m_StateStack.top().m_Stack;
+    m_CallStack = m_StateStack.top().m_CallStack;
+
     m_CurrentInstanceHandle = m_StateStack.top().m_CurrentInstanceHandle;
     m_CurrentInstanceClass= m_StateStack.top().m_CurrentInstanceClass;
 
     m_DATFile.getSymbolByName("self") = m_StateStack.top().m_Self;
 
     m_StateStack.pop();
+}
+
+std::vector<std::string> DaedalusVM::getCallStack()
+{
+    std::vector<std::string> cs;
+
+    for(size_t adr : m_CallStack)
+    {
+        // Find symbol with that address
+        for(const PARSymbol& s : m_DATFile.getSymTable().symbols)
+        {
+            if(s.address == adr)
+                cs.push_back(s.name);
+        }
+    }
+
+    std::reverse(cs.begin(), cs.end());
+
+    return cs;
 }
 
 

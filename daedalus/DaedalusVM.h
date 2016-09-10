@@ -103,6 +103,10 @@ namespace Daedalus
          */
         bool isStackEmpty(){ return m_Stack.empty(); }
 
+        /**
+         * @return Callstack in text-form
+         */
+        std::vector<std::string> getCallStack();
     private:
 
         DATFile m_DATFile;
@@ -114,6 +118,7 @@ namespace Daedalus
 
         std::stack<uint32_t> m_Stack;
         std::stack<size_t> m_RetStack;
+        std::vector<size_t> m_CallStack; // Debugging only
 
         /**
          * @brief External functions mapped by their symbols index value
@@ -150,6 +155,7 @@ namespace Daedalus
 
             std::stack<uint32_t> m_Stack;
             std::stack<size_t> m_RetStack;
+            std::vector<size_t> m_CallStack;
 
             PARSymbol m_Self;
         };
