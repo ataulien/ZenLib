@@ -32,20 +32,13 @@ void Daedalus::registerDaedalusStdLib(Daedalus::DaedalusVM& vm, bool enableVerbo
     });
 
     vm.registerExternalFunction("concatstrings", [l](Daedalus::DaedalusVM& vm){
-        uint32_t arr1, arr2;
-        int32_t s2 = vm.popVar(arr1);
-        int32_t s1 = vm.popVar(arr2);
+        std::string s2 = vm.popString();
+        std::string s1 = vm.popString();
 
-        Daedalus::PARSymbol& sym1 = vm.getDATFile().getSymbolByIndex(s1);
-        Daedalus::PARSymbol& sym2 = vm.getDATFile().getSymbolByIndex(s2);
-
-        std::string r = (*sym1.getStrAddr(arr1)) + (*sym2.getStrAddr(arr2));
-
-        vm.setReturn(r);
+        vm.setReturn(s1 + s2);
     });
 
     vm.registerExternalFunction("hlp_strcmp", [l](Daedalus::DaedalusVM& vm){
-        uint32_t arr1, arr2;
         std::string s1 = vm.popString();
         std::string s2 = vm.popString();
 

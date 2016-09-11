@@ -94,6 +94,18 @@ void DaedalusGameState::registerExternals()
         vm.setReturnVar(instancename);
     });
 
+    m_VM.registerExternalFunction("hlp_isvalidnpc", [=](Daedalus::DaedalusVM& vm){
+        int32_t self = vm.popVar();
+
+        if(vm.getDATFile().getSymbolByIndex(self).instanceDataHandle.isValid())
+        {
+            vm.setReturn(1);
+        }else
+        {
+            vm.setReturn(0);
+        }
+    });
+
     m_VM.registerExternalFunction("Wld_GetDay", [=](Daedalus::DaedalusVM& vm){
 
         if(m_GameExternals.wld_GetDay)
