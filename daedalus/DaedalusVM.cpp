@@ -70,6 +70,15 @@ bool DaedalusVM::doStack(bool verbose)
         case EParOp_BinAnd: pushInt(popDataValue() & popDataValue()); break;
         case EParOp_Less: pushInt(popDataValue() < popDataValue() ? 1 : 0); break;
         case EParOp_Greater: pushInt(popDataValue() > popDataValue() ? 1 : 0); break;
+
+        case EParOp_AssignFunc:
+            /*a = popVar(arr);
+            b = popDataValue();
+
+            sym2 = m_DATFile.getSymbolByIndex(b);
+            m_DATFile.getSymbolByIndex(a).set(sym2.address, 0, getCurrentInstanceDataPtr());
+            break;*/
+
         case EParOp_Assign:
             a = popVar(arr);
 
@@ -205,13 +214,7 @@ bool DaedalusVM::doStack(bool verbose)
         case EParOp_AssignStringRef:
             LogError() << "EParOp_AssignStringRef not implemented!";
             break;
-        case EParOp_AssignFunc:
-            a = popVar(arr);
-            b = popDataValue();
 
-            sym2 = m_DATFile.getSymbolByIndex(b);
-            m_DATFile.getSymbolByIndex(a).set(sym2.address, 0, getCurrentInstanceDataPtr());
-            break;
 
         case EParOp_AssignFloat:
             a = popVar(arr);
