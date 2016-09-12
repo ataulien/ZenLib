@@ -45,6 +45,12 @@ void Daedalus::registerDaedalusStdLib(Daedalus::DaedalusVM& vm, bool enableVerbo
         vm.setReturn(s1 == s2 ? 1 : 0);
     });
 
+    vm.registerExternalFunction("hlp_random", [=](Daedalus::DaedalusVM& vm){
+        int32_t n0 = vm.popDataValue();
+
+        vm.setReturn(rand() % n0);
+    });
+
     //
 }
 
