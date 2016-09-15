@@ -97,6 +97,15 @@ void DaedalusDialogManager::setNpcInfoKnown(size_t npcInstance, size_t infoInsta
     m_KnownNpcInfoSymbolsByNpcSymbols[npcInstance].insert(infoInstance);
 }
 
+void DaedalusDialogManager::processInfosFor(NpcHandle hnpc)
+{
+    Daedalus::GEngineClasses::C_Npc& npc = m_VM.getGameState().getNpc(hnpc);
+    auto& info = m_NpcInfosByNpcSymbols[npc.instanceSymbol];
+
+    // Notify user
+    m_OnStartConversation(hnpc, info);
+}
+
 
 
 

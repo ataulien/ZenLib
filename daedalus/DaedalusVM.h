@@ -63,7 +63,7 @@ namespace Daedalus
         float popFloatValue();
         uint32_t popVar(){uint32_t arr; return popVar(arr); }
         uint32_t popVar(uint32_t& arrIdx);
-        std::string popString();
+        std::string popString(bool toUpper = false);
 
         /**
          * @brief Sets the datapointer for the given instance-symbol

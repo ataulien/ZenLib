@@ -43,7 +43,7 @@ DaedalusVM::DaedalusVM(Daedalus::DATFile& dat, const std::string& main)
 
 bool DaedalusVM::doStack(bool verbose)
 {
-    bool log = verbose;
+    static bool log = verbose;
     size_t oldPC = m_PC;
     PARStackOpCode op = getCurrentInstruction();
 
@@ -377,12 +377,17 @@ uint32_t DaedalusVM::popVar(uint32_t& arrIdx)
 }
 
 
-std::string DaedalusVM::popString()
+std::string DaedalusVM::popString(bool toUpper)
 {
     uint32_t arr;
     uint32_t idx = popVar(arr);
 
-    return *m_DATFile.getSymbolByIndex(idx).getStrAddr(arr, getCurrentInstanceDataPtr());
+    std::string s = *m_DATFile.getSymbolByIndex(idx).getStrAddr(arr, getCurrentInstanceDataPtr());
+
+    if(toUpper)
+        std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+
+    return s;
 }
 
 void DaedalusVM::setReturn(int32_t v)
@@ -507,6 +512,7 @@ void DaedalusVM::pushState()
     m_RetStack = std::stack<size_t>();
     m_Stack = std::stack<uint32_t>();
     m_CurrentInstanceHandle.invalidate();
+    m_CallStack.clear();
 
     m_StateStack.push(s);
 }

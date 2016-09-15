@@ -36,6 +36,11 @@ namespace Daedalus
 			 */
             void setNpcInfoKnown(size_t npcInstance, size_t infoInstance);
 
+            /**
+             * Calls AI_ProcessInfos for the given NPC
+             * @param npc NPC to process infos for
+             */
+            void processInfosFor(NpcHandle npc);
         private:
 
             /**
