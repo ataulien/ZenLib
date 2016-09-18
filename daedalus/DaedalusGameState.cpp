@@ -228,9 +228,25 @@ FocusHandle DaedalusGameState::createFocus()
 
 ItemHandle DaedalusGameState::addInventoryItem(size_t itemSymbol, NpcHandle npc)
 {
+    auto items = m_NpcInventories[npc];
+
+    // Try to find an item of this type
+    for(ItemHandle h : items)
+    {
+        GEngineClasses::C_Item& item = getItem(h);
+
+        // Just add to the count here
+        if(item.instanceSymbol == itemSymbol)
+        {
+            item.count[0]++;
+            return h;
+        }
+    }
+
     // Get memory for the item
     ItemHandle h = createItem();
     GEngineClasses::C_Item& item = getItem(h);
+    item.count[0] = 1;
 
     // Run the script-constructor
     m_VM.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(itemSymbol), IC_Item);
@@ -293,4 +309,21 @@ NpcHandle DaedalusGameState::insertNPC(size_t instance, const std::string &waypo
 NpcHandle DaedalusGameState::insertNPC(const std::string &instance, const std::string& waypoint)
 {
     return insertNPC(m_VM.getDATFile().getSymbolIndexByName(instance), waypoint);
+}
+
+ItemHandle DaedalusGameState::insertItem(size_t instance)
+{
+    // Get memory for the item
+    ItemHandle h = createItem();
+    GEngineClasses::C_Item& item = getItem(h);
+
+    // Run the script-constructor
+    m_VM.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(instance), IC_Item);
+
+    return h;
+}
+
+ItemHandle DaedalusGameState::insertItem(const std::string &instance)
+{
+    return insertItem(m_VM.getDATFile().getSymbolIndexByName(instance));
 }

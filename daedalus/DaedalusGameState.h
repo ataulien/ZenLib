@@ -108,6 +108,14 @@ namespace Daedalus
             NpcHandle insertNPC(const std::string& instance, const std::string& waypoint);
 
             /**
+             * Creates a new item instance and initializes it (does not position it)
+             * @param instance Instance to create
+             * @return Handle to the created instance
+             */
+            ItemHandle insertItem(size_t instance);
+            ItemHandle insertItem(const std::string &instance);
+
+            /**
 			 * Creates scripting relevant objects
 			 */
             NpcHandle createNPC();
