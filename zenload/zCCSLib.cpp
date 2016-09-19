@@ -114,6 +114,8 @@ void zCCSLib::readObjectData(ZenParser& parser)
         }
         //parser.skipChunk();
 
+		parser.readChunkEnd();
+
         info.blocks.push_back(blk.atomicBlockData);
         m_MessagesByName[blk.blockName] = info.blocks.size()-1;
         //LogInfo() << blk.blockName;
