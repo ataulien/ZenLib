@@ -35,7 +35,7 @@ namespace ZenLoad
 
 			// Read vob data, followed by the count of the children of this vob
 			target.emplace_back();
-			zCVob::readObjectData(target.back(), parser, worldversion);
+			zCVob::readObjectData(target.back(), parser, worldversion, header);
 
 			// Save classname of this vob
 			target.back().objectClass = header.classname;

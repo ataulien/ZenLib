@@ -49,7 +49,7 @@ namespace ZenLoad
 		/**
 		* Reads this object from an internal zen
 		*/
-		static void readObjectData(zCVobData& info, ZenParser& parser, WorldVersion version)
+		static void readObjectData(zCVobData& info, ZenParser& parser, WorldVersion version, const ZenParser::ChunkHeader& header)
 		{
 			info.objectClass = "zCVob";
 
@@ -150,6 +150,13 @@ namespace ZenLoad
 										 Prop("dynShadow", info.dynamicShadow)); // TODO: References!
 				}
 			}
+
+			// Check subclasses
+			if(header.classname == "oCItem:zCVob")
+			{
+				parser.getImpl()->readEntry("itemInstance", &info.oCItem.instanceName, 0, ZenLoad::ParserImpl::ZVT_STRING);
+			}
+
 			parser.skipChunk();
 
 			// Generate world-matrix

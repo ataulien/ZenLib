@@ -157,6 +157,12 @@ namespace ZenLoad
 
 		bool physicsEnabled;
 
+		// Sub-classes
+		struct
+		{
+			std::string instanceName;
+		}oCItem;
+
 		std::vector<zCVobData> childVobs;
 	};
 
