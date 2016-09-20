@@ -38,6 +38,12 @@ namespace Daedalus
 
         struct Instance
         {
+			Instance()
+			{
+				userPtr = nullptr;
+				instanceSymbol = 0;
+			}
+
             size_t instanceSymbol;
 
             /**
