@@ -50,7 +50,7 @@ void DaedalusGameState::registerExternals()
 
         NpcHandle hnpc = ZMemory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(npc).instanceDataHandle);
 
-        ItemHandle h = addInventoryItem(itemInstance, hnpc);
+        ItemHandle h = createInventoryItem(itemInstance, hnpc);
 
         //LogInfo() << "1: " << item.name;
         //LogInfo() << "2. " << npcData.name[0];
@@ -67,7 +67,7 @@ void DaedalusGameState::registerExternals()
 
         for(int32_t i=0;i<num;i++)
         {
-            ItemHandle h = addInventoryItem(itemInstance, hnpc);
+            ItemHandle h = createInventoryItem(itemInstance, hnpc);
         }
 
         //LogInfo() << "1: " << item.name;
@@ -226,7 +226,7 @@ FocusHandle DaedalusGameState::createFocus()
     return h;
 }
 
-ItemHandle DaedalusGameState::addInventoryItem(size_t itemSymbol, NpcHandle npc)
+ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle npc)
 {
     auto items = m_NpcInventories[npc];
 
@@ -251,18 +251,37 @@ ItemHandle DaedalusGameState::addInventoryItem(size_t itemSymbol, NpcHandle npc)
     // Run the script-constructor
     m_VM.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(itemSymbol), IC_Item);
 
-    //LogInfo() << "NPC Handle: " << vm.getDATFile().getSymbolByIndex(npc).instanceDataHandle.index;
-
-    //GEngineClasses::C_Npc& npcData = getNpc(hnpc);
-
     // Put inside its inventory
-    m_NpcInventories[npc].push_back(h);
-
-    if (m_GameExternals.createinvitem)
-        m_GameExternals.createinvitem(h, npc);
+    addItemToInventory(h, npc);
 
     return h;
 }
+
+ItemHandle DaedalusGameState::addItemToInventory(ItemHandle item, NpcHandle npc)
+{
+    auto items = m_NpcInventories[npc];
+
+    // Try to find an item of this type
+    for(ItemHandle h : items)
+    {
+        GEngineClasses::C_Item& i = getItem(h);
+
+        // Just add to the count here
+        if(i.instanceSymbol == getItem(item).instanceSymbol)
+        {
+            i.count[0]++;
+
+            m_RegisteredObjects.items.removeObject(item);
+            return h;
+        }
+    }
+
+    m_NpcInventories[npc].push_back(item);
+
+    if (m_GameExternals.createinvitem)
+        m_GameExternals.createinvitem(item, npc);
+}
+
 
 bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc)
 {
@@ -272,6 +291,10 @@ bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc)
         if(item.instanceSymbol == itemSymbol)
         {
             m_NpcInventories[npc].erase(it);
+
+            // Clear memory
+            m_RegisteredObjects.items.removeObject(*it);
+
             return true;
         }
     }
@@ -327,3 +350,4 @@ ItemHandle DaedalusGameState::insertItem(const std::string &instance)
 {
     return insertItem(m_VM.getDATFile().getSymbolIndexByName(instance));
 }
+

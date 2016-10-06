@@ -88,12 +88,24 @@ namespace Daedalus
             }
 
             /**
-             * Adds the given item to the inventory of the given NPC
+             * Creates a new instance of the given item first and then adds it to the given NPC
+             * @param itemSymbol Symbol to create the instance of
+             * @param npc NPC to give the item to
+             * @return Newly created handle or an old one, if the item was stackable
              */
-            ItemHandle addInventoryItem(size_t itemSymbol, NpcHandle npc);
+            ItemHandle createInventoryItem(size_t itemSymbol, NpcHandle npc);
+
+            /**
+             * Adds the given item to the inventory of the given NPC
+             * Note: If there already is an instance of this item and it is stackable, the old instance will
+             *       be returned and the instance given in 'item' will be removed!
+             * @return Handle to the item now in the inventory or an old one, if the item was stackable
+             */
+            ItemHandle addItemToInventory(ItemHandle item, NpcHandle npc);
 
             /**
              * Removes one of the items matching the given instance from the NPCs inventory
+             * Note: Handle will not be valid anymore if this returns true!
              * @return True, if such an instance was found and removed, false otherwise
              */
             bool removeInventoryItem(size_t itemSymbol, NpcHandle npc);

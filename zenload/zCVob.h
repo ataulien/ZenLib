@@ -89,7 +89,23 @@ namespace ZenLoad
 
 				if(pd.bitfield.hasVisualName)
 					parser.getImpl()->readEntry("", &info.visual, 0, ZenLoad::ParserImpl::ZVT_STRING);
-	
+
+				if(pd.bitfield.hasRelevantVisualObject)
+				{
+					// Skip visual-chunk
+					ZenParser::ChunkHeader tmph;
+					parser.readChunkStart(tmph);
+					parser.skipChunk();
+				}
+
+				if(pd.bitfield.hasAIObject)
+				{
+					// Skip ai-chunk
+					ZenParser::ChunkHeader tmph;
+					parser.readChunkStart(tmph);
+					parser.skipChunk();
+				}
+
 				/*info.properties.insert(std::make_pair("PresetName", info.presetName));
 				info.properties.insert(std::make_pair("BBoxMin", info.bbox[0].toString()));
 				info.properties.insert(std::make_pair("BBoxMax", info.bbox[1].toString()));
@@ -149,12 +165,63 @@ namespace ZenLoad
 										 Prop("staticVob", info.staticVob),
 										 Prop("dynShadow", info.dynamicShadow)); // TODO: References!
 				}
+
+				// Skip visual-chunk
+				ZenParser::ChunkHeader tmph;
+				parser.readChunkStart(tmph);
+				parser.skipChunk();
+
+				// Skip ai-chunk
+				parser.readChunkStart(tmph);
+				parser.skipChunk();
+
 			}
+
+			/*// Skip visual-chunk
+			ZenParser::ChunkHeader tmph;
+			parser.readChunkStart(tmph);
+			parser.skipChunk();
+
+			// Skip ai-chunk
+			parser.readChunkStart(tmph);
+			parser.skipChunk();*/
 
 			// Check subclasses
 			if(header.classname == "oCItem:zCVob")
 			{
-				parser.getImpl()->readEntry("itemInstance", &info.oCItem.instanceName, 0, ZenLoad::ParserImpl::ZVT_STRING);
+				parser.getImpl()->readEntry("itemInstance", &info.oCItem.instanceName);
+			}
+
+			if(header.classname.find("oCMOB:") != std::string::npos)
+			{
+				parser.getImpl()->readEntry("focusName", &info.oCMOB.focusName);
+				parser.getImpl()->readEntry("hitpoints", &info.oCMOB.hitpoints);
+				parser.getImpl()->readEntry("damage", &info.oCMOB.damage);
+				parser.getImpl()->readEntry("moveable", &info.oCMOB.moveable);
+				parser.getImpl()->readEntry("takeable", &info.oCMOB.takeable);
+				parser.getImpl()->readEntry("focusOverride", &info.oCMOB.focusOverride);
+				parser.getImpl()->readEntry("soundMaterial", &info.oCMOB.soundMaterial);
+				parser.getImpl()->readEntry("visualDestroyed", &info.oCMOB.visualDestroyed);
+				parser.getImpl()->readEntry("owner", &info.oCMOB.owner);
+				parser.getImpl()->readEntry("ownerGuild", &info.oCMOB.ownerGuild);
+				parser.getImpl()->readEntry("isDestroyed", &info.oCMOB.isDestroyed);
+			}
+
+			if(header.classname.find("oCMobInter:") != std::string::npos)
+			{
+				if(version == WorldVersion::VERSION_G1_08k)
+				{
+					int32_t tmp;
+					parser.getImpl()->readEntry("state", &tmp);
+					parser.getImpl()->readEntry("stateTarget", &tmp);
+				}
+
+				parser.getImpl()->readEntry("stateNum", &info.oCMobInter.stateNum);
+				parser.getImpl()->readEntry("triggerTarget", &info.oCMobInter.triggerTarget);
+				parser.getImpl()->readEntry("useWithItem", &info.oCMobInter.useWithItem);
+				parser.getImpl()->readEntry("conditionFunc", &info.oCMobInter.conditionFunc);
+				parser.getImpl()->readEntry("onStateFunc", &info.oCMobInter.onStateFunc);
+				parser.getImpl()->readEntry("rewind", &info.oCMobInter.rewind);
 			}
 
 			parser.skipChunk();

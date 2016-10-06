@@ -163,6 +163,31 @@ namespace ZenLoad
 			std::string instanceName;
 		}oCItem;
 
+		struct
+		{
+			std::string focusName;
+			int32_t 	hitpoints;
+			int32_t 	damage;
+			bool 		moveable;
+			bool		takeable;
+			bool		focusOverride;
+			uint8_t		soundMaterial;
+			std::string	visualDestroyed;
+			std::string	owner;
+			std::string ownerGuild;
+			bool		isDestroyed;
+		}oCMOB;
+
+		struct
+		{
+			int 		stateNum;
+			std::string triggerTarget;
+			std::string useWithItem;
+			std::string conditionFunc;
+			std::string onStateFunc;
+			bool		rewind;
+		}oCMobInter;
+
 		std::vector<zCVobData> childVobs;
 	};
 

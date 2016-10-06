@@ -63,6 +63,16 @@ namespace ZenLoad
 		 */
 		virtual void readEntry(const std::string& name, void* target, size_t targetSize, EZenValueType expectedType = ZVT_0) = 0;
 
+		void readEntry(const std::string& name, std::string* target){ readEntry(name, target, 0, ZVT_STRING); }
+		void readEntry(const std::string& name, int32_t* target){ readEntry(name, target, sizeof(*target), ZVT_INT); }
+		void readEntry(const std::string& name, uint8_t* target){ readEntry(name, target, sizeof(*target), ZVT_BYTE); }
+		void readEntry(const std::string& name, bool* target){ readEntry(name, target, sizeof(*target), ZVT_BOOL); }
+		void readEntry(const std::string& name, uint32_t* target){ readEntry(name, target, sizeof(*target), ZVT_INT); }
+		void readEntry(const std::string& name, float* target){ readEntry(name, target, sizeof(*target), ZVT_FLOAT); }
+		void readEntry(const std::string& name, ZMath::float3* target){ readEntry(name, target, sizeof(*target), ZVT_VEC3); }
+		void readEntry(const std::string& name, ZMath::Matrix* target){ readEntry(name, target, sizeof(*target), ZVT_RAW_FLOAT); }
+
+
 		/**
 		 * @brief Reads the type of a single entry
 		 */
