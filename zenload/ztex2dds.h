@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <inttypes.h>
+#include "ztex.h"
 
 namespace ZenLoad
 {
@@ -13,4 +14,10 @@ namespace ZenLoad
 	 * @brief Convert dds to RGBA8
 	 */
 	void convertDDSToRGBA8( const std::vector<uint8_t>& ddsData, std::vector<uint8_t>& rgba8Data, int mip=0);
+
+	/**
+	 * @param ddsData Loaded dds
+	 * @return surface info of the given dds
+	 */
+	DDSURFACEDESC2 getSurfaceDesc( const std::vector<uint8_t>& ddsData);
 }
