@@ -17,12 +17,11 @@ namespace ZenLoad
         {
             zCWaypointData info;
 
-            ReadObjectProperties(parser, info.properties,
-                                 Prop("wpName", info.wpName),
-                                 Prop("waterDepth", info.waterDepth),
-                                 Prop("underWater", info.underWater),
-                                 Prop("position", info.position),
-                                 Prop("direction", info.direction));
+            parser.getImpl()->readEntry("wpName", &info.wpName);
+            parser.getImpl()->readEntry("waterDepth", &info.waterDepth);
+            parser.getImpl()->readEntry("underWater", &info.underWater);
+            parser.getImpl()->readEntry("position", &info.position);
+            parser.getImpl()->readEntry("direction", &info.direction);
 
             return info;
         }
