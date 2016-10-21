@@ -209,12 +209,12 @@ namespace ZenLoad
 
 			if(header.classname.find("oCMobInter:") != std::string::npos)
 			{
-				if(version == WorldVersion::VERSION_G1_08k)
+				/*if(version == WorldVersion::VERSION_G1_08k)
 				{
 					int32_t tmp;
 					parser.getImpl()->readEntry("state", &tmp);
 					parser.getImpl()->readEntry("stateTarget", &tmp);
-				}
+				}*/
 
 				parser.getImpl()->readEntry("stateNum", &info.oCMobInter.stateNum);
 				parser.getImpl()->readEntry("triggerTarget", &info.oCMobInter.triggerTarget);
