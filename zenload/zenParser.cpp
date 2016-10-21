@@ -444,15 +444,17 @@ void ZenParser::checkArraySize()
 */
 uint32_t ZenParser::readBinaryDWord()
 {
-	uint32_t retVal = *reinterpret_cast<uint32_t *>(&m_Data[m_Seek]);
-	m_Seek += sizeof(uint32_t);
+	uint32_t retVal;
+	readStructure(retVal);
+
 	return retVal;
 }
 
 uint16_t ZenParser::readBinaryWord()
 {
-	uint16_t retVal = *reinterpret_cast<uint16_t *>(&m_Data[m_Seek]);
-	m_Seek += sizeof(uint16_t);
+	uint16_t retVal;
+	readStructure(retVal);
+
 	return retVal;
 }
 
@@ -465,8 +467,9 @@ uint8_t ZenParser::readBinaryByte()
 
 float ZenParser::readBinaryFloat()
 {
-	float retVal = *reinterpret_cast<float *>(&m_Data[m_Seek]);
-	m_Seek += sizeof(float);
+	float retVal;
+	readStructure(retVal);
+
 	return retVal;
 }
 
