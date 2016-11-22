@@ -4,4 +4,8 @@ git:
   submodules: false
 
 script:
-  - mkdir -p build && cd build && cmake .. && make -j2
+  - git submodule update --init --recursive
+  - mkdir -p build
+  - cd build
+  - cmake ..
+  - make -j2
