@@ -12,6 +12,7 @@ git:
   submodules: false
 
 script:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - git submodule update --init --recursive
   - mkdir -p build
   - cd build
