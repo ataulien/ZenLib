@@ -1,4 +1,4 @@
-# ZenLib [![Build status](https://ci.appveyor.com/api/projects/status/3hih95admhl2gtmj?svg=true)](https://ci.appveyor.com/project/degenerated1123/zenlib)
+# ZenLib [![Build status](https://ci.appveyor.com/api/projects/status/3hih95admhl2gtmj?svg=true)](https://ci.appveyor.com/project/degenerated1123/zenlib) [![Build Status](https://travis-ci.org/degenerated1123/ZenLib.svg?branch=master)](https://travis-ci.org/degenerated1123/ZenLib)
 Loading of proprietary formats used by the engine of the games "Gothic" and "Gothic II".
 
 ### Features
