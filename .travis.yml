@@ -1,5 +1,13 @@
 language: c++
 
+addons:
+    apt:
+        sources:
+            - ubuntu-toolchain-r-test
+        packages:
+            - g++-6
+            - gcc-6
+
 git:
   submodules: false
 
