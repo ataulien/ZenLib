@@ -188,6 +188,14 @@ namespace ZenLoad
 			bool		rewind;
 		}oCMobInter;
 
+		struct
+		{
+            bool        locked;
+			std::string keyInstance;
+			std::string pickLockStr;
+			std::string contains;
+		}oCMobContainer;
+
 		std::vector<zCVobData> childVobs;
 	};
 

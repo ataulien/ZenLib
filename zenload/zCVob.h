@@ -222,6 +222,14 @@ namespace ZenLoad
 				parser.getImpl()->readEntry("conditionFunc", &info.oCMobInter.conditionFunc);
 				parser.getImpl()->readEntry("onStateFunc", &info.oCMobInter.onStateFunc);
 				parser.getImpl()->readEntry("rewind", &info.oCMobInter.rewind);
+
+				if(header.classname.find("oCMobContainer:") != std::string::npos)
+				{
+                    parser.getImpl()->readEntry("locked", &info.oCMobContainer.locked);
+					parser.getImpl()->readEntry("keyInstance", &info.oCMobContainer.keyInstance);
+					parser.getImpl()->readEntry("pickLockStr", &info.oCMobContainer.pickLockStr);
+					parser.getImpl()->readEntry("contains", &info.oCMobContainer.contains);
+				}
 			}
 
 			parser.skipChunk();

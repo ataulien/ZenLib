@@ -44,7 +44,7 @@ void DaedalusGameState::registerExternals()
     });
 
     m_VM.registerExternalFunction("createinvitem", [=](Daedalus::DaedalusVM& vm){
-        int32_t itemInstance = vm.popDataValue(); if(l) LogInfo() << "itemInstance: " << itemInstance;
+        uint32_t itemInstance = (uint32_t)vm.popDataValue(); if(l) LogInfo() << "itemInstance: " << itemInstance;
         uint32_t arr_n0;
         int32_t npc = vm.popVar(arr_n0);
 
@@ -58,17 +58,14 @@ void DaedalusGameState::registerExternals()
     });
 
     m_VM.registerExternalFunction("createinvitems", [=](Daedalus::DaedalusVM& vm){
-        int32_t num = vm.popDataValue();
-        int32_t itemInstance = vm.popDataValue(); if(l) LogInfo() << "itemInstance: " << itemInstance;
+        uint32_t num = (uint32_t)vm.popDataValue();
+        uint32_t itemInstance = (uint32_t)vm.popDataValue(); if(l) LogInfo() << "itemInstance: " << itemInstance;
         uint32_t arr_n0;
         int32_t npc = vm.popVar(arr_n0);
 
         NpcHandle hnpc = ZMemory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(npc).instanceDataHandle);
 
-        for(int32_t i=0;i<num;i++)
-        {
-            ItemHandle h = createInventoryItem(itemInstance, hnpc);
-        }
+        createInventoryItem(itemInstance, hnpc, num);
 
         //LogInfo() << "1: " << item.name;
         //LogInfo() << "2. " << npcData.name[0];
@@ -226,7 +223,7 @@ FocusHandle DaedalusGameState::createFocus()
     return h;
 }
 
-ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle npc)
+ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle npc, unsigned int count)
 {
     auto items = m_NpcInventories[npc];
 
@@ -238,7 +235,7 @@ ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle n
         // Just add to the count here
         if(item.instanceSymbol == itemSymbol)
         {
-            item.count[0]++;
+            item.count[0] += count;
             return h;
         }
     }
@@ -246,7 +243,7 @@ ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle n
     // Get memory for the item
     ItemHandle h = createItem();
     GEngineClasses::C_Item& item = getItem(h);
-    item.count[0] = 1;
+    item.count[0] = count;
 
     // Run the script-constructor
     m_VM.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(itemSymbol), IC_Item);
@@ -288,12 +285,20 @@ bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc)
     for(auto it = m_NpcInventories[npc].begin(); it != m_NpcInventories[npc].end(); it++)
     {
         Daedalus::GEngineClasses::C_Item& item = getItem((*it));
+
+
         if(item.instanceSymbol == itemSymbol)
         {
-            m_NpcInventories[npc].erase(it);
+            item.count[0]--;
 
-            // Clear memory
-            m_RegisteredObjects.items.removeObject(*it);
+            // Remove if count reached 0
+            if(item.count[0] == 0)
+            {
+                m_NpcInventories[npc].erase(it);
+
+                // Clear memory
+                m_RegisteredObjects.items.removeObject(*it);
+            }
 
             return true;
         }

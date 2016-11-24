@@ -91,9 +91,10 @@ namespace Daedalus
              * Creates a new instance of the given item first and then adds it to the given NPC
              * @param itemSymbol Symbol to create the instance of
              * @param npc NPC to give the item to
+             * @param count How many to give
              * @return Newly created handle or an old one, if the item was stackable
              */
-            ItemHandle createInventoryItem(size_t itemSymbol, NpcHandle npc);
+            ItemHandle createInventoryItem(size_t itemSymbol, NpcHandle npc, unsigned int count = 1);
 
             /**
              * Adds the given item to the inventory of the given NPC
