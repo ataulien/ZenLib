@@ -1,7 +1,5 @@
-# ZenLib
+# ZenLib [![Build status](https://ci.appveyor.com/api/projects/status/3hih95admhl2gtmj?svg=true)](https://ci.appveyor.com/project/degenerated1123/zenlib) [![Build Status](https://travis-ci.org/degenerated1123/ZenLib.svg?branch=master)](https://travis-ci.org/degenerated1123/ZenLib)
 Loading of proprietary formats used by the engine of the games "Gothic" and "Gothic II".
-
-> Currently, only Gothic II is supported
 
 ### Features
 Contains loaders for:
@@ -15,7 +13,10 @@ Contains loaders for:
 There is no possibility to write files at the moment. However, this is planned for a later release.
 
 # Building
-> ZenLib requires a compiler capable of the C++11-standard and at least CMake 3.1!
+ZenLib requires a compiler capable of the C++14-standard and at least CMake 3.1!
+
+> Make sure to clone the repository with the '--recursive'-flag, since otherwise you will be missing some dependencies!
+> Like so: `git clone --recursive https://github.com/degenerated1123/ZenLib.git`
 
 ### Linux
 ```sh
