@@ -280,7 +280,7 @@ ItemHandle DaedalusGameState::addItemToInventory(ItemHandle item, NpcHandle npc)
 }
 
 
-bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc)
+bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc, unsigned int count)
 {
     for(auto it = m_NpcInventories[npc].begin(); it != m_NpcInventories[npc].end(); it++)
     {
@@ -289,7 +289,7 @@ bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc)
 
         if(item.instanceSymbol == itemSymbol)
         {
-            item.count[0]--;
+            item.count[0] -= std::min(item.count[0], (int32_t)count); // Handle overflow;
 
             // Remove if count reached 0
             if(item.count[0] == 0)
