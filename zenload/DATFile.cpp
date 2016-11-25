@@ -301,6 +301,7 @@ size_t DATFile::getSymbolIndexByName(const std::string& symName)
 
 PARSymbol& DATFile::getSymbolByIndex(size_t idx)
 {
+	assert(idx < m_SymTable.symbols.size());
     return m_SymTable.symbols[idx];
 }
 

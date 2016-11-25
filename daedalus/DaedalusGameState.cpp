@@ -36,13 +36,6 @@ void DaedalusGameState::registerExternals()
             m_GameExternals.wld_insertitem(item);
     });
 
-    m_VM.registerExternalFunction("wld_insertnpc", [=](Daedalus::DaedalusVM& vm){
-        std::string spawnpoint = vm.popString(); if(l) LogInfo() << "spawnpoint: " << spawnpoint;
-        uint32_t npcinstance = vm.popDataValue(); if(l) LogInfo() << "npcinstance: " << npcinstance;
-
-        insertNPC(npcinstance, spawnpoint);
-    });
-
     m_VM.registerExternalFunction("createinvitem", [=](Daedalus::DaedalusVM& vm){
         int32_t itemInstance = vm.popDataValue(); if(l) LogInfo() << "itemInstance: " << itemInstance;
         uint32_t arr_n0;
@@ -78,17 +71,15 @@ void DaedalusGameState::registerExternals()
     m_VM.registerExternalFunction("hlp_getnpc", [=](Daedalus::DaedalusVM& vm){
         int32_t instancename = vm.popDataValue(); if(l) LogInfo() << "instancename: " << instancename;
 
-        if(!vm.getDATFile().getSymbolByIndex(instancename).instanceDataHandle.isValid())
+        /*if(!vm.getDATFile().getSymbolByIndex(instancename).instanceDataHandle.isValid())
         {
-            NpcHandle h = createNPC();
-            GEngineClasses::C_Npc& npc = getNpc(h);
-            vm.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(instancename), IC_Npc);
+			
         }else
         {
             GEngineClasses::C_Npc& npcData = getNpc(ZMemory::handleCast<NpcHandle>(vm.getDATFile().getSymbolByIndex(instancename).instanceDataHandle));
             if(l) LogInfo() << " [HLP_GETNPC] Name: "
                   << npcData.name[0];
-        }
+        }*/
 
         // TODO: PB returns the actual address to the npc here. But why?
         vm.setReturnVar(instancename);

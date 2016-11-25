@@ -142,31 +142,52 @@ bool DaedalusVM::doStack(bool verbose)
             pushInt(~popDataValue());
             break;
         case EParOp_Ret:
-            if(m_RetStack.empty())
+            /*if(m_RetStack.empty())
                 return false; // Program ended
 
             m_PC = static_cast<uint32_t>(m_RetStack.top());
             m_RetStack.pop();
-            m_CallStack.pop_back();
+            m_CallStack.pop_back();*/
+			return false;
             break;
         case EParOp_Call:
         {
             if(log) LogInfo() << oldPC <<" - CALL: " << op.address;
 
-            m_RetStack.push(m_PC);
-            m_PC = (size_t)op.address;
+			/*m_RetStack.push(m_PC);
+			m_PC = (size_t)op.address;
 
-            m_CallStack.push_back((size_t)op.address);
+			m_CallStack.push_back((size_t)op.address);*/
+
+			ZMemory::BigHandle currentInstanceHandle = m_CurrentInstanceHandle;
+			EInstanceClass currentInstanceClass = m_CurrentInstanceClass;
+			size_t PC = m_PC;
+           
+			m_PC = (size_t)op.address;
+			while(doStack());
+
+			m_PC = PC;
+			m_CurrentInstanceHandle = currentInstanceHandle;
+			m_CurrentInstanceClass = currentInstanceClass; 
         }
             break;
 
         case EParOp_CallExternal: {
             auto it = m_ExternalsByIndex.find(op.symbol);
 
+			ZMemory::BigHandle currentInstanceHandle = m_CurrentInstanceHandle;
+			EInstanceClass currentInstanceClass = m_CurrentInstanceClass;
+			size_t PC = m_PC;
+
             if(log) LogInfo() << " - Function: " << m_DATFile.getSymbolByIndex(op.symbol).name;
             if (it != m_ExternalsByIndex.end()) {
                 (*it).second(*this);
             }
+
+			m_PC = PC;
+			m_CurrentInstanceHandle = currentInstanceHandle;
+			m_CurrentInstanceClass = currentInstanceClass; 
+
         }
             break;
 
@@ -455,6 +476,7 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     setCurrentInstance(symIdx);
 
     // Set self
+	PARSymbol selfCpy = m_DATFile.getSymbolByName("self"); // Copy of "self"-symbol
     setInstance("self", instance, classIdx);
 
     // Place the assigning symbol into the instance
@@ -472,9 +494,13 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     // Run script code to initialize the object
     while(doStack());
 
+	// Reset to old "self"
+	m_DATFile.getSymbolByName("self") = selfCpy;
+
     // Return to old location and continue like nothing ever happened
     m_PC = pc;
     m_RetStack = retStack;
+
 
     // Reset state
     /*m_DATFile.getSymbolByName("SELF").instanceDataHandle = oldSelfInstance;
@@ -499,6 +525,7 @@ void* DaedalusVM::getCurrentInstanceDataPtr()
 
 void DaedalusVM::pushState()
 {
+	return;
     VMState s;
     s.m_CurrentInstanceClass = m_CurrentInstanceClass;
     s.m_CurrentInstanceHandle = m_CurrentInstanceHandle;
@@ -519,6 +546,7 @@ void DaedalusVM::pushState()
 
 void DaedalusVM::popState()
 {
+	return; 
     m_PC = m_StateStack.top().m_PC;
     m_RetStack = m_StateStack.top().m_RetStack;
     m_Stack = m_StateStack.top().m_Stack;
