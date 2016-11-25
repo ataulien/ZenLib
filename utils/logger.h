@@ -194,6 +194,11 @@ namespace Utils
 			if(s_LogCallback)
 				s_LogCallback(m_Info.str() + m_Message.str() + "\n");
 
+			if(s_LogLines.size() >= 50)
+				s_LogLines.pop_back();
+
+			s_LogLines.push_front(m_Info.str() + m_Message.str() + "\n");
+
 			// Pop a messagebox, if wanted
 			switch(m_TypeID)
 			{
@@ -220,10 +225,16 @@ namespace Utils
 			s_LogCallback = fn;
 		}
 
+		/**
+		 * @return Last 50 Log lines
+		 */
+		static const std::list<std::string>& getLastLogLines(){ return s_LogLines; }
+
 	private:
 
 		static std::function<void(const std::string&)> s_LogCallback;
 		static std::string s_LogFile;
+		static std::list<std::string> s_LogLines; // Last 50 log lines
 
 		std::stringstream m_Info; // Contains an information like "Info", "Warning" or "Error"
 		std::stringstream m_Message; // Text to write into the logfile

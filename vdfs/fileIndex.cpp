@@ -148,3 +148,11 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
 
 	return false;
 }
+
+bool FileIndex::hasFile(const std::string& name)
+{
+	std::string upper = name;
+	std::transform(upper.begin(), upper.end(),upper.begin(), ::toupper);
+
+	return m_FileIndicesByName.find(upper) != m_FileIndicesByName.end();
+}

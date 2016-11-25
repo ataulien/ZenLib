@@ -55,11 +55,34 @@ namespace Daedalus
 
         struct C_Npc : Instance
         {
+            enum EAttributes : int32_t
+            {
+                EATR_HITPOINTS = 0,
+                EATR_HITPOINTSMAX = 1,
+                EATR_MANA = 2,
+                EATR_MANAMAX = 3,
+                EATR_STRENGTH = 4,
+                EATR_DEXTERITY = 5,
+                EATR_REGENERATEHP = 6,
+                EATR_REGENERATEMANA = 7,
+
+                EATR_MAX = 8
+            };
+
+            enum ENPCFlag : int32_t
+            {
+                EFLAG_NONE = 0,
+                EFLAG_FRIENDS = 1 << 0,
+                EFLAG_IMMORTAL = 1 << 1,
+                EFLAG_GHOST = 1 << 2,
+                EFLAG_PROTECTED = 1 << 10,
+            };
+
 			C_Npc()
 			{
 				id = 0;
 				npcType = 0;
-				flags = 0;
+				flags = EFLAG_NONE;
 				memset(attribute, 0, sizeof(attribute));
 				memset(protection, 0, sizeof(protection));
 				memset(damage, 0, sizeof(damage));
@@ -87,8 +110,8 @@ namespace Daedalus
             std::string name[5];
             std::string slot;
             int32_t npcType;
-            int32_t flags;
-            int32_t attribute[ATR_INDEX_MAX];
+            ENPCFlag flags;
+            int32_t attribute[EATR_MAX];
             int32_t protection[PROT_INDEX_MAX];
             int32_t damage[DAM_INDEX_MAX];
             int32_t damagetype;
@@ -177,6 +200,8 @@ namespace Daedalus
                 ITEM_RING	  = 1 << 11,
             };
 
+
+
             // Für alle Items
             int32_t id;
             std::string name, nameID;
@@ -198,12 +223,14 @@ namespace Daedalus
             int32_t nutrition;        //	HP-Steigerung bei Nahrung
 
             // Benötigte Attribute zum Benutzen des Items
-            int32_t cond_atr[3];
-            int32_t cond_value[3];
+            enum { COND_ATR_MAX = 3 };
+            int32_t cond_atr[COND_ATR_MAX];
+            int32_t cond_value[COND_ATR_MAX];
 
             // Attribute, die bei anlegen des Items verändert werden
-            int32_t change_atr[3];
-            int32_t change_value[3];
+            enum { CHANGE_ATR_MAX = 3 };
+            int32_t change_atr[CHANGE_ATR_MAX];
+            int32_t change_value[CHANGE_ATR_MAX];
 
             // Parserfunktionen
             uint32_t magic;        //	Parserfunktion zum "Magie Header"

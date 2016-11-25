@@ -69,6 +69,10 @@ namespace VDFS
 		 */
 		const std::vector<FileInfo>& getKnownFiles(){return m_KnownFiles;}
 
+		/**
+		 * @return Whether a file with the given name exists
+		 */
+		 bool hasFile(const std::string& name);
 	private:
 		/**
 		 * @brief Vector of all known files

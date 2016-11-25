@@ -430,6 +430,19 @@ namespace ZenLoad
 	}
 
 	/**
+	 * @param ddsData Loaded dds
+	 * @return Pointer to the surface info of the given dds
+	 */
+	DDSURFACEDESC2 getSurfaceDesc( const std::vector<uint8_t>& ddsData)
+	{
+		DDSURFACEDESC2 desc;
+
+		memcpy(&desc, &ddsData[sizeof(uint32_t)], sizeof(DDSURFACEDESC2));
+
+		return desc;
+	}
+
+	/**
 	 * @brief Convert dds to RGBA8
 	 */
 	void convertDDSToRGBA8(const std::vector<uint8_t>& ddsData, std::vector<uint8_t>& rgba8Data, int mip)

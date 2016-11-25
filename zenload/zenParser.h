@@ -199,7 +199,8 @@ namespace ZenLoad
 		template<typename T>
 		void readStructure(T& s) 
 		{
-			s = *reinterpret_cast<T*>(&m_Data[m_Seek]);
+			void* _s = (void*)&s;
+			memcpy(_s, &m_Data[m_Seek], sizeof(T));
 			m_Seek += sizeof(T);
 		}
 
