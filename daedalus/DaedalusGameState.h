@@ -109,7 +109,7 @@ namespace Daedalus
              * Note: Handle will not be valid anymore if this returns true!
              * @return True, if such an instance was found and removed, false otherwise
              */
-            bool removeInventoryItem(size_t itemSymbol, NpcHandle npc);
+            bool removeInventoryItem(size_t itemSymbol, NpcHandle npc, unsigned int count = 1);
 
             /**
              * Creates a new NPC-Instance, just as Wld_InsertNPC was called from script
