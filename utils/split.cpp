@@ -1,6 +1,6 @@
 #include "split.h"
 
-std::vector<std::string> &Utils::split(const std::string &s, const char& delim, std::vector<std::string> &elems)
+std::vector<std::string> &Utils::split(const std::string &s, const char delim, std::vector<std::string> &elems)
 {
     std::stringstream ss(s);
     std::string item;
@@ -10,7 +10,7 @@ std::vector<std::string> &Utils::split(const std::string &s, const char& delim, 
     return elems;
 }
 
-std::vector<std::string> Utils::split(const std::string &s, const char& delim)
+std::vector<std::string> Utils::split(const std::string &s, const char delim)
 {
     std::vector<std::string> elems;
     split(s, delim, elems);

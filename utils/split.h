@@ -6,7 +6,7 @@
 
 namespace Utils
 {
-    std::vector<std::string> &split(const std::string &s, const char& delim, std::vector<std::string> &elems);
+    std::vector<std::string> &split(const std::string &s, const char delim, std::vector<std::string> &elems);
 
     /**
      * @brief split string function
@@ -14,7 +14,7 @@ namespace Utils
      * @param delimitor
      * @return splitted string in a std::vector<std::string>
      */
-	std::vector<std::string> split(const std::string &s, const char& delim);
+	std::vector<std::string> split(const std::string &s, const char delim);
 
 	/**
 	 * @brief Splits a string on every occasion of one of the input-chars, in the given order
