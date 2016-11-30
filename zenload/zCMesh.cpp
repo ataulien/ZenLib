@@ -520,10 +520,10 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale, bool removeDoubles)
 		uint32_t matIdx = m_TriangleMaterialIndices[i / 3];
 
 		// Find texture of this material
-		auto& matByTex = materialsByTexture.find(m_Materials[matIdx].texture);
+		const auto& matByTex = materialsByTexture.find(m_Materials[matIdx].texture);
 		if(matByTex != materialsByTexture.end())
 		{
-			auto& matSlotByIndex = newMaterialSlotsByMatIndex.find(matByTex->second);
+			const auto& matSlotByIndex = newMaterialSlotsByMatIndex.find(matByTex->second);
 			if(matSlotByIndex != newMaterialSlotsByMatIndex.end())
 			{
 				// Copy lightmap index
