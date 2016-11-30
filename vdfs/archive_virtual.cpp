@@ -123,7 +123,7 @@ bool ArchiveVirtual::updateFileCatalog()
 		// these are not 0 terminated
         // FIXME: This could give trouble with names which are actually 64 chars long!
         e.Name[63] = '\0';
-        for(size_t i = 62; i >= 0; i--)
+        for(int i = 62; i >= 0; i--)
 		{
 			if(e.Name[i] != ' ')
 				break;
