@@ -13,7 +13,7 @@ namespace Daedalus
     class DaedalusVM
     {
     public:
-        DaedalusVM(DATFile& dat, const std::string& main="main");
+        DaedalusVM(const std::string& file, const std::string& main="main");
 
         /**
          * @brief Performs a single instruction on the stack

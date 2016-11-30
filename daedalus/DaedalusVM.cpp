@@ -6,7 +6,6 @@
 #include <map>
 #include <assert.h>
 #include "DaedalusVM.h"
-#include "DATFile.h"
 
 #define STACKIFY(x) static_cast<int32_t>(x)
 
@@ -17,11 +16,11 @@ const int NUM_FAKE_STRING_SYMBOLS = 5;
 using namespace ZenLoad;
 using namespace Daedalus;
 
-DaedalusVM::DaedalusVM(Daedalus::DATFile& dat, const std::string& main)
+DaedalusVM::DaedalusVM(const std::string& file, const std::string& main)
     : m_GameState(*this)
 {
     m_PC = 0;
-    m_DATFile = dat;
+    m_DATFile = Daedalus::DATFile(file);
 
     // See if we find a "main"-function
     if(m_DATFile.hasSymbolName(main))

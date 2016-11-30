@@ -82,6 +82,8 @@ void DATFile::readSymTable()
     if(m_Verbose) LogInfo() << "Reading Sym-Table...";
 
     uint32_t count = m_Parser.readBinaryDWord();
+	m_SymTable.symbolsByName.reserve(count);
+	m_SymTable.symbols.resize(count);
     m_SymTable.sortTable.resize(count);
     m_Parser.readBinaryRaw(m_SymTable.sortTable.data(), sizeof(uint32_t) * count);
 
@@ -171,10 +173,10 @@ void DATFile::readSymTable()
 
         s.parent = static_cast<int32_t>(m_Parser.readBinaryDWord());
 
-        m_SymTable.symbols.push_back(s);
+		if(!s.name.empty())
+			m_SymTable.symbolsByName.emplace(s.name, i);
 
-        if(!s.name.empty())
-            m_SymTable.symbolsByName[s.name] = m_SymTable.symbols.size()-1;
+		m_SymTable.symbols[i] = std::move(s);
     }
 
     readStack();
@@ -189,6 +191,9 @@ void DATFile::readStack()
 
     m_Stack.stackOffset = m_Parser.getSeek();
 
+	std::string ss;
+	std::stringstream sss;
+
     size_t seek=0;
     while(m_Parser.getSeek() < m_Parser.getFileSize())
     {
@@ -196,12 +201,16 @@ void DATFile::readStack()
         memset(&s, 0, sizeof(s));
         s.op = static_cast<EParOp>(m_Parser.readBinaryByte());
 
-        std::stringstream sss;
-        sss << seek << ": " << OP_MAP[s.op];
+		if(m_Verbose)
+		{
+			sss.str(std::string());
+			sss.clear();
 
-        std::string ss = sss.str();
+			sss << seek << ": " << OP_MAP[s.op];
+			ss = sss.str();
+		}
 
-        seek += sizeof(uint8_t);
+		seek += sizeof(uint8_t);
 
         switch(s.op)
         {

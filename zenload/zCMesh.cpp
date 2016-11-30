@@ -174,6 +174,7 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 
 				// Read number of materials
 				uint32_t numMaterials = parser.readBinaryDWord();
+				m_Materials.reserve(numMaterials);
 
 				// Read every stored material
 				for(uint32_t i = 0; i < numMaterials; i++)
@@ -519,14 +520,20 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale, bool removeDoubles)
 		uint32_t matIdx = m_TriangleMaterialIndices[i / 3];
 
 		// Find texture of this material
-		matIdx = newMaterialSlotsByMatIndex[materialsByTexture[m_Materials[matIdx].texture]];
+		auto& matByTex = materialsByTexture.find(m_Materials[matIdx].texture);
+		if(matByTex != materialsByTexture.end())
+		{
+			auto& matSlotByIndex = newMaterialSlotsByMatIndex.find(matByTex->second);
+			if(matSlotByIndex != newMaterialSlotsByMatIndex.end())
+			{
+				// Copy lightmap index
+				mesh.subMeshes[matSlotByIndex->second].triangleLightmapIndices.push_back(m_TriangleLightmapIndices[i / 3]);
 
-		// Copy lightmap index
-		mesh.subMeshes[matIdx].triangleLightmapIndices.push_back(m_TriangleLightmapIndices[i/3]);
-
-		// Add this triangle to its submesh
-		for(size_t j = 0; j < 3; j++)
-			mesh.subMeshes[matIdx].indices.push_back(newIndices[i+j]);
+				// Add this triangle to its submesh
+				for(size_t j = 0; j < 3; j++)
+					mesh.subMeshes[matSlotByIndex->second].indices.push_back(newIndices[i + j]);
+			}
+		}
 	}
 
 	// Store triangles with more information attached as well
