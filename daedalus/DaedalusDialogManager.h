@@ -41,6 +41,11 @@ namespace Daedalus
              * @param npc NPC to process infos for
              */
             void processInfosFor(NpcHandle npc);
+
+            /**
+             * @return Map of NPC-Symbols -> All info they know
+             */
+            const std::map<size_t, std::set<size_t>>& getKnownNPCInformation(){ return m_KnownNpcInfoSymbolsByNpcSymbols; };
         private:
 
             /**

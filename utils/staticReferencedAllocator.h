@@ -162,7 +162,7 @@ namespace ZMemory
                 m_OnRemoved(m_Elements[actIdx]);
 
             // Overwrite this element with the last one
-            memcpy(&m_Elements[actIdx], &m_Elements[m_LastInternalHandle->m_Handle.index], sizeof(T));
+            m_Elements[actIdx] = m_Elements[m_LastInternalHandle->m_Handle.index];
 
             // Fix the handle of the last element
             m_LastInternalHandle->m_Handle.index = actIdx;

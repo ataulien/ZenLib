@@ -115,6 +115,11 @@ namespace Daedalus
 			dataOffset = -1;
 			instanceDataHandle.invalidate();
 			instanceDataClass = IC_Npc;
+			memset(&properties, 0, sizeof(properties));
+			/*classOffset = 0;
+            address = 0;
+            dataOffset = 0;*/
+            parent = 0xFFFFFFFF;
 		}
 
         std::string name;

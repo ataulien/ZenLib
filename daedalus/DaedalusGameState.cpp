@@ -231,9 +231,19 @@ ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle n
         }
     }
 
+    static int s_Tmp = 0;
+    s_Tmp++;
+
     // Get memory for the item
     ItemHandle h = createItem();
     GEngineClasses::C_Item& item = getItem(h);
+
+    if(h.generation > 1000)
+    {
+        m_RegisteredObjects.items.removeObject(h);
+        h = createItem();
+    }
+
     item.count[0] = count;
 
     // Run the script-constructor
@@ -264,10 +274,15 @@ ItemHandle DaedalusGameState::addItemToInventory(ItemHandle item, NpcHandle npc)
         }
     }
 
+    if(item.generation > 1000)
+        LogInfo() << "Oh noes!";
+
     m_NpcInventories[npc].push_back(item);
 
     if (m_GameExternals.createinvitem)
         m_GameExternals.createinvitem(item, npc);
+
+    return item;
 }
 
 

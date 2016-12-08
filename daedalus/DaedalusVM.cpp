@@ -220,11 +220,12 @@ bool DaedalusVM::doStack(bool verbose)
             straddr = m_DATFile.getSymbolByIndex(a).getStrAddr(arr, getCurrentInstanceDataPtr());
 
             {
-                std::string s1 = *straddr;
+                //std::string s1 = *straddr;
                 std::string s2 = *m_DATFile.getSymbolByIndex(b).getStrAddr(arr2, getCurrentInstanceDataPtr());
 
                 //LogInfo() << "s1 (" << sym.name << "): " << s1 << " s2: " << s2;
 
+                *straddr = "test";
                 *straddr = s2;
             }
 
