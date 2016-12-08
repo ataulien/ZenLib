@@ -24,6 +24,7 @@ add_subdirectory(utils)
 add_subdirectory(vdfs)
 add_subdirectory(zenload)
 add_subdirectory(daedalus)
+add_subdirectory(daedalus/compiler)
 
 if(ZENLIB_BUILD_EXAMPLES)
     add_subdirectory(samples)
