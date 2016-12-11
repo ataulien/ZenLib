@@ -17,6 +17,7 @@
 #include <iostream> //temporary
 #include <daedalus/compiler/Location.h>
 #include <daedalus/compiler/Diagnostic.h>
+#include <daedalus/compiler/StringUtils.h>
 namespace Daedalus {
 struct DiagnosticHelper {
 	DiagnosticHelper()
@@ -34,9 +35,7 @@ struct DiagnosticHelper {
 	void report(Diagnostic const& diag)
 	{
 		assert(size_t(diag.id) < sizeof(diagMessages)/sizeof(char*));
-		// TODO: pull compose out of awlib
-		//auto msg = string::compose(diagMessages[diag.id], diag.args);
-		auto msg = std::string();
+		auto msg = compose(diagMessages[diag.id], diag.args);
 
 		auto pos = countLines(*buf, diag.loc.pos);
 
