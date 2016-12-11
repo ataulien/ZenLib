@@ -11,21 +11,10 @@
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  */
-#include <algorithm>
-#include <cstring>
+#include <daedalus/compiler/StringUtils.h>
 #include <daedalus/compiler/KeywordMap.h>
 namespace Daedalus {
 constexpr bool Case_Insensitive_Keywords = true;
-/*!
- * Transform the string to lower case.
- */
-static std::string& tolower(std::string& str)
-{
-	auto lower_char = [] (char c) { return std::tolower(c); };
-	std::transform(begin(str), end(str), begin(str), lower_char);
-	return str;
-}
-
 // Link token to a keyword
 KeywordMap& KeywordMap::add(std::string def, Token::Kind kind)
 {
