@@ -12,9 +12,8 @@
  * all copies or substantial portions of the Software.
  */
 #include <cassert>
-#include <algorithm>
-#include <daedalus/StringUtils.h>
 #include <daedalus/compiler/OUParser.h>
+#include <daedalus/compiler/StringUtils.h>
 namespace daedalus {
 namespace ou {
 namespace {

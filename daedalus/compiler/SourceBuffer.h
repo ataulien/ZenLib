@@ -15,25 +15,17 @@
 #define Daedalus_FileSystem_SourceBuffer
 #include <istream>
 namespace Daedalus {
-// TODO: this is left-over code, should replaced by buffer manager
-/*!
- * Wraps access to source files
+/* TODO: replace with std::string_view
  */
 struct SourceBuffer {
 	SourceBuffer(std::string const& str)
-		: buffer(str.data()), length(str.size())
-	{
-	}
+		: buffer{str.data()}, length{str.size()}
+	{ }
 
 	SourceBuffer(char const* begin, char const* end)
-		: buffer(begin), length(end - begin)
-	{
-	}
+		: buffer{begin}, length{ size_t(end - begin) }
+	{ }
 
-	~SourceBuffer()
-	{
-		//free();
-	}
 
 	char const* begin()
 	{
@@ -49,15 +41,8 @@ struct SourceBuffer {
 	{
 		return length;
 	}
-private:
-	void free()
-	{
-		/*if (buffer)
-			delete[] buffer;
-		buffer = 0;
-		length = 0;*/
-	}
 
+private:
 	char const* buffer;
 	size_t length;
 };

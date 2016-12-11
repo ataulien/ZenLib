@@ -63,10 +63,6 @@ Lexer::Lexer(SourceBuffer* inputBuffer)
 	nextToken();
 }
 
-void Lexer::init()
-{
-}
-
 Token Lexer::currentToken()
 {
 	return cur_token;

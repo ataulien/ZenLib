@@ -31,7 +31,6 @@ struct Lexer {
 	Token nextToken();
 
 private:
-	void init();
 	char peek() const;
 	char prev() const;
 
