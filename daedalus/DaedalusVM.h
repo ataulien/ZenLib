@@ -32,6 +32,11 @@ namespace Daedalus
         void doCallOperation(uint32_t target);
 
         /**
+         * @brief Clears the debug-callstack
+         */
+        void clearCallStack(){ m_CallStack.clear(); }
+
+        /**
          * @brief Registers an External-Function to the VM
          */
         void registerExternalFunction(const std::string& symName, const std::function<void(DaedalusVM&)>& fn);

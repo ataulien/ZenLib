@@ -467,11 +467,17 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 {
     pushState();
 
+    if(symIdx == m_DATFile.getSymbolIndexByName("GRD_282_NEK"))
+        LogInfo() << "Nek!";
+
     PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
 
     // Enter address into instance-symbol
     s.instanceDataHandle = instance;
     s.instanceDataClass = classIdx;
+
+    ZMemory::BigHandle currentInstanceHandle = m_CurrentInstanceHandle;
+    EInstanceClass currentInstanceClass = m_CurrentInstanceClass;
 
     setCurrentInstance(symIdx);
 
@@ -491,6 +497,8 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     m_RetStack = std::stack<size_t>();
     size_t pc = m_PC;
 
+    m_CallStack.clear();
+
     // Run script code to initialize the object
     while(doStack());
 
@@ -503,10 +511,10 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 
 
     // Reset state
-    /*m_DATFile.getSymbolByName("SELF").instanceDataHandle = oldSelfInstance;
-    m_DATFile.getSymbolByName("SELF").instanceDataClass = oldSelfClass;
-    m_CurrentInstanceHandle = oldInstance;
-    m_CurrentInstanceClass = oldClass;*/
+    //m_DATFile.getSymbolByName("SELF").instanceDataHandle = oldSelfInstance;
+    //m_DATFile.getSymbolByName("SELF").instanceDataClass = oldSelfClass;
+    m_CurrentInstanceHandle = currentInstanceHandle;
+    m_CurrentInstanceClass = currentInstanceClass;
 
     popState();
 }

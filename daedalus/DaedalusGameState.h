@@ -112,6 +112,12 @@ namespace Daedalus
             bool removeInventoryItem(size_t itemSymbol, NpcHandle npc, unsigned int count = 1);
 
             /**
+             * Removes the data behind the given item handle
+             * @param item Item to remove
+             */
+            void removeItem(ItemHandle item);
+
+            /**
              * Creates a new NPC-Instance, just as Wld_InsertNPC was called from script
              * @param instance Instance-Index of the NPC to create
              * @param waypoint Waypoint to place the newly created npc on

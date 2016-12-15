@@ -186,6 +186,7 @@ namespace Daedalus
                 ITM_CAT_LIGHT			= 1<<8,
                 ITM_CAT_RUNE			= 1<<9,
                 ITM_CAT_MAGIC			= 1<<31,
+                ITM_CAT_EQUIPABLE       = ITM_CAT_NF | ITM_CAT_FF | ITM_CAT_ARMOR | ITM_CAT_RUNE | ITM_CAT_MAGIC,
             };
 
             enum Flags
@@ -200,7 +201,40 @@ namespace Daedalus
                 ITEM_RING	  = 1 << 11,
             };
 
-
+            C_Item()
+                    : on_state{},
+                      count{},
+                      cond_atr{},
+                      cond_value{},
+                      change_atr{},
+                      change_value{},
+                      protection{},
+                      damage{}
+            {
+                id = 0;
+                hp = 0;
+                hp_max = 0;
+                mainflag = 0;
+                flags = 0;
+                weight = 0;
+                value = 0;
+                damageType = 0;
+                damageTotal = 0;
+                wear = 0;
+                nutrition = 0;
+                magic = 0;
+                on_equip = 0;
+                on_unequip = 0;
+                owner = 0;
+                ownerGuild = 0;
+                disguiseGuild = 0;
+                visual_skin = 0;
+                material = 0;
+                munition = 0;
+                spell = 0;
+                range = 0;
+                mag_circle = 0;
+            }
 
             // Für alle Items
             int32_t id;

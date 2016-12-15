@@ -78,7 +78,6 @@ void DaedalusGameState::registerExternals()
                   << npcData.name[0];
         }*/
 
-        // TODO: PB returns the actual address to the npc here. But why?
         vm.setReturnVar(instancename);
     });
 
@@ -238,12 +237,6 @@ ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle n
     ItemHandle h = createItem();
     GEngineClasses::C_Item& item = getItem(h);
 
-    if(h.generation > 1000)
-    {
-        m_RegisteredObjects.items.removeObject(h);
-        h = createItem();
-    }
-
     item.count[0] = count;
 
     // Run the script-constructor
@@ -273,9 +266,6 @@ ItemHandle DaedalusGameState::addItemToInventory(ItemHandle item, NpcHandle npc)
             return h;
         }
     }
-
-    if(item.generation > 1000)
-        LogInfo() << "Oh noes!";
 
     m_NpcInventories[npc].push_back(item);
 
@@ -360,5 +350,10 @@ ItemHandle DaedalusGameState::insertItem(size_t instance)
 ItemHandle DaedalusGameState::insertItem(const std::string &instance)
 {
     return insertItem(m_VM.getDATFile().getSymbolIndexByName(instance));
+}
+
+void DaedalusGameState::removeItem(ItemHandle item)
+{
+    m_RegisteredObjects.items.removeObject(item);
 }
 
