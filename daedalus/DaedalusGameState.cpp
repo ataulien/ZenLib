@@ -283,8 +283,6 @@ ItemHandle DaedalusGameState::addItemToInventory(ItemHandle item, NpcHandle npc)
         if(i.instanceSymbol == getItem(item).instanceSymbol)
         {
             i.count[0]++;
-
-            m_RegisteredObjects.items.removeObject(item);
             return h;
         }
     }
