@@ -20,6 +20,8 @@ namespace Daedalus
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Focus, MAX_NUM_ITEMS>::Handle FocusHandle;
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_ItemReact, MAX_NUM_ITEMS>::Handle ItemReactHandle;
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Info, MAX_NUM_ITEMS>::Handle InfoHandle;
+        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu, MAX_NUM_ITEMS>::Handle MenuHandle;
+        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu_Item, MAX_NUM_ITEMS>::Handle MenuItemHandle;
 
         struct LogTopic
         {
@@ -61,6 +63,8 @@ namespace Daedalus
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Mission, MAX_NUM_ITEMS> missions;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Focus, MAX_NUM_ITEMS> focuses;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Info, MAX_NUM_ITEMS> infos;
+                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu, MAX_NUM_ITEMS> menus;
+                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu_Item, MAX_NUM_ITEMS> menuItems;
             };
 
             DaedalusGameState(Daedalus::DaedalusVM &vm);
@@ -116,6 +120,8 @@ namespace Daedalus
              * @param item Item to remove
              */
             void removeItem(ItemHandle item);
+            void removeMenu(MenuHandle menu);
+            void removeMenuItem(MenuItemHandle menuItem);
 
             /**
              * Creates a new NPC-Instance, just as Wld_InsertNPC was called from script
@@ -143,6 +149,8 @@ namespace Daedalus
             MissionHandle createMission();
             InfoHandle createInfo();
             FocusHandle createFocus();
+            MenuHandle createMenu();
+            MenuItemHandle createMenuItem();
 
             /**
 			 * Accessors
@@ -164,6 +172,12 @@ namespace Daedalus
 
             Daedalus::GEngineClasses::C_Info &getInfo(InfoHandle h)
             { return m_RegisteredObjects.infos.getElement(h); };
+
+            Daedalus::GEngineClasses::C_Menu &getMenu(InfoHandle h)
+            { return m_RegisteredObjects.menus.getElement(h); };
+
+            Daedalus::GEngineClasses::C_Menu_Item &getMenuItem(InfoHandle h)
+            { return m_RegisteredObjects.menuItems.getElement(h); };
 
             Daedalus::GEngineClasses::Instance *getByClass(ZMemory::BigHandle h, EInstanceClass instClass);
 

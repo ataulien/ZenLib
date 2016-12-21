@@ -163,6 +163,12 @@ Daedalus::GEngineClasses::Instance* DaedalusGameState::getByClass(ZMemory::BigHa
         case IC_Focus:
             return &getFocus(ZMemory::handleCast<FocusHandle>(h));
 
+        case IC_Menu:
+            return &getMenu(ZMemory::handleCast<MenuHandle>(h));
+
+        case IC_MenuItem:
+            return &getMenuItem(ZMemory::handleCast<MenuItemHandle>(h));
+
         default:
             return nullptr;
 
@@ -212,6 +218,22 @@ FocusHandle DaedalusGameState::createFocus()
     getFocus(h).userPtr = nullptr;
     return h;
 }
+
+FocusHandle DaedalusGameState::createMenu()
+{
+    auto h = m_RegisteredObjects.menus.createObject();
+    getMenu(h).userPtr = nullptr;
+    return h;
+}
+
+FocusHandle DaedalusGameState::createMenuItem()
+{
+    auto h = m_RegisteredObjects.menuItems.createObject();
+    getMenuItem(h).userPtr = nullptr;
+    return h;
+}
+
+
 
 ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle npc, unsigned int count)
 {
@@ -355,5 +377,15 @@ ItemHandle DaedalusGameState::insertItem(const std::string &instance)
 void DaedalusGameState::removeItem(ItemHandle item)
 {
     m_RegisteredObjects.items.removeObject(item);
+}
+
+void DaedalusGameState::removeMenu(MenuHandle menu)
+{
+    m_RegisteredObjects.menus.removeObject(menu);
+}
+
+void DaedalusGameState::removeMenuItem(MenuItemHandle menuItem)
+{
+    m_RegisteredObjects.menuItems.removeObject(menuItem);
 }
 
