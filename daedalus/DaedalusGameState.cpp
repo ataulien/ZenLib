@@ -310,10 +310,10 @@ bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc, un
             // Remove if count reached 0
             if(item.count[0] == 0)
             {
-                m_NpcInventories[npc].erase(it);
-
                 // Clear memory
                 m_RegisteredObjects.items.removeObject(*it);
+
+                m_NpcInventories[npc].erase(it);
             }
 
             return true;
