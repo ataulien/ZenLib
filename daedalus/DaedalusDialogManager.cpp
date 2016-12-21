@@ -106,6 +106,12 @@ void DaedalusDialogManager::processInfosFor(NpcHandle hnpc)
     m_OnStartConversation(hnpc, info);
 }
 
+bool DaedalusDialogManager::doesNpcKnowInfo(size_t npcInstance, size_t infoInstance)
+{
+    const auto& m = m_KnownNpcInfoSymbolsByNpcSymbols[npcInstance];
+    return m.find(infoInstance) != m.end();
+}
+
 
 
 

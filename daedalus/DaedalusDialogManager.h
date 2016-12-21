@@ -37,6 +37,14 @@ namespace Daedalus
             void setNpcInfoKnown(size_t npcInstance, size_t infoInstance);
 
             /**
+             * Checks whether the given NPC knows the info passed here
+             * @param npcInstance NPC to check
+             * @param infoInstance Info to check
+             * @return Whether the NPC knows
+             */
+            bool doesNpcKnowInfo(size_t npcInstance, size_t infoInstance);
+
+            /**
              * Calls AI_ProcessInfos for the given NPC
              * @param npc NPC to process infos for
              */
