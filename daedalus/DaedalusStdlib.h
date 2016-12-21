@@ -36,6 +36,15 @@ namespace Daedalus
         const int PROT_FALL = DAM_INDEX_FALL;
         const int PROT_INDEX_MAX = DAM_INDEX_MAX;
 
+        namespace MenuConstants
+        {
+            const int MAX_USERSTRINGS = 10;
+            const int MAX_ITEMS = 150;
+            const int MAX_EVENTS = 10;
+            const int MAX_SEL_ACTIONS = 5;
+            const int MAX_USERVARS = 4;
+        }
+
         struct Instance
         {
 			Instance()
@@ -51,6 +60,119 @@ namespace Daedalus
              * Note: This is set to nullptr after creation.
              */
             void* userPtr;
+        };
+
+        struct C_Menu : Instance
+        {
+            enum EFlags : int32_t
+            {
+                MENU_OVERTOP		= 1,
+                MENU_EXCLUSIVE		= 2,
+                MENU_NOANI			= 4,
+                MENU_DONTSCALE_DIM	= 8,
+                MENU_DONTSCALE_POS	= 16,
+                MENU_ALIGN_CENTER	= 32,
+                MENU_SHOW_INFO		= 64,
+            };
+
+            C_Menu()
+            {
+                posx = 0;
+                posy = 0;
+                alpha = 0;
+                eventTimerMSec = 0;
+                flags = 0;
+                defaultOutGame = 0;
+                defaultInGame = 0;
+            }
+
+            std::string 	backPic;
+            std::string  	backWorld;
+            int32_t    	    posx,posy;
+            int32_t    	    dimx,dimy;
+            int32_t    	    alpha;
+            std::string  	musicTheme;
+            int32_t    	    eventTimerMSec;
+            std::string  	items[MenuConstants::MAX_ITEMS];
+            int32_t    	    flags;
+            int32_t 	    defaultOutGame;
+            int32_t 	    defaultInGame;
+        };
+
+        struct C_Menu_Item : Instance
+        {
+            enum EFlags : int32_t
+            {
+                IT_CHROMAKEYED		= 1, 
+                IT_TRANSPARENT		= 2, 
+                IT_SELECTABLE		= 4, 
+                IT_MOVEABLE			= 8, 
+                IT_TXT_CENTER		= 16, 
+                IT_DISABLED			= 32, 
+                IT_FADE				= 64, 
+                IT_EFFECTS_NEXT		= 128, 
+                IT_ONLY_OUT_GAME	= 256, 
+                IT_ONLY_IN_GAME		= 512, 
+                IT_PERF_OPTION		= 1024, 
+                IT_MULTILINE		= 2048, 
+                IT_NEEDS_APPLY 		= 4096,  
+                IT_NEEDS_RESTART	= 8192,  
+                IT_EXTENDED_MENU	= 16384, 
+            };
+
+            enum EType : int32_t
+            {
+                MENU_ITEM_UNDEF		    = 0,
+                MENU_ITEM_TEXT		    = 1,
+                MENU_ITEM_SLIDER		= 2,
+                MENU_ITEM_INPUT		    = 3,
+                MENU_ITEM_CURSOR		= 4,
+                MENU_ITEM_CHOICEBOX	    = 5,
+                MENU_ITEM_BUTTON		= 6,
+                MENU_ITEM_LISTBOX		= 7,
+            };
+
+            C_Menu_Item()
+            {
+                alpha = 0;
+                type = 0;
+                memset(onSelAction, 0, sizeof(onSelAction));
+                memset(onEventAction, 0, sizeof(onEventAction));
+                posx = 0;
+                posy = 0;
+                dimx = 0;
+                dimy = 0;
+                sizeStartScale = 0.0f;
+                flags = 0;
+                openDelayTime = 0;
+                openDuration = 0;
+                memset(userfloat, 0, sizeof(userfloat));
+                frameSizeX = 0;
+                frameSizeY = 0;
+            }
+
+            std::string 	fontName;
+            std::string 	text[MenuConstants::MAX_USERSTRINGS];
+            std::string 	backPic;
+            std::string 	alphaMode;
+            int32_t    	    alpha;
+            int32_t    	    type;
+            int32_t    	    onSelAction[MenuConstants::MAX_SEL_ACTIONS];
+            std::string 	onSelAction_S[MenuConstants::MAX_SEL_ACTIONS];
+            std::string 	onChgSetOption;
+            std::string 	onChgSetOptionSection;
+
+            int32_t   	    onEventAction[MenuConstants::MAX_EVENTS];
+            int32_t    	    posx,posy;
+            int32_t    	    dimx,dimy;		// -1 = AUTODETECT (FONTWISE)
+            float  	        sizeStartScale;
+            int32_t    	    flags;
+            float  	        openDelayTime;
+            float  	        openDuration;
+            float  	        userfloat [MenuConstants::MAX_USERVARS];
+            std::string 	userString[MenuConstants::MAX_USERVARS];
+            int32_t		    frameSizeX;
+            int32_t		    frameSizeY;
         };
 
         struct C_Npc : Instance

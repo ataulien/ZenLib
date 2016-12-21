@@ -62,6 +62,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
     GEngineClasses::C_ItemReact itemreact;
     GEngineClasses::C_Item item;
     GEngineClasses::C_Mission mission;
+    GEngineClasses::C_Menu menu;
+    GEngineClasses::C_Menu_Item menuItem;
 
     REGISTER("C_Npc", npc, id);
     REGISTER("C_Npc", npc, name);
@@ -181,6 +183,44 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
     REGISTER("C_Mission", mission, obsoleteConditions);
     REGISTER("C_Mission", mission, obsolete);
     REGISTER("C_Mission", mission, running);
+
+    REGISTER("C_Menu", menu, backPic);
+    REGISTER("C_Menu", menu, backWorld);
+    REGISTER("C_Menu", menu, posx);
+    REGISTER("C_Menu", menu, posy);
+    REGISTER("C_Menu", menu, dimx);
+    REGISTER("C_Menu", menu, dimy);
+    REGISTER("C_Menu", menu, alpha);
+    REGISTER("C_Menu", menu, musicTheme);
+    REGISTER("C_Menu", menu, eventTimerMSec);
+    REGISTER("C_Menu", menu, items);
+    REGISTER("C_Menu", menu, flags);
+    REGISTER("C_Menu", menu, defaultOutGame);
+    REGISTER("C_Menu", menu, defaultInGame);
+
+    REGISTER("C_Menu_Item", menuItem, fontName);
+    REGISTER("C_Menu_Item", menuItem, text);
+    REGISTER("C_Menu_Item", menuItem, backPic);
+    REGISTER("C_Menu_Item", menuItem, alphaMode);
+    REGISTER("C_Menu_Item", menuItem, alpha);
+    REGISTER("C_Menu_Item", menuItem, type);
+    REGISTER("C_Menu_Item", menuItem, onSelAction);
+    REGISTER("C_Menu_Item", menuItem, onSelAction_S);
+    REGISTER("C_Menu_Item", menuItem, onChgSetOption);
+    REGISTER("C_Menu_Item", menuItem, onChgSetOptionSection);
+    REGISTER("C_Menu_Item", menuItem, onEventAction);
+    REGISTER("C_Menu_Item", menuItem, posx);
+    REGISTER("C_Menu_Item", menuItem, posy);
+    REGISTER("C_Menu_Item", menuItem, dimx);
+    REGISTER("C_Menu_Item", menuItem, dimy);
+    REGISTER("C_Menu_Item", menuItem, sizeStartScale);
+    REGISTER("C_Menu_Item", menuItem, flags);
+    REGISTER("C_Menu_Item", menuItem, openDelayTime);
+    REGISTER("C_Menu_Item", menuItem, openDuration);
+    REGISTER("C_Menu_Item", menuItem, userfloat);
+    REGISTER("C_Menu_Item", menuItem, userString);
+    REGISTER("C_Menu_Item", menuItem, frameSizeX);
+    REGISTER("C_Menu_Item", menuItem, frameSizeY);
 
 }
 

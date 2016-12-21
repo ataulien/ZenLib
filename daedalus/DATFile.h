@@ -15,7 +15,9 @@ namespace Daedalus
 		IC_Info,
 		IC_Item,
 		IC_ItemReact,
-		IC_Focus
+		IC_Focus,
+		IC_Menu,
+		IC_MenuItem
 	};
 
 
