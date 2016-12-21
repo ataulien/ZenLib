@@ -6,11 +6,20 @@
 #include "zenParser.h"
 #include <vdfs/fileIndex.h>
 #include <utils/logger.h>
+#include <algorithm>
 
 using namespace ZenLoad;
 
 zCFont::zCFont(const std::string& fileName, const VDFS::FileIndex& fileIndex)
 {
+    std::string fntFile = fileName;
+    std::transform(fntFile.begin(), fntFile.end(), fntFile.begin(), ::tolower);
+
+    if(fntFile.find(".tga") != std::string::npos)
+        fntFile = fntFile.substr(0, fntFile.size() - 4) + ".FNT";
+    else if(fntFile.find(".fnt") == std::string::npos)
+        fntFile += ".FNT";
+
     std::vector<uint8_t> data;
     fileIndex.getFileData(fileName, data);
 
@@ -44,7 +53,7 @@ bool zCFont::parseFNTData(const std::vector<uint8_t>& fntData)
          * {float2]:  fontUV2[FONT_NUM_MAX_LETTERS]
          */
 
-        std::string version = parser.readString();
+        std::string version = parser.readLine();
 
         // Only version 1 is used by gothic
         if(version != "1")
@@ -53,12 +62,12 @@ bool zCFont::parseFNTData(const std::vector<uint8_t>& fntData)
             return false;
         }
 
-        std::string name = parser.readString();
+        std::string name = parser.readLine();
 
         uint32_t height = parser.readBinaryDWord();
         uint32_t magic = parser.readBinaryDWord();
 
-        if(magic != 0xFF)
+        if(magic != 256)
         {
             LogError() << "Invalid font-file! Magic: " << magic;
             return false;
