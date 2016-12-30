@@ -6,6 +6,7 @@
 #include "vdfs/fileIndex.h"
 #include "zCMaterial.h"
 #include <map>
+#include <utils/alignment.h>
 
 using namespace ZenLoad;
 
@@ -56,8 +57,6 @@ zCMesh::zCMesh(const std::string& fileName, VDFS::FileIndex& fileIndex)
 /**
  * Helper structs for version independend loading of polygon data
  */
-#pragma pack(push, 1)
-// FIXME: This is going to give some unaligned access issues on ARM
 template<typename FT>
 struct polyData1
 {
@@ -67,6 +66,18 @@ struct polyData1
     FT          flags;
     uint8_t		polyNumVertices;
 };
+
+#pragma pack(push, 1)
+template<typename FT>
+struct polyData1Packed
+{
+    int16_t	materialIndex; // -1 if none
+    int16_t	lightmapIndex; // -1 if none
+    zTPlane		polyPlane;
+    FT          flags;
+    uint8_t		polyNumVertices;
+};
+#pragma pack(pop)
 
 template<typename IT, typename FT>
 struct polyData2 : public polyData1<FT>
@@ -98,10 +109,32 @@ struct polyData2 : public polyData1<FT>
         uint32_t FeatIndex;
     };
 
+#pragma pack(push, 1)
+    struct IndexPacked
+    {
+        IT VertexIndex;
+        uint32_t FeatIndex;
+    };
+#pragma pack(pop)
+
+    void read(const uint8_t* _data)
+    {
+        const void*& data = (const void*&)_data;
+        Utils::unalignedRead(polyData1<FT>::materialIndex, data);
+        Utils::unalignedRead(polyData1<FT>::lightmapIndex, data);
+        Utils::unalignedRead(polyData1<FT>::polyPlane, data);
+        Utils::unalignedRead(polyData1<FT>::flags, data);
+        Utils::unalignedRead(polyData1<FT>::polyNumVertices, data);
+
+        for(int i=0;i<polyData1<FT>::polyNumVertices;i++)
+        {
+            Utils::unalignedRead(indices[i].VertexIndex, data);
+            Utils::unalignedRead(indices[i].FeatIndex, data);
+        }
+    }
 
     Index indices[255];
 };
-#pragma pack(pop)
 /**
 * @brief Reads the mesh-object from the given binary stream
 */
@@ -269,16 +302,16 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 				parser.setSeek(parser.getSeek() + chunkInfo.length);
 
                 size_t blockSize = version == EVersion::G2_2_6fix
-                                   ? sizeof(polyData1<PolyFlags2_6fix>)
-                                   : sizeof(polyData1<PolyFlags1_08k>);
+                                   ? sizeof(polyData1Packed<PolyFlags2_6fix>)
+                                   : sizeof(polyData1Packed<PolyFlags1_08k>);
 
                 size_t indicesSize = version == EVersion::G2_2_6fix
-                                     ? sizeof(polyData2<uint32_t, PolyFlags2_6fix>::Index)
-                                     : sizeof(polyData2<uint16_t, PolyFlags1_08k>::Index);
+                                     ? sizeof(polyData2<uint32_t, PolyFlags2_6fix>::IndexPacked)
+                                     : sizeof(polyData2<uint16_t, PolyFlags1_08k>::IndexPacked);
 
                 if(forceG132bitIndices)
                 {
-                    indicesSize = sizeof(polyData2<uint32_t, PolyFlags1_08k>::Index);
+                    indicesSize = sizeof(polyData2<uint32_t, PolyFlags1_08k>::IndexPacked);
                 }
 
 				// Preallocate some memory for the triangles
@@ -288,20 +321,26 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 				// Iterate throuh every poly
 				for(int i = 0; i < numPolys; i++)
 				{
-					polyData2<uint32_t, PolyFlags2_6fix>* p26 = (polyData2<uint32_t, PolyFlags2_6fix> *)blockPtr;
-                    polyData2<uint16_t, PolyFlags1_08k>* p18k = (polyData2<uint16_t, PolyFlags1_08k> *)blockPtr;
-                    polyData2<uint32_t, PolyFlags1_08k>* p18k_32 = (polyData2<uint32_t, PolyFlags1_08k> *)blockPtr;
-
                     // Convert to a generic version
                     polyData2<uint32_t, PolyFlags> p;
                     if(version == EVersion::G2_2_6fix) {
-                        p.from(*p26);
+                        polyData2<uint32_t, PolyFlags2_6fix> d;
+                        d.read(blockPtr);
+
+                        p.from(d);
                     }
                     else {
-                        if(forceG132bitIndices)
-                            p.from(*p18k_32);
-                        else
-                            p.from(*p18k);
+                        if(forceG132bitIndices){
+                            polyData2<uint32_t, PolyFlags1_08k> d;
+                            d.read(blockPtr);
+
+                            p.from(d);
+                        }else{
+                            polyData2<uint16_t, PolyFlags1_08k> d;
+                            d.read(blockPtr);
+
+                            p.from(d);
+                        }
                     }
 
                     if(skipPolys.empty() || skipPolys[skipListEntry] == i)
@@ -470,7 +509,6 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale, bool removeDoubles)
 	else
 	{
 		// Just add them as triangles
-		newIndices = m_Indices;
 		newVertices.reserve(m_Indices.size());
 		for(size_t i = 0, end = m_Indices.size(); i < end; i++)
 		{
@@ -487,6 +525,7 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale, bool removeDoubles)
 			vx.Normal = m_Features[featidx].vertNormal;
 
 			newVertices.push_back(vx);
+            newIndices.push_back(newVertices.size() - 1);
 		}
 	}
 
