@@ -43,6 +43,19 @@ namespace Daedalus
             const int MAX_EVENTS = 10;
             const int MAX_SEL_ACTIONS = 5;
             const int MAX_USERVARS = 4;
+            const int SEL_EVENT_UNDEF			= 0;
+
+            enum ESelEvent 
+            {
+                SEL_EVENT_EXECUTE		= 1,
+                SEL_EVENT_CHANGED		= 2,
+                SEL_EVENT_LEAVE			= 3,
+                SEL_EVENT_TIMER			= 4,
+                SEL_EVENT_CLOSE			= 5,
+                SEL_EVENT_INIT			= 6,
+                SEL_EVENT_SEL_PREV		= 7,
+                SEL_EVENT_SEL_NEXT		= 8,
+            };
         }
 
         struct Instance
