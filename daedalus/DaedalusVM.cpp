@@ -588,6 +588,52 @@ std::vector<std::string> DaedalusVM::getCallStack()
 }
 
 
+void DaedalusVM::prepareRunFunction()
+{
+    // Clean the VM for this run
+    pushState();
+}
+
+
+int32_t DaedalusVM::runFunction(const std::string& fname)
+{
+    assert(getDATFile().hasSymbolName(fname));
+
+    return runFunction(getDATFile().getSymbolByName(fname).address);
+}
+
+int32_t DaedalusVM::runFunction(size_t addr)
+{
+	if(addr == 0)
+		return -1;
+
+    // Place the call-operation
+    doCallOperation(addr);
+
+    clearCallStack();
+
+    // Execute the instructions
+    while(doStack());
+
+    int32_t ret = 0;
+
+    // Only pop if the VM didn't mess up
+    if(!isStackEmpty())
+        ret = popDataValue();
+    else
+        LogWarn() << "DaedalusVM: Safety int was popped by scriptcode!";
+
+    // Restore to previous VM-State
+    popState();
+    return ret;
+}
+
+int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
+{
+    int32_t r = runFunction(getDATFile().getSymbolByIndex(symIdx).address);
+
+    return r;
+}
 
 
 

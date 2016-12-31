@@ -27,6 +27,22 @@ namespace Daedalus
         PARStackOpCode getCurrentInstruction();
 
         /**
+         * Saves the state of the VM and prepares it for a call to runFunction.
+         * You can push function arguments after this call.
+         */
+        void prepareRunFunction();
+
+        /**
+         * Runs a complete function with the arguments given by pushing onto the stack
+         * Note: Must be prepared first, using prepareRunFunction.
+         * @param fname Symbol-name of the function to look up and call
+         * @return value returned by the function
+         */
+        int32_t runFunction(const std::string& fname);
+        int32_t runFunction(size_t addr);
+        int32_t runFunctionBySymIndex(size_t symIdx);
+
+        /**
          * @brief Performs a call-instruction with the given address
          */
         void doCallOperation(uint32_t target);
