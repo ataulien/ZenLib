@@ -117,6 +117,9 @@ namespace ZenLoad
                             n.treePolyIndex = static_cast<size_t>(parser.readBinaryDWord());
                             n.numPolys = static_cast<size_t>(parser.readBinaryDWord());
 
+                            n.front = zCBspNode::INVALID_NODE;
+                            n.back = zCBspNode::INVALID_NODE;
+
                             // Only need to load data if this isn't a leaf
                             if(isNode)
                             {
@@ -140,9 +143,6 @@ namespace ZenLoad
                                 // G1 has an extra byte here
                                 if(fileInfo.version == Gothic_18k)
                                     parser.readBinaryByte(); // Lod-flag
-
-                                n.front = zCBspNode::INVALID_NODE;
-                                n.back = zCBspNode::INVALID_NODE;
 
                                 // Read front node
                                 if((flags & FLAG_FRONT) != 0)
