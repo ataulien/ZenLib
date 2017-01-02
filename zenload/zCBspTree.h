@@ -122,6 +122,7 @@ namespace ZenLoad
 
                             n.front = zCBspNode::INVALID_NODE;
                             n.back = zCBspNode::INVALID_NODE;
+                            n.parent = zCBspNode::INVALID_NODE;
 
                             // Only need to load data if this isn't a leaf
                             if(isNode)
@@ -141,7 +142,11 @@ namespace ZenLoad
                                 // flags tell if this node got children and whether they are leafs
                                 uint8_t flags = parser.readBinaryByte();
 
-                                parser.readStructure(n.plane);
+                                parser.readStructure(n.plane.w);
+                                parser.readStructure(n.plane.x);
+                                parser.readStructure(n.plane.y);
+                                parser.readStructure(n.plane.z);
+
                                 n.plane.w *= 0.01f; // Convert to meters
 
                                 // G1 has an extra byte here
