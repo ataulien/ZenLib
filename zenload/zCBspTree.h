@@ -113,6 +113,9 @@ namespace ZenLoad
                             parser.readStructure(n.bbox3dMin);
                             parser.readStructure(n.bbox3dMax);
 
+                            n.bbox3dMin *= 0.01f; // Convert to meters
+                            n.bbox3dMax *= 0.01f;
+
                             // Read indices to the polys this contains
                             n.treePolyIndex = static_cast<size_t>(parser.readBinaryDWord());
                             n.numPolys = static_cast<size_t>(parser.readBinaryDWord());
@@ -139,6 +142,7 @@ namespace ZenLoad
                                 uint8_t flags = parser.readBinaryByte();
 
                                 parser.readStructure(n.plane);
+                                n.plane.w *= 0.01f; // Convert to meters
 
                                 // G1 has an extra byte here
                                 if(fileInfo.version == Gothic_18k)
