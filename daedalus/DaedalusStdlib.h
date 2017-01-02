@@ -56,6 +56,18 @@ namespace Daedalus
                 SEL_EVENT_SEL_PREV		= 7,
                 SEL_EVENT_SEL_NEXT		= 8,
             };
+
+            enum ESelAction
+            {
+                SEL_ACTION_UNDEF			= 0,
+                SEL_ACTION_BACK  			= 1,
+                SEL_ACTION_STARTMENU		= 2,
+                SEL_ACTION_STARTITEM		= 3,
+                SEL_ACTION_CLOSE			= 4,
+                SEL_ACTION_CONCOMMANDS      = 5,
+                SEL_ACTION_PLAY_SOUND		= 6,
+                SEL_ACTION_EXECCOMMANDS	    = 7,	
+            };
         }
 
         struct Instance
