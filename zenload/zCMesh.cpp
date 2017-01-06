@@ -375,11 +375,12 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
                                     // Save material index for the written triangle
                                     m_TriangleMaterialIndices.push_back(p.materialIndex);
 
-									// Save lightmap-index
-									m_TriangleLightmapIndices.push_back(p.lightmapIndex);
+                                    // Save lightmap-index
+                                    m_TriangleLightmapIndices.push_back(p.lightmapIndex);
 
                                     WorldTriangle triangle;
                                     triangle.flags = p.flags;
+                                    triangle.materialIndex = p.materialIndex;
                                     memcpy(triangle.vertices, vx, sizeof(vx));
 
                                     // Save triangle
@@ -402,12 +403,12 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
                                         // Save material index for the written triangle
                                         m_TriangleMaterialIndices.push_back(p.materialIndex);
 
-										// Save lightmap-index
-										m_TriangleLightmapIndices.push_back(p.lightmapIndex);
+                                        // Save lightmap-index
+                                        m_TriangleLightmapIndices.push_back(p.lightmapIndex);
 
                                         WorldTriangle triangle;
                                         triangle.flags = p.flags;
-
+                                        triangle.materialIndex = p.materialIndex;
                                         uint32_t idx[] = {p.indices[0].VertexIndex, p.indices[i].VertexIndex,
                                                           p.indices[i + 1].VertexIndex};
 
