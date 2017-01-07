@@ -534,7 +534,6 @@ namespace ZenLoad
 		std::vector<WorldTriangle> triangles; // Use index / 3 to access these
 		std::vector<WorldVertex> vertices;
 		std::vector<SubMesh> subMeshes;
- 		std::vector<zCMaterialData> materials;
 		ZMath::float3 bbox[2];
 	};
 
