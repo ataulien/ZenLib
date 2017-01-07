@@ -380,7 +380,6 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 
                                     WorldTriangle triangle;
                                     triangle.flags = p.flags;
-                                    triangle.materialIndex = p.materialIndex;
                                     memcpy(triangle.vertices, vx, sizeof(vx));
 
                                     // Save triangle
@@ -408,7 +407,6 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 
                                         WorldTriangle triangle;
                                         triangle.flags = p.flags;
-                                        triangle.materialIndex = p.materialIndex;
                                         uint32_t idx[] = {p.indices[0].VertexIndex, p.indices[i].VertexIndex,
                                                           p.indices[i + 1].VertexIndex};
 
@@ -577,9 +575,11 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale, bool removeDoubles)
 
 	// Store triangles with more information attached as well
 	mesh.triangles.reserve(m_Triangles.size());
-	for(auto& t : m_Triangles)
+	for(int i = 0; i < m_Triangles.size(); i++)
 	{
-		mesh.triangles.push_back(t);
+      // Add submesh index to this triangle
+		m_Triangles[i].submeshIndex = newMaterialSlotsByMatIndex[materialsByTexture[m_Materials[m_TriangleMaterialIndices[i]].texture]];
+		mesh.triangles.push_back(m_Triangles[i]);
 
 		for(int v = 0; v < 3; v++)
 			mesh.triangles.back().vertices[v].Position = mesh.triangles.back().vertices[v].Position * scale;

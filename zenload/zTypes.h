@@ -513,9 +513,9 @@ namespace ZenLoad
         WorldVertex vertices[ 3 ];
 
         /**
-		* @brief Material assigned to this triangle
+		* @brief Index of submesh correlated with this triangle
 		*/
-        int16_t materialIndex;
+        int16_t submeshIndex;
     };
 
     /**
