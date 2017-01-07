@@ -549,7 +549,6 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale, bool removeDoubles)
 	}
 
 	mesh.subMeshes.resize(materialsByTexture.size());
- 	mesh.materials = m_Materials;
 	// Add triangles
 	for(size_t i = 0, end = newIndices.size(); i < end; i += 3)
 	{
