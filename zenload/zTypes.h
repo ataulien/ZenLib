@@ -466,25 +466,25 @@ namespace ZenLoad
 
 #pragma pack(pop)
 
-	/**
+    /**
 	* @brief Information about a triangle in the World. Contains whether the triangle 
 	*		  belongs to an outside/inside location, the static lighting colors of the edges,
 	*		  material-information and to which sector this belongs, amongst others
 	*/
-	struct WorldTriangle
-	{
-		/**
+    struct WorldTriangle
+    {
+        /**
 		* @brief Returns whether this triangle is outside or inside
 		*/
-		bool isOutside() const { return !flags.sectorPoly; }
+        bool isOutside() const { return !flags.sectorPoly; }
 
-		/**
+        /**
 		* @brief Returns the interpolated lighting value for the given position on the triangle
 		*/
-		
-                ZMath::float4 interpolateLighting(const ZMath::float3& position) const
-		{
-			/*float u,v,w;
+
+        ZMath::float4 interpolateLighting( const ZMath::float3& position ) const
+        {
+            /*float u,v,w;
 			ZMath::barycentric(position, vertices[0].Position, vertices[1].Position, vertices[2].Position, u, v, w);
 
 			ZMath::float4 c[3];
@@ -493,27 +493,32 @@ namespace ZenLoad
 			c[2].fromABGR8(vertices[2].Color);
 
 			return u * c[0] + v * c[1] + w * c[2];*/
-                        
-                        return ZMath::float4(1,1,1,1); // TODO: Implementation missing without GLM
-		}
 
-		/**
+            return ZMath::float4( 1, 1, 1, 1 ); // TODO: Implementation missing without GLM
+        }
+
+        /**
 		* @brief Flags taken from the original ZEN-File
 		*/
-		PolyFlags flags;
+        PolyFlags flags;
 
-		/**
+        /**
 		 * @brief Index to the lightmap stored in the zCMesh
 		 */
-		int16_t lightmapIndex;
+        int16_t lightmapIndex;
 
-		/**
+        /**
 		* @brief Vertices belonging to this triangle
 		*/
-		WorldVertex vertices[3];
-	};
+        WorldVertex vertices[ 3 ];
 
-	/**
+        /**
+		* @brief Index of submesh correlated with this triangle
+		*/
+        int16_t submeshIndex;
+    };
+
+    /**
 	* @brief Simple generic packed mesh, containing all useful information of a (lod-level of) zCMesh and zCProgMeshProto
 	*/
 	// FIXME: Probably move this to renderer-package
@@ -529,6 +534,7 @@ namespace ZenLoad
 		std::vector<WorldTriangle> triangles; // Use index / 3 to access these
 		std::vector<WorldVertex> vertices;
 		std::vector<SubMesh> subMeshes;
+ 		std::vector<zCMaterialData> materials;
 		ZMath::float3 bbox[2];
 	};
 
