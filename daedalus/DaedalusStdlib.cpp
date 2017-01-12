@@ -64,6 +64,7 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
     GEngineClasses::C_Mission mission;
     GEngineClasses::C_Menu menu;
     GEngineClasses::C_Menu_Item menuItem;
+    GEngineClasses::C_SFX sfx;
 
     REGISTER("C_Npc", npc, id);
     REGISTER("C_Npc", npc, name);
@@ -222,6 +223,15 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
     REGISTER("C_Menu_Item", menuItem, frameSizeX);
     REGISTER("C_Menu_Item", menuItem, frameSizeY);
 
+    REGISTER("C_SFX", sfx, file);
+    REGISTER("C_SFX", sfx, pitchOff);
+    REGISTER("C_SFX", sfx, pitchVar);
+    REGISTER("C_SFX", sfx, vol);
+    REGISTER("C_SFX", sfx, loop);
+    REGISTER("C_SFX", sfx, loopStartOffset);
+    REGISTER("C_SFX", sfx, loopEndOffset);
+    REGISTER("C_SFX", sfx, reverbLevel);
+    REGISTER("C_SFX", sfx, pfxName);
 }
 
 

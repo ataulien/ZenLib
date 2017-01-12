@@ -163,7 +163,8 @@ namespace ZenLoad
 										 Prop("cdStatic", info.cdStatic),
 										 Prop("cdDyn", info.cdDyn),
 										 Prop("staticVob", info.staticVob),
-										 Prop("dynShadow", info.dynamicShadow)); // TODO: References!
+                                         Prop("dynShadow", info.dynamicShadow),
+                                         Prop("visualAniMode", info.visualAniMode)); // TODO: References!
 				}
 
 				// Skip visual-chunk

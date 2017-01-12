@@ -169,6 +169,9 @@ Daedalus::GEngineClasses::Instance* DaedalusGameState::getByClass(ZMemory::BigHa
         case IC_MenuItem:
             return &getMenuItem(ZMemory::handleCast<MenuItemHandle>(h));
 
+        case EInstanceClass::IC_Sfx:
+            return &getSfx(ZMemory::handleCast<SfxHandle>(h));
+
         default:
             return nullptr;
 
@@ -216,6 +219,13 @@ FocusHandle DaedalusGameState::createFocus()
 {
     auto h = m_RegisteredObjects.focuses.createObject();
     getFocus(h).userPtr = nullptr;
+    return h;
+}
+
+SfxHandle DaedalusGameState::createSfx()
+{
+    auto h = m_RegisteredObjects.sfx.createObject();
+    getSfx(h).userPtr = nullptr;
     return h;
 }
 
@@ -370,6 +380,23 @@ ItemHandle DaedalusGameState::insertItem(size_t instance)
 ItemHandle DaedalusGameState::insertItem(const std::string &instance)
 {
     return insertItem(m_VM.getDATFile().getSymbolIndexByName(instance));
+}
+
+SfxHandle DaedalusGameState::insertSFX(size_t instance)
+{
+    // Get memory for the item
+    SfxHandle h = createSfx();
+    GEngineClasses::C_SFX& sfx = getSfx(h);
+
+    // Run the script-constructor
+    m_VM.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(instance), IC_Sfx);
+
+    return h;
+}
+
+SfxHandle DaedalusGameState::insertSFX(const std::string &instance)
+{
+    return insertSFX(m_VM.getDATFile().getSymbolIndexByName(instance));
 }
 
 void DaedalusGameState::removeItem(ItemHandle item)
