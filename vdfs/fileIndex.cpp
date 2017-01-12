@@ -149,7 +149,7 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
 	return false;
 }
 
-bool FileIndex::hasFile(const std::string& name)
+bool FileIndex::hasFile(const std::string& name) const
 {
 	std::string upper = name;
 	std::transform(upper.begin(), upper.end(),upper.begin(), ::toupper);

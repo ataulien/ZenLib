@@ -10,6 +10,7 @@ const int MAX_NUM_ITEMS = 12000;
 const int MAX_NUM_MISSIONS = 512;
 const int MAX_NUM_INFO = 16000;
 const int MAX_NUM_MISC = 1024;
+const int MAX_NUM_SFX = 4096; // G2 has 1700
 
 namespace Daedalus
 {
@@ -25,6 +26,7 @@ namespace Daedalus
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Info, MAX_NUM_INFO>::Handle InfoHandle;
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu, MAX_NUM_MISC>::Handle MenuHandle;
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu_Item, MAX_NUM_MISC>::Handle MenuItemHandle;
+        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_SFX, MAX_NUM_SFX>::Handle SfxHandle;
 
         struct LogTopic
         {
@@ -68,6 +70,7 @@ namespace Daedalus
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Info, MAX_NUM_INFO> infos;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu, MAX_NUM_MISC> menus;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu_Item, MAX_NUM_MISC> menuItems;
+                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_SFX, MAX_NUM_SFX> sfx;
             };
 
             DaedalusGameState(Daedalus::DaedalusVM &vm);
@@ -143,6 +146,9 @@ namespace Daedalus
             ItemHandle insertItem(size_t instance);
             ItemHandle insertItem(const std::string &instance);
 
+            SfxHandle insertSFX(size_t instance);
+            SfxHandle insertSFX(const std::string& instance);
+
             /**
 			 * Creates scripting relevant objects
 			 */
@@ -154,6 +160,7 @@ namespace Daedalus
             FocusHandle createFocus();
             MenuHandle createMenu();
             MenuItemHandle createMenuItem();
+            SfxHandle createSfx();
 
             /**
 			 * Accessors
@@ -181,6 +188,9 @@ namespace Daedalus
 
             Daedalus::GEngineClasses::C_Menu_Item &getMenuItem(MenuItemHandle h)
             { return m_RegisteredObjects.menuItems.getElement(h); };
+
+            Daedalus::GEngineClasses::C_SFX &getSfx(SfxHandle h)
+            { return m_RegisteredObjects.sfx.getElement(h); };
 
             Daedalus::GEngineClasses::Instance *getByClass(ZMemory::BigHandle h, EInstanceClass instClass);
 

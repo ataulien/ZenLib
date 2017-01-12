@@ -72,7 +72,7 @@ namespace VDFS
 		/**
 		 * @return Whether a file with the given name exists
 		 */
-		 bool hasFile(const std::string& name);
+         bool hasFile(const std::string& name) const;
 	private:
 		/**
 		 * @brief Vector of all known files

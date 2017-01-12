@@ -128,21 +128,21 @@ namespace Daedalus
         {
             enum EFlags : int32_t
             {
-                IT_CHROMAKEYED		= 1, 
-                IT_TRANSPARENT		= 2, 
-                IT_SELECTABLE		= 4, 
-                IT_MOVEABLE			= 8, 
-                IT_TXT_CENTER		= 16, 
-                IT_DISABLED			= 32, 
-                IT_FADE				= 64, 
-                IT_EFFECTS_NEXT		= 128, 
-                IT_ONLY_OUT_GAME	= 256, 
-                IT_ONLY_IN_GAME		= 512, 
-                IT_PERF_OPTION		= 1024, 
-                IT_MULTILINE		= 2048, 
-                IT_NEEDS_APPLY 		= 4096,  
-                IT_NEEDS_RESTART	= 8192,  
-                IT_EXTENDED_MENU	= 16384, 
+                IT_CHROMAKEYED		= 1,
+                IT_TRANSPARENT		= 2,
+                IT_SELECTABLE		= 4,
+                IT_MOVEABLE			= 8,
+                IT_TXT_CENTER		= 16,
+                IT_DISABLED			= 32,
+                IT_FADE				= 64,
+                IT_EFFECTS_NEXT		= 128,
+                IT_ONLY_OUT_GAME	= 256,
+                IT_ONLY_IN_GAME		= 512,
+                IT_PERF_OPTION		= 1024,
+                IT_MULTILINE		= 2048,
+                IT_NEEDS_APPLY 		= 4096,
+                IT_NEEDS_RESTART	= 8192,
+                IT_EXTENDED_MENU	= 16384,
             };
 
             enum EType : int32_t
@@ -489,6 +489,22 @@ namespace Daedalus
             int32_t requested_item;
             int32_t requested_amount;
             uint32_t reaction;
+        };
+
+        struct C_SFX : Instance
+        {
+            std::string     file;
+            // pitch offset in semi-tones
+            int32_t         pitchOff = 0;
+            // semitone variance
+            int32_t         pitchVar = 0;
+            // 0 .. 127
+            int32_t         vol = 64;
+            int32_t         loop = 0;
+            int32_t         loopStartOffset = 0;
+            int32_t         loopEndOffset = 0;
+            float           reverbLevel = 0.0f;
+            std::string     pfxName;
         };
     }
 
