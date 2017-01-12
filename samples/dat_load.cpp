@@ -276,7 +276,7 @@ int main(int argc, char** argv)
 
     if(!main.empty() || cmdLine)
     {
-        Daedalus::DaedalusVM vm(f, main);
+        Daedalus::DaedalusVM vm(file, main);
 
 #include "lambdas.cpp"
 
