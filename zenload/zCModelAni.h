@@ -33,13 +33,6 @@ namespace ZenLoad
         std::string nextAniName;
 
         uint32_t nodeChecksum;
-
-        // MSB
-        float blendIn = 0.0f;
-        float blendOut = 0.0f;
-        std::string flags; // TODO: make enum
-        std::string alias; // data of other animation is used
-        std::string dir;  // TODO: make enum
     };
 
     struct zCModelAniEvent
@@ -76,17 +69,22 @@ namespace ZenLoad
          * call loadMDS() to load additional required data.
          *
          */
-        bool loadMAN(const VDFS::FileIndex& index, const std::string& fileName);
+        bool loadMAN(const VDFS::FileIndex& fileIndex, const std::string& fileName);
+
+        /** Loads a model hierarchy (.MDH) file.
+         *
+         */
+        bool loadMDH(const std::string& fileName);
 
         /** Loads a compiled MDS (.MSB) file.
          *
          */
-        bool loadMSB(const VDFS::FileIndex& index, const std::string& fileName);
+        bool loadMSB(const std::string& fileName);
 
         /** Loads a model script (.MDS) file.
          *
          */
-        bool loadMDS(const VDFS::FileIndex& index, const std::string& fileName);
+        bool loadMDS(const std::string& fileName);
 
         /**
          * @return generic information about this animation
