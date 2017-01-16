@@ -13,6 +13,7 @@ namespace Daedalus
     class DaedalusVM
     {
     public:
+        DaedalusVM(const DATFile &dat, const std::string &main);
         DaedalusVM(const std::string& file, const std::string& main="main");
 
         /**
@@ -201,6 +202,7 @@ namespace Daedalus
             PARSymbol m_Self;
         };
         std::stack<VMState> m_StateStack;
+        void init(const DATFile &dat, const std::string &main);
 
         /**
          * Callback for when a symbol-value changed/External got called

@@ -14,6 +14,11 @@ namespace ZenLoad
 {
     class ZenParser;
 
+    enum
+    {
+        ANIEVENT_MAXSTRING = 4
+    };
+
     struct zCModelAniHeader
     {
         uint16_t version;
@@ -33,19 +38,10 @@ namespace ZenLoad
         std::string nextAniName;
 
         uint32_t nodeChecksum;
-
-        // MSB
-        float blendIn = 0.0f;
-        float blendOut = 0.0f;
-        std::string flags; // TODO: make enum
-        std::string alias; // data of other animation is used
-        std::string dir;  // TODO: make enum
     };
 
     struct zCModelAniEvent
     {
-        enum { ANIEVENT_MAXSTRING = 4 };
-
         zTMdl_AniEventType aniEventType;
         uint32_t frameNr;
         std::string tagString;
