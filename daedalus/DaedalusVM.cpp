@@ -16,11 +16,22 @@ const int NUM_FAKE_STRING_SYMBOLS = 5;
 using namespace ZenLoad;
 using namespace Daedalus;
 
+DaedalusVM::DaedalusVM(const DATFile &dat, const std::string &main)
+    : m_GameState(*this)
+{
+    init(dat, main);
+}
+
 DaedalusVM::DaedalusVM(const std::string& file, const std::string& main)
     : m_GameState(*this)
 {
+    init(Daedalus::DATFile(file), main);
+}
+
+void DaedalusVM::init(const DATFile &dat, const std::string& main)
+{
     m_PC = 0;
-    m_DATFile = Daedalus::DATFile(file);
+    m_DATFile = dat;
 
     // See if we find a "main"-function
     if(m_DATFile.hasSymbolName(main))
@@ -38,6 +49,7 @@ DaedalusVM::DaedalusVM(const std::string& file, const std::string& main)
     m_GameState.registerExternals();
 
     m_CurrentInstanceHandle.invalidate();
+
 }
 
 bool DaedalusVM::doStack(bool verbose)
