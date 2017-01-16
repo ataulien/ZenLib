@@ -1,18 +1,18 @@
 #include <cmath>
 
-#include "msbParser.h"
+#include "modelScriptParser.h"
 #include "zenParser.h"
 
 namespace ZenLoad
 {
 
-MsbParser::MsbParser(ZenParser &zen)
+ModelScriptBinParser::ModelScriptBinParser(ZenParser &zen)
     : m_Zen(zen)
 {
 
 }
 
-MsbParser::EChunkType MsbParser::parse()
+ModelScriptBinParser::EChunkType ModelScriptBinParser::parse()
 {
     if (m_Zen.getSeek() >= m_Zen.getFileSize())
         return CHUNK_EOF;
@@ -70,13 +70,13 @@ static uint32_t makeAniFlags(ZenParser &zen)
     return flags;
 }
 
-static EMsbAniDir makeAniDir(ZenParser &zen)
+static EModelScriptAniDir makeAniDir(ZenParser &zen)
 {
     std::string str = zen.readString();
     return (!str.empty() && str[0] == 'R') ? MSB_BACKWARD : MSB_FORWARD;
 }
 
-void MsbParser::readAni()
+void ModelScriptBinParser::readAni()
 {
     m_Ani.m_Name = m_Zen.readLine(true);
     m_Ani.m_Layer = m_Zen.readBinaryDWord();
@@ -93,7 +93,7 @@ void MsbParser::readAni()
     m_Ani.m_ColVolScale = m_Zen.readBinaryFloat();
 }
 
-void MsbParser::readAlias()
+void ModelScriptBinParser::readAlias()
 {
     m_Alias.m_Name = m_Zen.readLine(true);
     m_Alias.m_Layer = m_Zen.readBinaryDWord();
@@ -105,7 +105,7 @@ void MsbParser::readAlias()
     m_Ani.m_Dir = makeAniDir(m_Zen);
 }
 
-void MsbParser::readSfx()
+void ModelScriptBinParser::readSfx()
 {
     m_Sfx.m_Frame = m_Zen.readBinaryDWord();
     m_Sfx.m_Name = m_Zen.readLine(true);

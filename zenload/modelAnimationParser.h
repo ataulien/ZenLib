@@ -11,7 +11,7 @@ class ZenParser;
 
 /** Streaming parser for .MAN files.
  */
-class ManParser
+class ModelAnimationParser
 {
 public:
 
@@ -28,7 +28,9 @@ public:
 
     };
 
-    ManParser(ZenParser &zen);
+    ModelAnimationParser(ZenParser &zen);
+
+    void                            setScale(float scale) { m_Scale = scale; }
 
     /** Returns the parsed header.
      *
@@ -59,6 +61,8 @@ public:
 private:
 
     ZenParser                       &m_Zen;
+
+    float                           m_Scale = 1.0f;
 
     zCModelAniHeader                m_Header;
     Samples                         m_Samples;
