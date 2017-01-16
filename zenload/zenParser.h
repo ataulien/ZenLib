@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstring>
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -204,9 +205,12 @@ namespace ZenLoad
 		template<typename T>
 		void readStructure(T& s) 
 		{
-			void* _s = (void*)&s;
-			memcpy(_s, &m_Data[m_Seek], sizeof(T));
-			m_Seek += sizeof(T);
+            if (ssize_t(m_Seek) <= ssize_t(m_Data.size()) - ssize_t(sizeof(T)))
+            {
+                void* _s = (void*)&s;
+                memcpy(_s, &m_Data[m_Seek], sizeof(T));
+                m_Seek += sizeof(T);
+            }
 		}
 
 		/**
