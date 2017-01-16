@@ -30,15 +30,13 @@ public:
 
     ModelAnimationParser(ZenParser &zen);
 
-    void                            setScale(float scale) { m_Scale = scale; }
-
     /** Returns the parsed header.
      *
      * Call this if parse() returns CHUNK_HEADER.
      *
      * @return The header read during the last call to parse().
      */
-    const zCModelAniHeader          &getHeader() const { return m_Header; }
+    const zCModelAniHeader          &header() const { return m_Header; }
 
     /** Returns the parsed samples.
      *
@@ -46,7 +44,7 @@ public:
      *
      * @return The samples read during the last call to parse().
      */
-    const Samples                   &getSamples() const { return m_Samples; }
+    const Samples                   &samples() const { return m_Samples; }
 
     /** Returns the parsed nodes.
      *
@@ -54,15 +52,13 @@ public:
      *
      * @return The nodes read during the last call to parse().
      */
-    const NodeIndex                 &getNodeIndex() const { return m_NodeIndex; }
+    const NodeIndex                 &nodeIndex() const { return m_NodeIndex; }
 
     EChunkType                      parse();
 
 private:
 
     ZenParser                       &m_Zen;
-
-    float                           m_Scale = 1.0f;
 
     zCModelAniHeader                m_Header;
     Samples                         m_Samples;

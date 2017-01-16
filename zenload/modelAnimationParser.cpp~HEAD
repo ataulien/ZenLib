@@ -1,6 +1,6 @@
 #include <cmath>
 
-#include "manParser.h"
+#include "modelAnimationParser.h"
 #include "zenParser.h"
 
 namespace ZenLoad
@@ -11,13 +11,13 @@ static const float SAMPLE_ROT_SCALER		= (float(1.0f) / SAMPLE_ROT_BITS) * 2.0f *
 static const float SAMPLE_QUAT_SCALER		= (1.0f / SAMPLE_ROT_BITS) * 2.1f;
 static const uint16_t SAMPLE_QUAT_MIDDLE      = (1 << 15) - 1;
 
-ManParser::ManParser(ZenParser &zen)
+ModelAnimationParser::ModelAnimationParser(ZenParser &zen)
     : m_Zen(zen)
 {
 
 }
 
-ManParser::EChunkType ManParser::parse()
+ModelAnimationParser::EChunkType ModelAnimationParser::parse()
 {
     if (m_Zen.getSeek() >= m_Zen.getFileSize())
         return CHUNK_EOF;
@@ -44,7 +44,7 @@ ManParser::EChunkType ManParser::parse()
     return CHUNK_EOF;
 }
 
-void ManParser::readHeader()
+void ModelAnimationParser::readHeader()
 {
     m_Header.version = m_Zen.readBinaryWord();
 
@@ -90,7 +90,7 @@ static void SampleUnpackQuat(const uint16_t* in, ZMath::float4& out)
     }
 }
 
-void ManParser::readRawData()
+void ModelAnimationParser::readRawData()
 {
     m_Header.nodeChecksum = m_Zen.readBinaryDWord();
 
@@ -105,6 +105,7 @@ void ManParser::readRawData()
         zTMdl_AniSample sample;
         m_Zen.readBinaryRaw(&sample, sizeof(zTMdl_AniSample));
         SampleUnpackTrans(sample.position, m_Samples[i].position, m_Header.samplePosScaler, m_Header.samplePosRangeMin);
+        m_Samples[i].position *= m_Scale;
         SampleUnpackQuat(sample.rotation, m_Samples[i].rotation);
     }
 }
