@@ -10,24 +10,26 @@ namespace ZenLoad
 
 class ZenParser;
 
-class ModelScriptParser
+/** Streaming parser for .MAN files.
+ */
+class ModelScriptBinParser
 {
 public:
 
+    typedef std::vector<zCModelAniSample> Samples;
+    typedef std::vector<uint32_t> NodeIndex;
+
     enum EChunkType
-    {
+    {       
         CHUNK_ERROR,
         CHUNK_EOF,
 
         CHUNK_MODEL_SCRIPT          = 0xF000,
-        CHUNK_MODEL_SCRIPT_END      = 0xFFFF,
         CHUNK_SOURCE                = 0xF100,
         CHUNK_MODEL                 = 0xF200,
-        CHUNK_MODEL_END             = 0xF2FF,
         CHUNK_MESH_AND_TREE         = 0xF300,
         CHUNK_REGISTER_MESH         = 0xF400,
         CHUNK_ANI_ENUM              = 0xF500,
-        CHUNK_ANI_ENUM_END          = 0xF5FF,
         CHUNK_ANI_MAX_FPS           = 0xF510,
         CHUNK_ANI                   = 0xF520,
         CHUNK_ANI_ALIAS             = 0xF530,
@@ -36,9 +38,8 @@ public:
         CHUNK_ANI_BATCH             = 0xF560,
         CHUNK_ANI_COMB              = 0xF570,
         CHUNK_ANI_DISABLE           = 0xF580,
-        CHUNK_MODEL_TAG             = 0xF590,
+        CHUNK_MODE_LTAG             = 0xF590,
         CHUNK_ANI_EVENTS            = 0xF5A0,
-        CHUNK_ANI_EVENTS_END        = 0xF5AF,
         CHUNK_EVENT_SFX             = 0xF5A1,
         CHUNK_EVENT_SFX_GRND        = 0xF5A2,
         CHUNK_EVENT_TAG             = 0xF5A3,
@@ -51,11 +52,7 @@ public:
         CHUNK_EVENT_CAMTREMOR       = 0xF5AA
     };
 
-    typedef std::vector<zCModelAniSample> Samples;
-    typedef std::vector<uint32_t>   NodeIndex;
-
-    ModelScriptParser(ZenParser &zen);
-    virtual ~ModelScriptParser();
+    ModelScriptBinParser(ZenParser &zen);
 
     /** Returns the parsed animation alias.
      *
@@ -63,7 +60,7 @@ public:
      *
      * @return The ani read during the last call to parse().
      */
-    const zCModelScriptAni          &ani() const { return m_Ani; }
+    const zCModelScriptAni                  &ani() const { return m_Ani; }
 
     /** Returns the parsed animation alias.
      *
@@ -71,157 +68,29 @@ public:
      *
      * @return The alias read during the last call to parse().
      */
-    const zCModelScriptAniAlias     &alias() const { return m_Alias; }
+    const zCModelScriptAniAlias             &alias() const { return m_Alias; }
 
     /** Returns the sfx event.
      *
      * Call this if parse() returns CHUNK_EVENT_SFX or CHUNK_EVENT_SFX_GRND.
      *
-     * @return The event read during the last call to parse().
+     * @return The header read during the last call to parse().
      */
-    const zCModelScriptEventSfx     &sfx() const { return m_Sfx; }
+    const zCModelScriptEventSfx             &sfx() const { return m_Sfx; }
 
-    /** Reads the next chunk.
-     *
-     * @return The chunk type or CHUNK_ERROR / CHUNK_EOF.
-     *
-     */
-    virtual EChunkType              parse()=0;
+    EChunkType                      parse();
 
-protected:
+private:
 
     ZenParser                       &m_Zen;
 
-    zCModelScriptAni                m_Ani;
-    zCModelScriptAniAlias           m_Alias;
-    zCModelScriptEventSfx           m_Sfx;
-};
-
-/** Streaming parser for .MSB files.
- */
-class ModelScriptBinParser : public ModelScriptParser
-{
-public:
-
-    ModelScriptBinParser(ZenParser &zen);
-
-    EChunkType                      parse() override;
-
-private:
+    zCModelScriptAni                        m_Ani;
+    zCModelScriptAniAlias                   m_Alias;
+    zCModelScriptEventSfx                   m_Sfx;
 
     void                            readAni();
     void                            readAlias();
     void                            readSfx();
-};
-
-/** Streaming parser for .MDS files.
- */
-class ModelScriptTextParser : public ModelScriptParser
-{
-public:
-
-    ModelScriptTextParser(ZenParser &zen);
-
-    void                            setStrict(bool strict) { m_Strict = strict; }
-
-    EChunkType                      parse() override;
-
-private:
-
-    enum Result
-    {
-        Error,
-        End,
-        Success
-    };
-
-    enum TokenType
-    {
-        TokenText,
-        TokenOpenParen,
-        TokenCloseParen,
-    };
-
-    enum Context
-    {
-        ContextFile,
-        ContextModel,
-        ContextAniEnum
-    };
-
-    struct Token
-    {
-        TokenType                   type = TokenText;
-        unsigned                    line = 0;
-        std::string                 text;
-    };
-
-    Token                           m_Token;
-    Token                           m_NextToken;
-    unsigned                        m_Line = 1;
-
-    std::vector<std::string>        m_Args;
-    unsigned                        m_ArgCount = 0;
-
-    std::vector<Context>            m_Context;
-
-    bool                            m_Strict = false;
-
-    bool                            isEof() const;
-
-    Result                          token();
-
-    Result                          skipSpace();
-
-    Result                          expectChar(char ch);
-
-    bool                            nextIs(char ch) const;
-
-    Result                          parseObjectStart();
-
-    Result                          parseObjectEnd();
-
-    Result                          parseArguments();
-
-    EChunkType                      parseFileChunk();
-
-    bool                            parseModelStart();
-
-    EChunkType                      parseModelChunk();
-
-    bool                            parseAniEnumStart();
-
-    Result                          parseModelTag();
-
-    Result                          parseAniDisable();
-
-    Result                          parseAniComb();
-
-    EChunkType                      parseAniEnumChunk();
-
-    Result                          parseAni();
-
-    Result                          parseAniAlias();
-
-    Result                          parseAniBlend();
-
-    Result                          parseAniEvents();
-
-    Result                          parseTagEvent();
-
-    Result                          parseMMStartAniEvent();
-
-    Result                          parseCamTremorEvent();
-
-    Result                          parseSfxEvent();
-
-    Result                          parseSfxGrndEvent();
-
-    Result                          parseSwapMeshEvent();
-
-    Result                          parsePfxEvent();
-
-    Result                          parsePfxStopEvent();
 };
 
 } // namespace ZenLoad
