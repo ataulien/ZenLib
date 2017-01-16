@@ -38,19 +38,19 @@ public:
      */
     const zCModelAniHeader          &header() const { return m_Header; }
 
-    /** Returns the parsed header.
+    /** Returns the parsed samples.
      *
-     * Call this if parse() returns CHUNK_HEADER.
+     * Call this if parse() returns CHUNK_RAWDATA.
      *
-     * @return The header read during the last call to parse().
+     * @return The samples read during the last call to parse().
      */
     const Samples                   &samples() const { return m_Samples; }
 
-    /** Returns the parsed header.
+    /** Returns the parsed nodes.
      *
-     * Call this if parse() returns CHUNK_HEADER.
+     * Call this if parse() returns CHUNK_RAWDATA.
      *
-     * @return The header read during the last call to parse().
+     * @return The nodes read during the last call to parse().
      */
     const NodeIndex                 &nodeIndex() const { return m_NodeIndex; }
 
