@@ -11,7 +11,7 @@ class ZenParser;
 
 /** Streaming parser for .MAN files.
  */
-class ManParser
+class ModelAnimationParser
 {
 public:
 
@@ -28,7 +28,7 @@ public:
 
     };
 
-    ManParser(ZenParser &zen);
+    ModelAnimationParser(ZenParser &zen);
 
     /** Returns the parsed header.
      *
