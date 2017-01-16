@@ -12,36 +12,6 @@
 
 using namespace ZenLoad;
 
-enum
-{
-    MSB_MODEL_SCRIPT     = 0xF000,
-    MSB_SOURCE           = 0xF100,
-    MSB_MODEL            = 0xF200,
-    MSB_MESH_AND_TREE    = 0xF300,
-    MSB_REGISTER_MESH    = 0xF400,
-    MSB_ANI_ENUM         = 0xF500,
-    MSB_ANI_MAX_FPS      = 0xF510,
-    MSB_ANI              = 0xF520,
-    MSB_ANI_ALIAS        = 0xF530,
-    MSB_ANI_BLEND        = 0xF540,
-    MSB_ANI_SYNC         = 0xF550,
-    MSB_ANI_BATCH        = 0xF560,
-    MSB_ANI_COMB         = 0xF570,
-    MSB_ANI_DISABLE      = 0xF580,
-    MSB_MODE_LTAG        = 0xF590,
-    MSB_ANI_EVENTS       = 0xF5A0,
-    MSB_EVENT_SFX        = 0xF5A1,
-    MSB_EVENT_SFX_GRND   = 0xF5A2,
-    MSB_EVENT_TAG        = 0xF5A3,
-    MSB_EVENT_PFX        = 0xF5A4,
-    MSB_EVENT_PFX_STOP   = 0xF5A5,
-    MSB_EVENT_PFX_GRND   = 0xF5A6,
-    MSB_EVENT_SET_MESH   = 0xF5A7,
-    MSB_EVENT_SWAP_MESH  = 0xF5A8,
-    MSB_EVENT_MMSTARTANI = 0xF5A9,
-    MSB_EVENT_CAMTREMOR  = 0xF5AA,
-};
-
 /*
 static const uint16_t MSID_MESHSOFTSKIN = 0xE100;
 static const uint16_t MSID_MESHSOFTSKIN_END = 0xE110;
@@ -210,7 +180,7 @@ bool zCModelAni::loadMSB(const VDFS::FileIndex &index, const std::string &fileNa
     LogInfo() << "load MSB " << fileName;
 
     return parse(index, fileName, [&](ZenParser &parser) -> bool {
-
+#if 0
         // Information about a single chunk
         BinaryChunkInfo chunkInfo;
 
@@ -362,6 +332,8 @@ bool zCModelAni::loadMSB(const VDFS::FileIndex &index, const std::string &fileNa
                 parser.setSeek(chunkEnd); // Skip chunk
             }
         }
+#endif
+        return true;
     });
 }
 
