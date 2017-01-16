@@ -30,6 +30,8 @@ public:
 
     ModelAnimationParser(ZenParser &zen);
 
+    void                            setScale(float scale) { m_Scale = scale; }
+
     /** Returns the parsed header.
      *
      * Call this if parse() returns CHUNK_HEADER.
@@ -59,6 +61,8 @@ public:
 private:
 
     ZenParser                       &m_Zen;
+
+    float                           m_Scale = 1.0f;
 
     zCModelAniHeader                m_Header;
     Samples                         m_Samples;
