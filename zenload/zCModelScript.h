@@ -40,7 +40,7 @@ struct zCModelScriptAni
     float                           m_BlendOut = 0;
     uint32_t                        m_Flags = 0;
     std::string                     m_Asc;
-    EModelScriptAniDir                      m_Dir = MSB_FORWARD;
+    EModelScriptAniDir              m_Dir = MSB_FORWARD;
     uint32_t                        m_FirstFrame = 0;
     uint32_t                        m_LastFrame = 0;
     float                           m_MaxFps = 0.0f;
@@ -58,7 +58,7 @@ struct zCModelScriptAniAlias
     float                           m_BlendOut = 0;
     uint32_t                        m_Flags = 0;
     std::string                     m_Alias;
-    EModelScriptAniDir                      m_Dir = MSB_FORWARD;
+    EModelScriptAniDir              m_Dir = MSB_FORWARD;
 };
 
 struct zCModelScriptAniBlend
