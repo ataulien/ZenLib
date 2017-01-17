@@ -67,7 +67,7 @@ namespace VDFS
 		/**
 		 * @brief Returnst the list of all known files
 		 */
-		const std::vector<FileInfo>& getKnownFiles(){return m_KnownFiles;}
+        const std::vector<FileInfo>& getKnownFiles() const { return m_KnownFiles; }
 
 		/**
 		 * @return Whether a file with the given name exists
