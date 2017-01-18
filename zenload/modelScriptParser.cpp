@@ -6,8 +6,19 @@
 namespace ZenLoad
 {
 
-ModelScriptBinParser::ModelScriptBinParser(ZenParser &zen)
+ModelScriptParser::ModelScriptParser(ZenParser &zen)
     : m_Zen(zen)
+{
+
+}
+
+ModelScriptParser::~ModelScriptParser()
+{
+
+}
+
+ModelScriptBinParser::ModelScriptBinParser(ZenParser &zen)
+    : ModelScriptParser(zen)
 {
 
 }
