@@ -60,7 +60,7 @@ public:
      *
      * @return The ani read during the last call to parse().
      */
-    const zCModelScriptAni                  &ani() const { return m_Ani; }
+    const zCModelScriptAni          &ani() const { return m_Ani; }
 
     /** Returns the parsed animation alias.
      *
@@ -68,7 +68,7 @@ public:
      *
      * @return The alias read during the last call to parse().
      */
-    const zCModelScriptAniAlias             &alias() const { return m_Alias; }
+    const zCModelScriptAniAlias     &alias() const { return m_Alias; }
 
     /** Returns the sfx event.
      *
@@ -76,7 +76,7 @@ public:
      *
      * @return The header read during the last call to parse().
      */
-    const zCModelScriptEventSfx             &sfx() const { return m_Sfx; }
+    const zCModelScriptEventSfx     &sfx() const { return m_Sfx; }
 
     EChunkType                      parse();
 
@@ -84,9 +84,9 @@ private:
 
     ZenParser                       &m_Zen;
 
-    zCModelScriptAni                        m_Ani;
-    zCModelScriptAniAlias                   m_Alias;
-    zCModelScriptEventSfx                   m_Sfx;
+    zCModelScriptAni                m_Ani;
+    zCModelScriptAniAlias           m_Alias;
+    zCModelScriptEventSfx           m_Sfx;
 
     void                            readAni();
     void                            readAlias();
