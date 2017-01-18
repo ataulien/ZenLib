@@ -14,6 +14,25 @@ namespace ZenLoad
 	};
 
 	/**
+	 * Used by zCVobSound
+	 */
+	enum SoundMode : uint32_t
+	{
+		SM_LOOPING,
+		SM_ONCE,
+		SM_RANDOM
+	};
+
+	/**
+	 * Used by zCVobSound
+	 */
+	enum SoundVolType
+	{
+		SVT_SPHERE = 0,
+		SVT_ELLIPSOID
+	};
+
+	/**
 	 * @brief Maximum amount of nodes a skeletal mesh can render
 	 */
 	const size_t MAX_NUM_SKELETAL_NODES = 96;
@@ -129,6 +148,18 @@ namespace ZenLoad
 	 */
 	struct zCVobData : public ParsedZenObject
 	{
+        enum EVobType
+        {
+            VT_zCVob,
+            VT_oCItem,
+            VT_oCMOB,
+            VT_oCMobInter,
+            VT_oCMobContainer,
+            VT_zCVobLight,
+        };
+
+        EVobType vobType;
+
 		uint32_t pack;
 		std::string presetName;
 		ZMath::float3 bbox[2];
@@ -195,6 +226,33 @@ namespace ZenLoad
 			std::string pickLockStr;
 			std::string contains;
 		}oCMobContainer;
+
+		struct
+		{
+			std::string lightPresetInUse;
+			uint32_t lightType;
+			float range;
+			uint32_t color;
+			float spotConeAngle;
+			bool lightStatic;
+            uint32_t lightQuality;
+			std::string lensflareFX;
+		}zCVobLight;
+
+		struct
+		{
+			float sndVolume;
+			SoundMode sndType;
+			float sndRandDelay;
+			float sndRandDelayVar;
+			bool sndStartOn;
+			bool sndAmbient3D;
+			bool sndObstruction;
+			float sndConeAngle;
+			SoundVolType sndVolType;
+			float sndRadius;
+			std::string sndName;
+		}zCVobSound;
 
 		std::vector<zCVobData> childVobs;
 	};
