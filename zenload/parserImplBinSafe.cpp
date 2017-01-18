@@ -298,6 +298,16 @@ void ParserImplBinSafe::readEntry(const std::string& expectedName, void* target,
 	// Read type and size of the entry
 	readTypeAndSizeBinSafe(type, size);
 
+    // These are the same in size
+    if(expectedType == ZVT_INT)
+    {
+        if(type == ZVT_COLOR)
+            type = ZVT_INT;
+
+        if(type == ZVT_ENUM && size == sizeof(uint32_t))
+            type = ZVT_INT; // Enum seems the be there in both 1 and 4 byte?
+    }
+
 	if(expectedType != ZVT_BYTE || type != ZVT_ENUM) // International CSLibs have this
 		if(expectedType != ZVT_0 && type != expectedType)
 			throw std::runtime_error("Valuetype name does not match expected type. Value:" + expectedName);
