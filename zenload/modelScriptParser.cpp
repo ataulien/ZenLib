@@ -27,12 +27,15 @@ ModelScriptBinParser::EChunkType ModelScriptBinParser::parse()
     {
     case CHUNK_ANI:
         readAni();
+        m_Zen.setSeek(chunkEnd);
         return CHUNK_ANI;
     case CHUNK_ANI_ALIAS:
         readAlias();
+        m_Zen.setSeek(chunkEnd);
         return CHUNK_ANI_ALIAS;
     case CHUNK_EVENT_SFX:
         readSfx();
+        m_Zen.setSeek(chunkEnd);
         return CHUNK_EVENT_SFX;
     default:
         m_Zen.setSeek(chunkEnd);
