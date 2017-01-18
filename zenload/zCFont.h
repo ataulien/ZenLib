@@ -31,7 +31,7 @@ namespace ZenLoad
             FontInfo()
             {
                 fontHeight = 0;
-                memset(glyphWidth, sizeof(glyphWidth), 0);
+                memset(glyphWidth, 0, sizeof(glyphWidth));
             }
 
             std::string fontName; // Name of the font-file?
