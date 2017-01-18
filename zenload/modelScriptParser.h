@@ -10,17 +10,12 @@ namespace ZenLoad
 
 class ZenParser;
 
-/** Streaming parser for .MAN files.
- */
-class ModelScriptBinParser
+class ModelScriptParser
 {
 public:
 
-    typedef std::vector<zCModelAniSample> Samples;
-    typedef std::vector<uint32_t> NodeIndex;
-
     enum EChunkType
-    {       
+    {
         CHUNK_ERROR,
         CHUNK_EOF,
 
@@ -52,7 +47,11 @@ public:
         CHUNK_EVENT_CAMTREMOR       = 0xF5AA
     };
 
-    ModelScriptBinParser(ZenParser &zen);
+    typedef std::vector<zCModelAniSample> Samples;
+    typedef std::vector<uint32_t>   NodeIndex;
+
+    ModelScriptParser(ZenParser &zen);
+    virtual ~ModelScriptParser();
 
     /** Returns the parsed animation alias.
      *
@@ -74,23 +73,56 @@ public:
      *
      * Call this if parse() returns CHUNK_EVENT_SFX or CHUNK_EVENT_SFX_GRND.
      *
-     * @return The header read during the last call to parse().
+     * @return The event read during the last call to parse().
      */
     const zCModelScriptEventSfx     &sfx() const { return m_Sfx; }
 
-    EChunkType                      parse();
+    /** Reads the next chunk.
+     *
+     * @return The chunk type or CHUNK_ERROR / CHUNK_EOF.
+     *
+     */
+    virtual EChunkType              parse()=0;
 
-private:
+protected:
 
     ZenParser                       &m_Zen;
 
     zCModelScriptAni                m_Ani;
     zCModelScriptAniAlias           m_Alias;
     zCModelScriptEventSfx           m_Sfx;
+};
+
+/** Streaming parser for .MSB files.
+ */
+class ModelScriptBinParser : public ModelScriptParser
+{
+public:
+
+    ModelScriptBinParser(ZenParser &zen);
+
+    EChunkType                      parse() override;
+
+private:
 
     void                            readAni();
     void                            readAlias();
     void                            readSfx();
+};
+
+/** Streaming parser for .MDS files.
+ */
+class ModelScriptTextParser : public ModelScriptParser
+{
+public:
+
+    ModelScriptTextParser(ZenParser &zen);
+
+    EChunkType                      parse() override;
+
+private:
+
+    ZenParser                       &m_Zen;
 };
 
 } // namespace ZenLoad
