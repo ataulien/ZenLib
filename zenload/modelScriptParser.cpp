@@ -129,20 +129,303 @@ void ModelScriptBinParser::readSfx()
     m_Sfx.m_Value2 = m_Zen.readLine(true);
 }
 
+ModelScriptBinParser::EChunkType ModelScriptTextParser::parse()
+{
+    m_Token = m_NextToken = Token();
+    m_Line = 1;
+
+    // read
+    Result res = token();
+    if (res != Success)
+        return CHUNK_ERROR; 
+
+    while (true)
+    {
+        Result res = token();
+        if (res == End)
+            break;
+
+        if (res == Error)
+            return CHUNK_ERROR;
+
+        switch (m_Token.type)
+        {
+        case TokenText:
+            if (m_Token.text == "MODEL")
+            {
+                res = parseModel();
+                if (res == Success)
+                    return CHUNK_MODEL;
+
+                return (res == End) ? CHUNK_EOF : CHUNK_ERROR;
+            }
+
+            // fallthrough for unrecognized tokens!
+
+        default:
+            LogError() << "invalid token '" << m_Token.text << "' in file at line " << m_Line;
+            return CHUNK_ERROR;
+        }
+
+        LogInfo() << "token: " << m_Token.text << " " << m_Token.line;
+    }
+
+    return CHUNK_EOF;
+}
+
 ModelScriptTextParser::ModelScriptTextParser(ZenParser &zen)
     : ModelScriptParser(zen)
 {
 
 }
 
-ModelScriptBinParser::EChunkType ModelScriptTextParser::parse()
+bool ModelScriptTextParser::isEof() const
 {
-    while (m_Zen.getSeek() < m_Zen.getFileSize())
+    return m_Zen.getSeek() >= m_Zen.getFileSize();
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::token()
+{
+    Result res = skipSpace();
+    if (res != Success)
+        return res;
+
+    m_Token = m_NextToken;
+    m_NextToken.text.clear();
+    m_NextToken.line = m_Line;
+
+    while (!isEof())
     {
-        std::string tok = m_Zen.readString();
-        LogInfo() << "token: " << tok;
+        char ch = m_Zen.readBinaryByte();
+        if (ch == '"')
+        {
+            while (true)
+            {
+                if (isEof())
+                {
+                    LogError() << "parser error in line " << m_Line << ": unexpected end in quoted string";
+                    return Error;
+                }
+
+                ch = m_Zen.readBinaryByte();
+                if (ch == '"')
+                    break;
+
+                if (ch == '\n')
+                    m_Line++;
+
+                m_NextToken.text.push_back(toupper(ch));
+            }
+
+            continue;
+
+        } else
+        if (ch == '/' && (m_Zen.getSeek() < m_Zen.getFileSize() - 1) && (m_Zen.getData()[m_Zen.getSeek() + 1] == '/'))
+        {
+            while (true)
+            {
+                while (m_Zen.readBinaryByte() != '\n')
+                {
+                    if (isEof())
+                        return End;
+                }
+            }
+        } else
+        if (isspace(ch) || ch == '(' || ch == ')' || ch == '{' || ch == '}')
+        {
+            if (m_NextToken.text.empty())
+            {
+                if (!isspace(ch))
+                    m_NextToken.text.push_back(ch);
+
+            } else
+            {
+                // we already have token text, the next token will be the special char
+                m_Zen.setSeek(m_Zen.getSeek() - 1);
+            }
+            break;
+        }
+
+        m_NextToken.text.push_back(toupper(ch));
     }
-    return CHUNK_EOF;
+
+    return m_NextToken.text.empty() ? End : Success;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::skipSpace()
+{
+    while (isspace(m_Zen.getData()[m_Zen.getSeek()]))
+    {
+        if (m_Zen.getData()[m_Zen.getSeek()] == '\n')
+            m_Line++;
+
+        if (isEof())
+            return End;
+
+        m_Zen.readBinaryByte();
+    }
+
+    return Success;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::expectChar(char ch)
+{
+    Result res = token();
+    if (res != Success)
+    {
+        LogError() << "unexpected end in line " << m_Line << ", expected " << ch;
+        return Error;
+    }
+
+    if (m_Token.text.empty() || m_Token.text[0] != ch)
+    {
+        LogError() << "invalid token '" << m_Token.text << "' in line " << m_Line << ", expected " << ch;
+        return Error;
+    }
+
+    return Success;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseObjectStart()
+{
+    return expectChar('{');
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseObjectEnd()
+{
+    return expectChar('}');
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseArguments()
+{
+    Result res = expectChar('(');
+    if (res != Success)
+        return res;
+
+    m_ArgCount = 0;
+    while (true)
+    {
+        res = token();
+        if (res != Success)
+        {
+            if (res == End)
+            {
+                LogError() << "invalid end in argument list in line " << m_Line;
+                return Error;
+            }
+            return res;
+        }
+
+        if (m_ArgCount < m_Args.size())
+        {
+            std::string &arg = m_Args[m_ArgCount];
+            arg.clear();
+            arg.insert(arg.begin(), m_Token.text.begin(), m_Token.text.end());
+        } else
+            m_Args.emplace_back(m_Token.text);
+
+        m_ArgCount++;
+
+        if (!m_NextToken.text.empty() && m_NextToken.text[0] == ')')
+            break;
+    }
+
+    return expectChar(')');
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseModel()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    res = parseObjectStart();
+    if (res != Success)
+        return Error;
+
+    while (true)
+    {
+        res = token();
+        if (res != Success)
+        {
+            if (res == Error)
+                return res;
+            break;
+        }
+
+        if (m_Token.text == "MESHANDTREE")
+        {
+            res = parseArguments();
+            if (res != Success)
+                break;
+
+        } else
+        if (m_Token.text == "REGISTERMESH")
+        {
+            res = parseArguments();
+            if (res != Success)
+                break;
+
+        } else
+        if (m_Token.text == "ANIENUM")
+        {
+            res = parseAnimEnum();
+            if (res != Success)
+                break;
+        } else
+        {
+            LogError() << "invalid token '" << m_Token.text << "' in Model at line " << m_Line;
+            return Error;
+        }
+
+        if (!m_NextToken.text.empty() && m_NextToken.text[0] == '}')
+            break;
+    }
+
+    if (res == Error)
+        return res;
+
+    return parseObjectEnd();
+#if 0
+
+               if (m_Token.text == "ANI")
+               {
+
+               } else
+               if (m_Token.text == "ANIALIAS")
+               {
+
+               } else
+               if (m_Token.text == "ANIBLEND")
+               {
+
+               } else
+               if (m_Token.text == "EVENTSFX")
+               {
+
+               } else
+               if (m_Token.text == "EVENTSFXGRND")
+               {
+
+               }
+#endif
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseAnimEnum()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    res = parseObjectStart();
+    if (res != Success)
+        return Error;
+
+    // TODO
+
+    return parseObjectEnd();
 }
 
 } // namespace ZenLoad
