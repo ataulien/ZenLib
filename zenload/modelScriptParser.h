@@ -121,8 +121,6 @@ public:
     EChunkType                      parse() override;
 
 private:
-
-    ZenParser                       &m_Zen;
 };
 
 } // namespace ZenLoad
