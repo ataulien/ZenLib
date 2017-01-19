@@ -121,6 +121,52 @@ public:
     EChunkType                      parse() override;
 
 private:
+
+    enum Result
+    {
+        Error,
+        End,
+        Success
+    };
+
+    enum TokenType
+    {
+        TokenText,
+        TokenOpenParen,
+        TokenCloseParen,
+    };
+
+    struct Token
+    {
+        TokenType                   type = TokenText;
+        unsigned                    line = 0;
+        std::string                 text;
+    };
+
+    Token                           m_Token;
+    Token                           m_NextToken;
+    unsigned                        m_Line = 1;
+
+    std::vector<std::string>        m_Args;
+    unsigned                        m_ArgCount = 0;
+
+    bool                            isEof() const;
+
+    Result                          token();
+
+    Result                          skipSpace();
+
+    Result                          expectChar(char ch);
+
+    Result                          parseObjectStart();
+
+    Result                          parseObjectEnd();
+
+    Result                          parseArguments();
+
+    Result                          parseModel();
+
+    Result                          parseAnimEnum();
 };
 
 } // namespace ZenLoad
