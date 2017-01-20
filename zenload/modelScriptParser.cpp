@@ -129,54 +129,16 @@ void ModelScriptBinParser::readSfx()
     m_Sfx.m_Value2 = m_Zen.readLine(true);
 }
 
-ModelScriptBinParser::EChunkType ModelScriptTextParser::parse()
-{
-    m_Token = m_NextToken = Token();
-    m_Line = 1;
-
-    // read
-    Result res = token();
-    if (res != Success)
-        return CHUNK_ERROR; 
-
-    while (true)
-    {
-        Result res = token();
-        if (res == End)
-            break;
-
-        if (res == Error)
-            return CHUNK_ERROR;
-
-        switch (m_Token.type)
-        {
-        case TokenText:
-            if (m_Token.text == "MODEL")
-            {
-                res = parseModel();
-                if (res == Success)
-                    return CHUNK_MODEL;
-
-                return (res == End) ? CHUNK_EOF : CHUNK_ERROR;
-            }
-
-            // fallthrough for unrecognized tokens!
-
-        default:
-            LogError() << "invalid token '" << m_Token.text << "' in file at line " << m_Line;
-            return CHUNK_ERROR;
-        }
-
-        LogInfo() << "token: " << m_Token.text << " " << m_Token.line;
-    }
-
-    return CHUNK_EOF;
-}
-
 ModelScriptTextParser::ModelScriptTextParser(ZenParser &zen)
-    : ModelScriptParser(zen)
-{
+    : ModelScriptParser(zen),
+      m_Line(1)
+{    
+    // read current token into next
+    token();
 
+    m_Context.push_back(ContextFile);
+
+//    LogInfo() << "MDS\n" << reinterpret_cast<const char*>(&zen.getData()[0]);
 }
 
 bool ModelScriptTextParser::isEof() const
@@ -214,7 +176,7 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
                 if (ch == '\n')
                     m_Line++;
 
-                m_NextToken.text.push_back(toupper(ch));
+                m_NextToken.text.push_back(ch);
             }
 
             continue;
@@ -286,6 +248,11 @@ ModelScriptTextParser::Result ModelScriptTextParser::expectChar(char ch)
     return Success;
 }
 
+bool ModelScriptTextParser::nextIs(char ch) const
+{
+    return !m_NextToken.text.empty() && m_NextToken.text[0] == ch;
+}
+
 ModelScriptTextParser::Result ModelScriptTextParser::parseObjectStart()
 {
     return expectChar('{');
@@ -296,8 +263,73 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseObjectEnd()
     return expectChar('}');
 }
 
+ModelScriptBinParser::EChunkType ModelScriptTextParser::parse()
+{
+    if (isEof())
+        return CHUNK_EOF;
+
+    // token is consumed by the functions below
+    Result res = token();
+    if (res != Success)
+        return CHUNK_ERROR;
+
+    switch (m_Context.back())
+    {
+    case ContextFile:
+        return parseFileChunk();
+    case ContextModel:
+        return parseModelChunk();
+    case ContextAniEnum:
+        return parseAniEnumChunk();
+    }
+
+    return CHUNK_EOF;
+
+#if 0
+    while (true)
+    {
+        Result res = token();
+        if (res == End)
+            break;
+
+        if (res == Error)
+            return CHUNK_ERROR;
+
+        switch (m_Token.type)
+        {
+        case TokenText:
+            if (m_Token.text == "MODEL")
+                return parseModelStart();
+            /*
+            {
+                if (res == Success)
+                    return CHUNK_MODEL;
+
+                return (res == End) ? CHUNK_EOF : CHUNK_ERROR;
+            }
+*/
+            // fallthrough for unrecognized tokens!
+
+        default:
+            LogError() << "invalid token '" << m_Token.text << "' in file at line " << m_Line;
+            return CHUNK_ERROR;
+        }
+
+        LogInfo() << "token: " << m_Token.text << " " << m_Token.line;
+    }
+
+    return CHUNK_EOF;
+#endif
+}
+
 ModelScriptTextParser::Result ModelScriptTextParser::parseArguments()
 {
+    if (nextIs('{'))
+    {
+        // no args, just object name
+        return Success;
+    }
+
     Result res = expectChar('(');
     if (res != Success)
         return res;
@@ -333,8 +365,106 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseArguments()
     return expectChar(')');
 }
 
-ModelScriptTextParser::Result ModelScriptTextParser::parseModel()
+ModelScriptParser::EChunkType ModelScriptTextParser::parseFileChunk()
 {
+    if (m_Token.text == "MODEL")
+    {
+        if (!parseModelStart())
+            return CHUNK_ERROR;
+
+        return CHUNK_MODEL;
+    }
+
+    LogError() << "invalid token '" << m_Token.text << "' in file at line " << m_Line;
+    return CHUNK_ERROR;
+}
+
+bool ModelScriptTextParser::parseModelStart()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return false;
+
+    // TODO: assign
+
+    res = parseObjectStart();
+    if (res != Success)
+        return false;
+
+    m_Context.push_back(ContextModel);
+
+    return true;
+}
+
+ModelScriptParser::EChunkType ModelScriptTextParser::parseModelChunk()
+{
+    if (m_Token.text == "MESHANDTREE")
+    {
+        Result res = parseArguments();
+        // TODO
+        return (res != Success) ? CHUNK_ERROR : CHUNK_MESH_AND_TREE;
+
+    } else
+    if (m_Token.text == "REGISTERMESH")
+    {
+        Result res = parseArguments();
+        // TODO
+        return (res != Success) ? CHUNK_ERROR : CHUNK_REGISTER_MESH;
+
+    } else
+    if (m_Token.text == "ANIENUM")
+    {
+        if (!parseAniEnumStart())
+            return CHUNK_ERROR;
+
+        return CHUNK_ANI_ENUM;
+    }
+
+    LogError() << "invalid token '" << m_Token.text << "' in Model at line " << m_Line;
+    return CHUNK_ERROR;
+}
+
+bool ModelScriptTextParser::parseAniEnumStart()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return false;
+
+    // TODO: assign
+
+    res = parseObjectStart();
+    if (res != Success)
+        return false;
+
+    m_Context.push_back(ContextAniEnum);
+
+    return true;
+}
+
+ModelScriptTextParser::EChunkType ModelScriptTextParser::parseAniEnumChunk()
+{
+    if (m_Token.text == "ANI")
+    {
+        return (parseAni() != Success) ? CHUNK_ERROR : CHUNK_ANI;
+    } else
+    if (m_Token.text == "ANIALIAS")
+    {
+        return (parseAniAlias() != Success) ? CHUNK_ERROR : CHUNK_ANI_ALIAS;
+    } else
+    if (m_Token.text == "ANIBLEND")
+    {
+        return (parseAniBlend() != Success) ? CHUNK_ERROR : CHUNK_ANI_BLEND;
+    }
+
+    LogError() << "invalid token '" << m_Token.text << "' in aniEnum at line " << m_Line;
+    return CHUNK_ERROR;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseAniEvents()
+{
+    if (!nextIs('{'))
+        return Success; // no ani events
+
     Result res = parseArguments();
     if (res != Success)
         return Error;
@@ -349,83 +479,167 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseModel()
     {
         res = token();
         if (res != Success)
-        {
-            if (res == Error)
-                return res;
             break;
-        }
 
-        if (m_Token.text == "MESHANDTREE")
+        if (m_Token.text == "*EVENTSWAPMESH")
         {
-            res = parseArguments();
+            res = parseSwapMeshEvent();
+            if (res != Success)
+                break;
+        } else
+        if (m_Token.text == "*EVENTPFX")
+        {
+            res = parsePfxEvent();
+            if (res != Success)
+                break;
+        } else
+        if (m_Token.text == "*EVENTPFXSTOP")
+        {
+            res = parsePfxStopEvent();
+            if (res != Success)
+                break;
+        } else
+        if (m_Token.text == "*EVENTSFX")
+        {
+            res = parseSfxEvent();
             if (res != Success)
                 break;
 
         } else
-        if (m_Token.text == "REGISTERMESH")
+        if (m_Token.text == "*EVENTSFXGRND")
         {
-            res = parseArguments();
+            res = parseSfxGrndEvent();
             if (res != Success)
                 break;
 
         } else
-        if (m_Token.text == "ANIENUM")
+        if (m_Token.text == "*EVENTTAG")
         {
-            res = parseAnimEnum();
+            res = parseTagEvent();
             if (res != Success)
                 break;
+
         } else
         {
-            LogError() << "invalid token '" << m_Token.text << "' in Model at line " << m_Line;
+            LogError() << "invalid token '" << m_Token.text << "' in ani at line " << m_Line;
             return Error;
         }
 
-        if (!m_NextToken.text.empty() && m_NextToken.text[0] == '}')
+        if (nextIs('}'))
             break;
     }
 
-    if (res == Error)
-        return res;
-
     return parseObjectEnd();
-#if 0
-
-               if (m_Token.text == "ANI")
-               {
-
-               } else
-               if (m_Token.text == "ANIALIAS")
-               {
-
-               } else
-               if (m_Token.text == "ANIBLEND")
-               {
-
-               } else
-               if (m_Token.text == "EVENTSFX")
-               {
-
-               } else
-               if (m_Token.text == "EVENTSFXGRND")
-               {
-
-               }
-#endif
 }
 
-ModelScriptTextParser::Result ModelScriptTextParser::parseAnimEnum()
+ModelScriptTextParser::Result ModelScriptTextParser::parseAni()
 {
     Result res = parseArguments();
     if (res != Success)
         return Error;
 
-    res = parseObjectStart();
+    if (m_ArgCount != 10)
+    {
+        LogError() << "invalid number of arguments for ani at line " << m_Line;
+        return Error;
+    }
+
+    m_Ani.m_Name = m_Args[0];
+    /*m_Ani.m_Layer = m_Args[1];*/
+    m_Ani.m_Next = m_Args[2];
+    /*m_Ani.m_BlendIn = m_Args[3];*/
+    /*m_Ani.m_BlendOut = m_Args[4];*/
+    /*m_Ani.m_Flags = m_Args[5];*/
+    /*m_Ani.m_Asc = m_Args[6];*/
+    /*m_Ani.m_Dir = m_Args[7];*/
+    /*m_Ani.mStartFrame = m_Args[8];*/
+    /*m_Ani.mEndFrame = m_Args[9];*/
+
+    return parseAniEvents();
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseAniAlias()
+{
+    Result res = parseArguments();
     if (res != Success)
         return Error;
 
-    // TODO
+    return parseAniEvents();
+}
 
-    return parseObjectEnd();
+ModelScriptTextParser::Result ModelScriptTextParser::parseAniBlend()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    return parseAniEvents();
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseSwapMeshEvent()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return Success;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parsePfxEvent()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return Success;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parsePfxStopEvent()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return Success;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseSfxEvent()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return Success;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseSfxGrndEvent()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return Success;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseTagEvent()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return Success;
 }
 
 } // namespace ZenLoad
