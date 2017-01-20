@@ -268,6 +268,23 @@ ModelScriptBinParser::EChunkType ModelScriptTextParser::parse()
     if (isEof())
         return CHUNK_EOF;
 
+    if (!m_Token.text.empty() && m_Token.text[0] == '}')
+    {
+        // skip '}'
+        if (!token())
+            return CHUNK_ERROR;
+
+        if (m_Context.empty())
+        {
+            LogError() << "unexpected '}' at line " << m_Line;
+            return CHUNK_ERROR;
+        }
+
+        m_Context.pop_back();
+
+        return parse();
+    }
+
     // token is consumed by the functions below
     Result res = token();
     if (res != Success)
@@ -284,47 +301,11 @@ ModelScriptBinParser::EChunkType ModelScriptTextParser::parse()
     }
 
     return CHUNK_EOF;
-
-#if 0
-    while (true)
-    {
-        Result res = token();
-        if (res == End)
-            break;
-
-        if (res == Error)
-            return CHUNK_ERROR;
-
-        switch (m_Token.type)
-        {
-        case TokenText:
-            if (m_Token.text == "MODEL")
-                return parseModelStart();
-            /*
-            {
-                if (res == Success)
-                    return CHUNK_MODEL;
-
-                return (res == End) ? CHUNK_EOF : CHUNK_ERROR;
-            }
-*/
-            // fallthrough for unrecognized tokens!
-
-        default:
-            LogError() << "invalid token '" << m_Token.text << "' in file at line " << m_Line;
-            return CHUNK_ERROR;
-        }
-
-        LogInfo() << "token: " << m_Token.text << " " << m_Token.line;
-    }
-
-    return CHUNK_EOF;
-#endif
 }
 
 ModelScriptTextParser::Result ModelScriptTextParser::parseArguments()
 {
-    if (nextIs('{'))
+    if (!nextIs('('))
     {
         // no args, just object name
         return Success;
@@ -463,15 +444,9 @@ ModelScriptTextParser::EChunkType ModelScriptTextParser::parseAniEnumChunk()
 ModelScriptTextParser::Result ModelScriptTextParser::parseAniEvents()
 {
     if (!nextIs('{'))
-        return Success; // no ani events
+        return Success; // no events
 
-    Result res = parseArguments();
-    if (res != Success)
-        return Error;
-
-    // TODO: assign
-
-    res = parseObjectStart();
+    Result res = parseObjectStart();
     if (res != Success)
         return Error;
 
