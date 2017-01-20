@@ -20,11 +20,14 @@ public:
         CHUNK_EOF,
 
         CHUNK_MODEL_SCRIPT          = 0xF000,
+        CHUNK_MODEL_SCRIPT_END      = 0xFFFF,
         CHUNK_SOURCE                = 0xF100,
         CHUNK_MODEL                 = 0xF200,
+        CHUNK_MODEL_END             = 0xF2FF,
         CHUNK_MESH_AND_TREE         = 0xF300,
         CHUNK_REGISTER_MESH         = 0xF400,
         CHUNK_ANI_ENUM              = 0xF500,
+        CHUNK_ANI_ENUM_END          = 0xF5FF,
         CHUNK_ANI_MAX_FPS           = 0xF510,
         CHUNK_ANI                   = 0xF520,
         CHUNK_ANI_ALIAS             = 0xF530,
@@ -35,6 +38,7 @@ public:
         CHUNK_ANI_DISABLE           = 0xF580,
         CHUNK_MODE_LTAG             = 0xF590,
         CHUNK_ANI_EVENTS            = 0xF5A0,
+        CHUNK_ANI_EVENTS_END        = 0xF5AF,
         CHUNK_EVENT_SFX             = 0xF5A1,
         CHUNK_EVENT_SFX_GRND        = 0xF5A2,
         CHUNK_EVENT_TAG             = 0xF5A3,
@@ -136,6 +140,13 @@ private:
         TokenCloseParen,
     };
 
+    enum Context
+    {
+        ContextFile,
+        ContextModel,
+        ContextAniEnum
+    };
+
     struct Token
     {
         TokenType                   type = TokenText;
@@ -150,6 +161,8 @@ private:
     std::vector<std::string>        m_Args;
     unsigned                        m_ArgCount = 0;
 
+    std::vector<Context>            m_Context;
+
     bool                            isEof() const;
 
     Result                          token();
@@ -158,15 +171,43 @@ private:
 
     Result                          expectChar(char ch);
 
+    bool                            nextIs(char ch) const;
+
     Result                          parseObjectStart();
 
     Result                          parseObjectEnd();
 
     Result                          parseArguments();
 
-    Result                          parseModel();
+    EChunkType                      parseFileChunk();
 
-    Result                          parseAnimEnum();
+    bool                            parseModelStart();
+
+    EChunkType                      parseModelChunk();
+
+    bool                            parseAniEnumStart();
+
+    EChunkType                      parseAniEnumChunk();
+
+    Result                          parseAni();
+
+    Result                          parseAniAlias();
+
+    Result                          parseAniBlend();
+
+    Result                          parseAniEvents();
+
+    Result                          parseTagEvent();
+
+    Result                          parseSfxEvent();
+
+    Result                          parseSfxGrndEvent();
+
+    Result                          parseSwapMeshEvent();
+
+    Result                          parsePfxEvent();
+
+    Result                          parsePfxStopEvent();
 };
 
 } // namespace ZenLoad
