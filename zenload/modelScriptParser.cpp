@@ -138,7 +138,7 @@ ModelScriptTextParser::ModelScriptTextParser(ZenParser &zen)
 
     m_Context.push_back(ContextFile);
 
-//    LogInfo() << "MDS\n" << reinterpret_cast<const char*>(&zen.getData()[0]);
+    LogInfo() << "MDS\n" << reinterpret_cast<const char*>(&zen.getData()[0]);
 }
 
 bool ModelScriptTextParser::isEof() const
@@ -182,7 +182,7 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
             continue;
 
         } else
-        if (ch == '/' && (m_Zen.getSeek() < m_Zen.getFileSize() - 1) && (m_Zen.getData()[m_Zen.getSeek() + 1] == '/'))
+        if (ch == '/' && (m_Zen.getSeek() < m_Zen.getFileSize() - 1) && (m_Zen.getData()[m_Zen.getSeek()] == '/'))
         {
             while (true)
             {
@@ -354,6 +354,14 @@ ModelScriptParser::EChunkType ModelScriptTextParser::parseFileChunk()
             return CHUNK_ERROR;
 
         return CHUNK_MODEL;
+    }
+
+    if (!m_Strict && !m_Token.text.empty() && m_Token.text[0] == '(')
+    {
+        // fixes duplicate '}' after anim, which will make the parser think
+        // it's on the file level
+        m_Context.push_back(ContextAniEnum);
+        return parseAniEnumChunk();
     }
 
     LogError() << "invalid token '" << m_Token.text << "' in file at line " << m_Line;
