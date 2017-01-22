@@ -122,6 +122,8 @@ public:
 
     ModelScriptTextParser(ZenParser &zen);
 
+    void                            setStrict(bool strict) { m_Strict = strict; }
+
     EChunkType                      parse() override;
 
 private:
@@ -162,6 +164,8 @@ private:
     unsigned                        m_ArgCount = 0;
 
     std::vector<Context>            m_Context;
+
+    bool                            m_Strict = false;
 
     bool                            isEof() const;
 
