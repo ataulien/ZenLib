@@ -172,6 +172,9 @@ Daedalus::GEngineClasses::Instance* DaedalusGameState::getByClass(ZMemory::BigHa
         case EInstanceClass::IC_Sfx:
             return &getSfx(ZMemory::handleCast<SfxHandle>(h));
 
+        case EInstanceClass::IC_Pfx:
+            return &getPfx(ZMemory::handleCast<PfxHandle>(h));
+
         default:
             return nullptr;
 
@@ -226,6 +229,13 @@ SfxHandle DaedalusGameState::createSfx()
 {
     auto h = m_RegisteredObjects.sfx.createObject();
     getSfx(h).userPtr = nullptr;
+    return h;
+}
+
+PfxHandle DaedalusGameState::createPfx()
+{
+    auto h = m_RegisteredObjects.pfx.createObject();
+    getPfx(h).userPtr = nullptr;
     return h;
 }
 

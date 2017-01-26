@@ -65,6 +65,7 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
     GEngineClasses::C_Menu menu;
     GEngineClasses::C_Menu_Item menuItem;
     GEngineClasses::C_SFX sfx;
+    GEngineClasses::C_ParticleFX pfx;
 
     REGISTER("C_Npc", npc, id);
     REGISTER("C_Npc", npc, name);
@@ -232,6 +233,59 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
     REGISTER("C_SFX", sfx, loopEndOffset);
     REGISTER("C_SFX", sfx, reverbLevel);
     REGISTER("C_SFX", sfx, pfxName);
+
+    REGISTER("C_ParticleFX", pfx, ppsValue);
+    REGISTER("C_ParticleFX", pfx, ppsScaleKeys_S);
+    REGISTER("C_ParticleFX", pfx, ppsIsLooping);
+    REGISTER("C_ParticleFX", pfx, ppsIsSmooth);
+    REGISTER("C_ParticleFX", pfx, ppsFPS);
+    REGISTER("C_ParticleFX", pfx, ppsCreateEm_S);
+    REGISTER("C_ParticleFX", pfx, ppsCreateEmDelay);
+    REGISTER("C_ParticleFX", pfx, shpType_S);
+    REGISTER("C_ParticleFX", pfx, shpFOR_S);
+    REGISTER("C_ParticleFX", pfx, shpOffsetVec_S);
+    REGISTER("C_ParticleFX", pfx, shpDistribType_S);
+    REGISTER("C_ParticleFX", pfx, shpDistribWalkSpeed);
+    REGISTER("C_ParticleFX", pfx, shpIsVolume);
+    REGISTER("C_ParticleFX", pfx, shpDim_S);
+    REGISTER("C_ParticleFX", pfx, shpMesh_S);
+    REGISTER("C_ParticleFX", pfx, shpMeshRender_B);
+    REGISTER("C_ParticleFX", pfx, shpScaleKeys_S);
+    REGISTER("C_ParticleFX", pfx, shpScaleIsLooping);
+    REGISTER("C_ParticleFX", pfx, shpScaleIsSmooth);
+    REGISTER("C_ParticleFX", pfx, shpScaleFPS);
+    REGISTER("C_ParticleFX", pfx, dirMode_S);
+    REGISTER("C_ParticleFX", pfx, dirFOR_S);
+    REGISTER("C_ParticleFX", pfx, dirModeTargetFOR_S);
+    REGISTER("C_ParticleFX", pfx, dirModeTargetPos_S);
+    REGISTER("C_ParticleFX", pfx, dirAngleHead);
+    REGISTER("C_ParticleFX", pfx, dirAngleHeadVar);
+    REGISTER("C_ParticleFX", pfx, dirAngleElev);
+    REGISTER("C_ParticleFX", pfx, dirAngleElevVar);
+    REGISTER("C_ParticleFX", pfx, velAvg);
+    REGISTER("C_ParticleFX", pfx, velVar);
+    REGISTER("C_ParticleFX", pfx, lspPartAvg);
+    REGISTER("C_ParticleFX", pfx, lspPartVar);
+    REGISTER("C_ParticleFX", pfx, flyGravity_S);
+    REGISTER("C_ParticleFX", pfx, flyCollDet_B);
+    REGISTER("C_ParticleFX", pfx, visName_S);
+    REGISTER("C_ParticleFX", pfx, visOrientation_S);
+    REGISTER("C_ParticleFX", pfx, visTexIsQuadPoly);
+    REGISTER("C_ParticleFX", pfx, visTexAniFPS);
+    REGISTER("C_ParticleFX", pfx, visTexAniIsLooping);
+    REGISTER("C_ParticleFX", pfx, visTexColorStart_S);
+    REGISTER("C_ParticleFX", pfx, visTexColorEnd_S);
+    REGISTER("C_ParticleFX", pfx, visSizeStart_S);
+    REGISTER("C_ParticleFX", pfx, visSizeEndScale);
+    REGISTER("C_ParticleFX", pfx, visAlphaFunc_S);
+    REGISTER("C_ParticleFX", pfx, visAlphaStart);
+    REGISTER("C_ParticleFX", pfx, visAlphaEnd);
+    REGISTER("C_ParticleFX", pfx, trlFadeSpeed);
+    REGISTER("C_ParticleFX", pfx, trlTexture_S);
+    REGISTER("C_ParticleFX", pfx, trlWidth);
+    REGISTER("C_ParticleFX", pfx, mrkFadeSpeed);
+    REGISTER("C_ParticleFX", pfx, mrkTexture_S);
+    REGISTER("C_ParticleFX", pfx, mrkSize);
 }
 
 

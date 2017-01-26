@@ -18,7 +18,8 @@ namespace Daedalus
 		IC_Focus,
 		IC_Menu,
         IC_MenuItem,
-        IC_Sfx
+		IC_Sfx,
+		IC_Pfx
 	};
 
 

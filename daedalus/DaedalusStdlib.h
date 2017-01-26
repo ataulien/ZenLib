@@ -87,6 +87,85 @@ namespace Daedalus
             void* userPtr;
         };
 
+        struct C_ParticleFX : Instance
+        {
+            // 1) Emitter: zeitliches  Austoss-Verhalten, particles-per-second
+            float					    ppsValue;
+            std::string					ppsScaleKeys_S;
+            int32_t						ppsIsLooping;
+            int32_t						ppsIsSmooth;
+            float					    ppsFPS;
+            std::string					ppsCreateEm_S;
+            float					    ppsCreateEmDelay;
+
+            // 2) Emitter: raeumliches Austoss-Verhalten
+            std::string					shpType_S;					//	"point, line, box, circle, sphere, mesh"
+            std::string					shpFOR_S;					//	"object,world"
+            std::string					shpOffsetVec_S;
+            std::string					shpDistribType_S;				//	"RAND, UNIFORM, WALK"
+            float					    shpDistribWalkSpeed;
+            int32_t						shpIsVolume;
+            std::string					shpDim_S;					//	"", "30", "10 20 30", "30", "30", "" //	line: nur 1 Dimension !=0 // shape Dimensions
+            std::string					shpMesh_S;					//	"cross.3ds"
+            int32_t						shpMeshRender_B;
+            std::string					shpScaleKeys_S;				//	"[1.0] [0.8 0.9 0.2] [1.0]"
+            int32_t						shpScaleIsLooping;
+            int32_t						shpScaleIsSmooth;
+            float					    shpScaleFPS;
+
+            // 3) Partikel: Start Richtung/Speed:
+            std::string					dirMode_S;					//	"DIR, TARGET, MESH_POLY"
+            std::string					dirFOR_S;					//	"OBJECT, WORLD"
+            std::string					dirModeTargetFOR_S;
+            std::string					dirModeTargetPos_S;			//	"30 23 67"
+            float					    dirAngleHead;
+            float					    dirAngleHeadVar;
+            float					    dirAngleElev;
+            float					    dirAngleElevVar;
+            float					    velAvg;
+            float					    velVar;
+
+            // 4) Partikel: Lebensdauer
+            float					    lspPartAvg;
+            float					    lspPartVar;
+
+            // 5) Partikel: Flugverhalten (gravity, nicht-linear?, mesh-selfRot?,..)
+            // grav: a) nur Y, b) XYZ, c) auf Ziel zu steuern
+            // std::string  flyMode_S;								//	"LINEAR, LIN_SINUS,.."
+            // flyMeshSelfRotSpeedMin, flyMeshSelfRotSpeedMax
+            std::string					flyGravity_S;
+            int32_t						flyCollDet_B;
+
+            // 6) Partikel: Visualisierung
+            std::string					visName_S;					//	"NAME_V0_A0.TGA/.3DS"	(Variation, Animation)
+            std::string					visOrientation_S;			//	"NONE, VELO"
+            int32_t						visTexIsQuadPoly;			//	0=triMesh, 1=quadMesh
+            float					visTexAniFPS;
+            int32_t						visTexAniIsLooping;			//	0=oneShot, 1=looping
+            // color		(nur Tex, lifeSpan-Sync)			
+            std::string					visTexColorStart_S;
+            std::string					visTexColorEnd_S;
+            // size-ani		(nur Tex, lifeSpan-Sync)
+            std::string					visSizeStart_S;
+            float					    visSizeEndScale;
+            // alpha		(lifeSpan-Sync)
+            std::string					visAlphaFunc_S;
+            float					    visAlphaStart;
+            float					    visAlphaEnd;
+
+            // 7) misc effects
+
+            // trail
+            float					    trlFadeSpeed;
+            std::string					trlTexture_S;
+            float					    trlWidth;
+
+            // marks
+            float					    mrkFadeSpeed;
+            std::string					mrkTexture_S;
+            float					    mrkSize;
+        };
+
         struct C_Menu : Instance
         {
             enum EFlags : int32_t

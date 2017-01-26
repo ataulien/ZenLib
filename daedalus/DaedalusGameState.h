@@ -11,6 +11,7 @@ const int MAX_NUM_MISSIONS = 512;
 const int MAX_NUM_INFO = 16000;
 const int MAX_NUM_MISC = 1024;
 const int MAX_NUM_SFX = 4096; // G2 has 1700
+const int MAX_NUM_PFX = 1024;
 
 namespace Daedalus
 {
@@ -27,6 +28,7 @@ namespace Daedalus
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu, MAX_NUM_MISC>::Handle MenuHandle;
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu_Item, MAX_NUM_MISC>::Handle MenuItemHandle;
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_SFX, MAX_NUM_SFX>::Handle SfxHandle;
+        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_ParticleFX, MAX_NUM_PFX>::Handle PfxHandle;
 
         struct LogTopic
         {
@@ -71,6 +73,7 @@ namespace Daedalus
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu, MAX_NUM_MISC> menus;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu_Item, MAX_NUM_MISC> menuItems;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_SFX, MAX_NUM_SFX> sfx;
+                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_ParticleFX, MAX_NUM_PFX> pfx;
             };
 
             DaedalusGameState(Daedalus::DaedalusVM &vm);
@@ -161,6 +164,7 @@ namespace Daedalus
             MenuHandle createMenu();
             MenuItemHandle createMenuItem();
             SfxHandle createSfx();
+            PfxHandle createPfx();
 
             /**
 			 * Accessors
@@ -191,6 +195,9 @@ namespace Daedalus
 
             Daedalus::GEngineClasses::C_SFX &getSfx(SfxHandle h)
             { return m_RegisteredObjects.sfx.getElement(h); };
+
+            Daedalus::GEngineClasses::C_ParticleFX &getPfx(PfxHandle h)
+            { return m_RegisteredObjects.pfx.getElement(h); };
 
             Daedalus::GEngineClasses::Instance *getByClass(ZMemory::BigHandle h, EInstanceClass instClass);
 
