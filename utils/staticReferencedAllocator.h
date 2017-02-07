@@ -45,6 +45,11 @@ namespace ZMemory
         {
             return index < r.index;
         }
+
+        bool operator == (const GenericHandle<N1,N2>& r) const
+        {
+            return index == r.index && generation == r.generation;
+        }
     };
 
     /**
