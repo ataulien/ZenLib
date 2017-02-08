@@ -248,7 +248,7 @@ namespace ZenLoad
 				parser.getImpl()->readEntry("spotConeAngle", &info.zCVobLight.spotConeAngle);
 				parser.getImpl()->readEntry("lightStatic", &info.zCVobLight.lightStatic);
 				parser.getImpl()->readEntry("lightQuality", &info.zCVobLight.lightQuality);
-				parser.getImpl()->readEntry("slensflareFX", &info.zCVobLight.lensflareFX);
+				parser.getImpl()->readEntry("lensflareFX", &info.zCVobLight.lensflareFX);
 
 			}else if(header.classname.find("zCVobSound:") != std::string::npos)
 			{
