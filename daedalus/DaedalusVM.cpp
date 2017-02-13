@@ -87,6 +87,10 @@ bool DaedalusVM::doStack(bool verbose)
             b = *addr;
             *addr = popDataValue();
             if(log) LogInfo() << " - " << b << " -> " << *addr;
+
+            if(m_OnSymbolValueChanged)
+                m_OnSymbolValueChanged((unsigned)a, EParOp_Assign);
+
             break;
         case EParOp_LogOr:
             // Note: This can't be done in one line because || wouldn't pop the second piece of the stack
@@ -112,21 +116,33 @@ bool DaedalusVM::doStack(bool verbose)
             a = popVar(arr);
             addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
             *addr += popDataValue();
+
+            if(m_OnSymbolValueChanged)
+                m_OnSymbolValueChanged((unsigned)a, EParOp_AssignAdd);
             break;
         case EParOp_AssignSubtract:
             a = popVar(arr);
             addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
             *addr -= popDataValue();
+
+            if(m_OnSymbolValueChanged)
+                m_OnSymbolValueChanged((unsigned)a, EParOp_AssignSubtract);
             break;
         case EParOp_AssignMultiply:
             a = popVar(arr);
             addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
             *addr *= popDataValue();
+
+            if(m_OnSymbolValueChanged)
+                m_OnSymbolValueChanged((unsigned)a, EParOp_AssignMultiply);
             break;
         case EParOp_AssignDivide:
             a = popVar(arr);
             addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
             *addr /= popDataValue();
+
+            if(m_OnSymbolValueChanged)
+                m_OnSymbolValueChanged((unsigned)a, EParOp_AssignDivide);
             break;
         case EParOp_Plus:
             pushInt(+popDataValue());
@@ -180,6 +196,10 @@ bool DaedalusVM::doStack(bool verbose)
 
             if(log) LogInfo() << " - Function: " << m_DATFile.getSymbolByIndex(op.symbol).name;
             if (it != m_ExternalsByIndex.end()) {
+
+                if(m_OnExternalCalled)
+                    m_OnExternalCalled((unsigned)op.symbol);
+
                 (*it).second(*this);
             }
 
@@ -225,9 +245,11 @@ bool DaedalusVM::doStack(bool verbose)
 
                 //LogInfo() << "s1 (" << sym.name << "): " << s1 << " s2: " << s2;
 
-                *straddr = "test";
                 *straddr = s2;
             }
+
+            if(m_OnSymbolValueChanged)
+                m_OnSymbolValueChanged((unsigned)a, EParOp_AssignString);
 
             //LogInfo() << "We're fine!";
             //if(log) LogInfo() << " - " << a << ", " << b << ": " << *m_DATFile.getSymbolByIndex(b).getStrAddr(arr2, getCurrentInstanceDataPtr());
@@ -242,6 +264,9 @@ bool DaedalusVM::doStack(bool verbose)
             b = popDataValue();
 
             m_DATFile.getSymbolByIndex(a).set(b, arr, getCurrentInstanceDataPtr());
+
+            if(m_OnSymbolValueChanged)
+                m_OnSymbolValueChanged((unsigned)a, EParOp_AssignFloat);
             break;
 
         case EParOp_AssignInstance:
@@ -259,6 +284,8 @@ bool DaedalusVM::doStack(bool verbose)
             if(log) LogInfo() << "AssignInstance: a=" << a << ", b=" << b;
             if(log) LogInfo() << " - [" << a << "] " << m_DATFile.getSymbolByIndex(a).name << ", addr: " << m_DATFile.getSymbolByIndex(a).instanceDataHandle.index;
 
+            if(m_OnSymbolValueChanged)
+                m_OnSymbolValueChanged((unsigned)a, EParOp_AssignInstance);
             break;
 
         case EParOp_Jump:
