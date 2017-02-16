@@ -185,6 +185,10 @@ NpcHandle DaedalusGameState::createNPC()
 {
     NpcHandle h = m_RegisteredObjects.NPCs.createObject();
     getNpc(h).userPtr = nullptr;
+
+    if(m_OnInstanceCreated)
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Npc);
+
     return h;
 }
 
@@ -194,6 +198,9 @@ ItemHandle DaedalusGameState::createItem()
 
     getItem(h).userPtr = nullptr;
 
+    if(m_OnInstanceCreated)
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Item);
+
     return h;
 }
 
@@ -201,6 +208,10 @@ ItemReactHandle DaedalusGameState::createItemReact()
 {
     auto h = m_RegisteredObjects.itemReacts.createObject();
     getItemReact(h).userPtr = nullptr;
+
+    if(m_OnInstanceCreated)
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_ItemReact);
+
     return h;
 }
 
@@ -208,6 +219,10 @@ MissionHandle DaedalusGameState::createMission()
 {
     auto h = m_RegisteredObjects.missions.createObject();
     getMission(h).userPtr = nullptr;
+
+    if(m_OnInstanceCreated)
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Mission);
+
     return h;
 }
 
@@ -215,6 +230,10 @@ InfoHandle DaedalusGameState::createInfo()
 {
     auto h = m_RegisteredObjects.infos.createObject();
     getInfo(h).userPtr = nullptr;
+
+    if(m_OnInstanceCreated)
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Info);
+
     return h;
 }
 
@@ -222,6 +241,10 @@ FocusHandle DaedalusGameState::createFocus()
 {
     auto h = m_RegisteredObjects.focuses.createObject();
     getFocus(h).userPtr = nullptr;
+
+    if(m_OnInstanceCreated)
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Focus);
+
     return h;
 }
 
@@ -229,6 +252,10 @@ SfxHandle DaedalusGameState::createSfx()
 {
     auto h = m_RegisteredObjects.sfx.createObject();
     getSfx(h).userPtr = nullptr;
+
+    if(m_OnInstanceCreated)
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Sfx);
+
     return h;
 }
 
@@ -236,6 +263,10 @@ PfxHandle DaedalusGameState::createPfx()
 {
     auto h = m_RegisteredObjects.pfx.createObject();
     getPfx(h).userPtr = nullptr;
+
+    if(m_OnInstanceCreated)
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Pfx);
+
     return h;
 }
 
@@ -243,6 +274,10 @@ FocusHandle DaedalusGameState::createMenu()
 {
     auto h = m_RegisteredObjects.menus.createObject();
     getMenu(h).userPtr = nullptr;
+
+    if(m_OnInstanceCreated)
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Menu);
+
     return h;
 }
 
@@ -250,6 +285,10 @@ FocusHandle DaedalusGameState::createMenuItem()
 {
     auto h = m_RegisteredObjects.menuItems.createObject();
     getMenuItem(h).userPtr = nullptr;
+
+    if(m_OnInstanceCreated)
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Item);
+
     return h;
 }
 
@@ -330,8 +369,7 @@ bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc, un
             // Remove if count reached 0
             if(item.count[0] == 0)
             {
-                // Clear memory
-                m_RegisteredObjects.items.removeObject(*it);
+                removeItem(*it);
 
                 m_NpcInventories[npc].erase(it);
             }
@@ -411,16 +449,25 @@ SfxHandle DaedalusGameState::insertSFX(const std::string &instance)
 
 void DaedalusGameState::removeItem(ItemHandle item)
 {
+    if(m_OnInstanceRemoved)
+        m_OnInstanceRemoved(ZMemory::toBigHandle(item), IC_Item);
+
     m_RegisteredObjects.items.removeObject(item);
 }
 
 void DaedalusGameState::removeMenu(MenuHandle menu)
 {
+    if(m_OnInstanceRemoved)
+        m_OnInstanceRemoved(ZMemory::toBigHandle(menu), IC_Menu);
+
     m_RegisteredObjects.menus.removeObject(menu);
 }
 
 void DaedalusGameState::removeMenuItem(MenuItemHandle menuItem)
 {
+    if(m_OnInstanceRemoved)
+        m_OnInstanceRemoved(ZMemory::toBigHandle(menuItem), IC_MenuItem);
+
     m_RegisteredObjects.menuItems.removeObject(menuItem);
 }
 

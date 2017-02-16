@@ -108,6 +108,8 @@ namespace Daedalus
          * @return The currently registered instance-data pointer
          */
         void* getCurrentInstanceDataPtr();
+        EInstanceClass getCurrentInstanceClass(){ return m_CurrentInstanceClass; }
+        ZMemory::BigHandle getCurrentInstanceHandle(){ return m_CurrentInstanceHandle; }
 
         /**
          * @brief Returns the DAT-File this VM runs on
@@ -128,6 +130,24 @@ namespace Daedalus
          * @return Callstack in text-form
          */
         std::vector<std::string> getCallStack();
+
+        /**
+         * @param callback Function called when a symbol changed its value
+         */
+        void setOnSymbolValueChangedCallback(const std::function<void(unsigned, EParOp)>& callback)
+        {
+            m_OnSymbolValueChanged = callback;
+        }
+
+        /**
+         * Called right before an external call gets triggered. At this moment, parameters pushed to the stack
+         * are still there
+         * @param callback Function to call
+         */
+        void setOnExternalCalledCallback(const std::function<void(unsigned)>& callback)
+        {
+            m_OnExternalCalled = callback;
+        }
     private:
 
         DATFile m_DATFile;
@@ -181,5 +201,11 @@ namespace Daedalus
             PARSymbol m_Self;
         };
         std::stack<VMState> m_StateStack;
+
+        /**
+         * Callback for when a symbol-value changed/External got called
+         */
+        std::function<void(unsigned, EParOp)> m_OnSymbolValueChanged;
+        std::function<void(unsigned)> m_OnExternalCalled;
     };
 }

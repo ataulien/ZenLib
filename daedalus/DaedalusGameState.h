@@ -210,6 +210,21 @@ namespace Daedalus
             const std::list<ItemHandle>& getInventoryOf(NpcHandle npc)
             { return m_NpcInventories[npc]; }
 
+            /**
+             * @param callback Function to be called right after an instance was created
+             */
+            void setOnInstanceCreatedCallback(const std::function<void(ZMemory::BigHandle, EInstanceClass)>& callback)
+            {
+                m_OnInstanceCreated = callback;
+            }
+
+            /**
+             * @param callback Function to be called right before the actual instance gets removed
+             */
+            void setOnInstanceRemovedCallback(const std::function<void(ZMemory::BigHandle, EInstanceClass)>& callback)
+            {
+                m_OnInstanceRemoved = callback;
+            }
         private:
 
 
@@ -234,6 +249,12 @@ namespace Daedalus
              * External-callback set by the user
              */
             GameExternals m_GameExternals;
+
+            /**
+             * Function called when an instance was created/removed
+             */
+            std::function<void(ZMemory::BigHandle, EInstanceClass)> m_OnInstanceCreated;
+            std::function<void(ZMemory::BigHandle, EInstanceClass)> m_OnInstanceRemoved;
         };
     }
 
