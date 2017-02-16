@@ -253,7 +253,7 @@ namespace ZenLoad
 			}else if(header.classname.find("zCVobSound:") != std::string::npos)
 			{
 				parser.getImpl()->readEntry("sndVolume", &info.zCVobSound.sndVolume);
-				parser.getImpl()->readEntry("sndType", (uint32_t*)&info.zCVobSound.sndType);
+				parser.getImpl()->readEntry("sndMode", (uint32_t*)&info.zCVobSound.sndType);
 				parser.getImpl()->readEntry("sndRandDelay", &info.zCVobSound.sndRandDelay);
 				parser.getImpl()->readEntry("sndRandDelayVar", &info.zCVobSound.sndRandDelayVar);
 				parser.getImpl()->readEntry("sndStartOn", &info.zCVobSound.sndStartOn);
