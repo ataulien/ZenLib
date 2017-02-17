@@ -49,12 +49,6 @@ void DaedalusDialogManager::registerExternals(
 		m_OnStartConversation(hself, info);
     });
 
-    m_VM.registerExternalFunction("InfoManager_HasFinished", [](Daedalus::DaedalusVM& vm){
-
-        // TODO: Implement this
-        vm.setReturn(1);
-    });
-
     m_VM.registerExternalFunction("npc_knowsinfo", [&](Daedalus::DaedalusVM& vm){
         int32_t infoinstance = vm.popDataValue();
         int32_t self = vm.popVar();
