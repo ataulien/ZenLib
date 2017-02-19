@@ -549,6 +549,10 @@ namespace Daedalus
 
         struct C_Info : Instance
         {
+            // important is optional in scripts, so we must to set a default value
+            C_Info() :
+                important(0)
+            {}
             int32_t npc;
             int32_t nr;
             int32_t important;        //	Wichtig Flag -> ansprechen
