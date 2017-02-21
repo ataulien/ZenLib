@@ -202,6 +202,7 @@ namespace Daedalus
             PARSymbol m_Self;
         };
         std::stack<VMState> m_StateStack;
+
         void init(const DATFile &dat, const std::string &main);
 
         /**
