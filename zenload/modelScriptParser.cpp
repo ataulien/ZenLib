@@ -184,14 +184,14 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
         } else
         if (ch == '/' && (m_Zen.getSeek() < m_Zen.getFileSize() - 1) && (m_Zen.getData()[m_Zen.getSeek()] == '/'))
         {
-            while (true)
+            while (m_Zen.readBinaryByte() != '\n')
             {
-                while (m_Zen.readBinaryByte() != '\n')
-                {
-                    if (isEof())
-                        return End;
-                }
+                if (isEof())
+                    return End;
             }
+
+            skipSpace(); // Skip any empty lines after the comment
+            continue; // Don't want comments inside the tokens
         } else
         if (isspace(ch) || ch == '(' || ch == ')' || ch == '{' || ch == '}')
         {
@@ -206,6 +206,11 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
                 m_Zen.setSeek(m_Zen.getSeek() - 1);
             }
             break;
+        }else if(ch == '\n')
+        {
+            // Skip completely empty lines
+            m_Line++;
+            continue;
         }
 
         m_NextToken.text.push_back(toupper(ch));
@@ -216,7 +221,8 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
 
 ModelScriptTextParser::Result ModelScriptTextParser::skipSpace()
 {
-    while (isspace(m_Zen.getData()[m_Zen.getSeek()]))
+    while (isspace(m_Zen.getData()[m_Zen.getSeek()])
+           || m_Zen.getData()[m_Zen.getSeek()] == '\n')
     {
         if (m_Zen.getData()[m_Zen.getSeek()] == '\n')
             m_Line++;
