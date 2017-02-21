@@ -138,7 +138,7 @@ ModelScriptTextParser::ModelScriptTextParser(ZenParser &zen)
 
     m_Context.push_back(ContextFile);
 
-    LogInfo() << "MDS\n" << reinterpret_cast<const char*>(&zen.getData()[0]);
+    //LogInfo() << "MDS\n" << reinterpret_cast<const char*>(&zen.getData()[0]);
 }
 
 bool ModelScriptTextParser::isEof() const
@@ -449,6 +449,10 @@ ModelScriptTextParser::EChunkType ModelScriptTextParser::parseAniEnumChunk()
     if (m_Token.text == "ANIBLEND")
     {
         return (parseAniBlend() != Success) ? CHUNK_ERROR : CHUNK_ANI_BLEND;
+    } else
+    if(m_Token.text == "MODELTAG")
+    {
+        return (parseModelTag() != Success) ? CHUNK_ERROR : CHUNK_MODEL_TAG;
     }
 
     LogError() << "invalid token '" << m_Token.text << "' in aniEnum at line " << m_Line;
@@ -621,6 +625,17 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseSfxGrndEvent()
 }
 
 ModelScriptTextParser::Result ModelScriptTextParser::parseTagEvent()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return Success;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseModelTag()
 {
     Result res = parseArguments();
     if (res != Success)
