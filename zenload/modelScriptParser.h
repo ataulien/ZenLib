@@ -36,7 +36,7 @@ public:
         CHUNK_ANI_BATCH             = 0xF560,
         CHUNK_ANI_COMB              = 0xF570,
         CHUNK_ANI_DISABLE           = 0xF580,
-        CHUNK_MODE_LTAG             = 0xF590,
+        CHUNK_MODEL_TAG             = 0xF590,
         CHUNK_ANI_EVENTS            = 0xF5A0,
         CHUNK_ANI_EVENTS_END        = 0xF5AF,
         CHUNK_EVENT_SFX             = 0xF5A1,
@@ -190,6 +190,8 @@ private:
     EChunkType                      parseModelChunk();
 
     bool                            parseAniEnumStart();
+
+    Result                          parseModelTag();
 
     EChunkType                      parseAniEnumChunk();
 
