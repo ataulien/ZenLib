@@ -193,6 +193,10 @@ private:
 
     Result                          parseModelTag();
 
+    Result                          parseAniDisable();
+
+    Result                          parseAniComb();
+
     EChunkType                      parseAniEnumChunk();
 
     Result                          parseAni();
@@ -204,6 +208,10 @@ private:
     Result                          parseAniEvents();
 
     Result                          parseTagEvent();
+
+    Result                          parseMMStartAniEvent();
+
+    Result                          parseCamTremorEvent();
 
     Result                          parseSfxEvent();
 
