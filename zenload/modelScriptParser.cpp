@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include <utils/logger.h>
+#include <algorithm>
 
 #include "modelScriptParser.h"
 #include "zenParser.h"
@@ -171,7 +172,7 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
 
                 ch = m_Zen.readBinaryByte();
                 if (ch == '"')
-                    break;
+                    return Success; // Need to return early here, because emtpy strings ( "" ) happen, which should not be seen as empty lines
 
                 if (ch == '\n')
                     m_Line++;
@@ -182,7 +183,8 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
             continue;
 
         } else
-        if (ch == '/' && (m_Zen.getSeek() < m_Zen.getFileSize() - 1) && (m_Zen.getData()[m_Zen.getSeek()] == '/'))
+        if (ch == '/'
+            && (!m_Strict || (m_Zen.getSeek() < m_Zen.getFileSize() - 1) && (m_Zen.getData()[m_Zen.getSeek()] == '/'))) // Single / were supported by the original parser as well
         {
             while (m_Zen.readBinaryByte() != '\n')
             {
@@ -190,6 +192,7 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
                     return End;
             }
 
+            m_Line++;
             skipSpace(); // Skip any empty lines after the comment
             continue; // Don't want comments inside the tokens
         } else
@@ -206,11 +209,6 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
                 m_Zen.setSeek(m_Zen.getSeek() - 1);
             }
             break;
-        }else if(ch == '\n')
-        {
-            // Skip completely empty lines
-            m_Line++;
-            continue;
         }
 
         m_NextToken.text.push_back(toupper(ch));
@@ -274,6 +272,11 @@ ModelScriptBinParser::EChunkType ModelScriptTextParser::parse()
     if (isEof())
         return CHUNK_EOF;
 
+    // token is consumed by the functions below
+    Result res = token();
+    if (res != Success)
+        return CHUNK_ERROR;
+
     if (!m_Token.text.empty() && m_Token.text[0] == '}')
     {
         // skip '}'
@@ -290,11 +293,6 @@ ModelScriptBinParser::EChunkType ModelScriptTextParser::parse()
 
         return parse();
     }
-
-    // token is consumed by the functions below
-    Result res = token();
-    if (res != Success)
-        return CHUNK_ERROR;
 
     switch (m_Context.back())
     {
@@ -321,6 +319,7 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseArguments()
     if (res != Success)
         return res;
 
+    m_Args.clear();
     m_ArgCount = 0;
     while (true)
     {
@@ -453,6 +452,14 @@ ModelScriptTextParser::EChunkType ModelScriptTextParser::parseAniEnumChunk()
     if(m_Token.text == "MODELTAG")
     {
         return (parseModelTag() != Success) ? CHUNK_ERROR : CHUNK_MODEL_TAG;
+    } else
+    if(m_Token.text == "ANIDISABLE")
+    {
+        return (parseAniDisable() != Success) ? CHUNK_ERROR : CHUNK_MODEL_TAG;
+    } else
+    if(m_Token.text == "ANICOMB")
+    {
+        return (parseAniComb() != Success) ? CHUNK_ERROR : CHUNK_MODEL_TAG;
     }
 
     LogError() << "invalid token '" << m_Token.text << "' in aniEnum at line " << m_Line;
@@ -470,6 +477,10 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseAniEvents()
 
     while (true)
     {
+        // Need to check this first, to fix parsing of empty { } blocks
+        if (nextIs('}'))
+            break;
+
         res = token();
         if (res != Success)
             break;
@@ -513,13 +524,26 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseAniEvents()
                 break;
 
         } else
+        if (m_Token.text == "*EVENTMMSTARTANI")
+        {
+            res = parseMMStartAniEvent();
+            if (res != Success)
+                break;
+
+        } else
+        if (m_Token.text == "*EVENTCAMTREMOR")
+        {
+            res = parseCamTremorEvent();
+            if (res != Success)
+                break;
+
+        } else
         {
             LogError() << "invalid token '" << m_Token.text << "' in ani at line " << m_Line;
             return Error;
         }
 
-        if (nextIs('}'))
-            break;
+
     }
 
     return parseObjectEnd();
@@ -531,15 +555,21 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseAni()
     if (res != Success)
         return Error;
 
-    if (m_ArgCount != 10)
+    // Most of the ani-chunks have 10 args, but they can have an additional one for FPS and some have only 8, omitting start and end-frame
+    if (m_ArgCount < 8)
     {
         LogError() << "invalid number of arguments for ani at line " << m_Line;
         return Error;
     }
 
     m_Ani.m_Name = m_Args[0];
+
+    std::transform(m_Ani.m_Name.begin(), m_Ani.m_Name.end(), m_Ani.m_Name.begin(), ::toupper);
+
     /*m_Ani.m_Layer = m_Args[1];*/
     m_Ani.m_Next = m_Args[2];
+    std::transform(m_Ani.m_Next.begin(), m_Ani.m_Next.end(), m_Ani.m_Next.begin(), ::toupper);
+
     /*m_Ani.m_BlendIn = m_Args[3];*/
     /*m_Ani.m_BlendOut = m_Args[4];*/
     /*m_Ani.m_Flags = m_Args[5];*/
@@ -547,6 +577,7 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseAni()
     /*m_Ani.m_Dir = m_Args[7];*/
     /*m_Ani.mStartFrame = m_Args[8];*/
     /*m_Ani.mEndFrame = m_Args[9];*/
+    // TODO: Read FPS
 
     return parseAniEvents();
 }
@@ -635,6 +666,17 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseTagEvent()
     return Success;
 }
 
+ModelScriptTextParser::Result ModelScriptTextParser::parseMMStartAniEvent()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return Success;
+}
+
 ModelScriptTextParser::Result ModelScriptTextParser::parseModelTag()
 {
     Result res = parseArguments();
@@ -645,5 +687,39 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseModelTag()
 
     return Success;
 }
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseAniDisable()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return Success;
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseAniComb()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return parseAniEvents();
+}
+
+ModelScriptTextParser::Result ModelScriptTextParser::parseCamTremorEvent()
+{
+    Result res = parseArguments();
+    if (res != Success)
+        return Error;
+
+    // TODO: assign
+
+    return Success;
+}
+
 
 } // namespace ZenLoad
