@@ -570,11 +570,49 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseAni()
     m_Ani.m_Next = m_Args[2];
     std::transform(m_Ani.m_Next.begin(), m_Ani.m_Next.end(), m_Ani.m_Next.begin(), ::toupper);
 
+    std::string& flags = m_Args[5];
+
+    m_Ani.m_Flags = 0;
+    for(size_t i=0;i<flags.size();i++)
+    {
+        switch(flags[i])
+        {
+            case 'M':
+                m_Ani.m_Flags |= EModelScriptAniFlags::MSB_MOVE_MODEL;
+                break;
+
+            case 'R':
+                m_Ani.m_Flags |= EModelScriptAniFlags::MSB_ROTATE_MODEL;
+                break;
+
+            case 'E':
+                m_Ani.m_Flags |= EModelScriptAniFlags::MSB_QUEUE_ANI;
+                break;
+
+            case 'F':
+                m_Ani.m_Flags |= EModelScriptAniFlags::MSB_FLY;
+                break;
+
+            case 'I':
+                m_Ani.m_Flags |= EModelScriptAniFlags::MSB_IDLE;
+                break;
+
+            case '.':
+                // This is used as a placeholder
+                break;
+
+            default:
+                LogWarn() << "Anim: Unknown animation-flag: " << flags[i];
+        }
+    }
+
+    m_Ani.m_Dir = m_Args[7] != "R" ? EModelScriptAniDir::MSB_FORWARD : EModelScriptAniDir::MSB_BACKWARD;
+
     /*m_Ani.m_BlendIn = m_Args[3];*/
     /*m_Ani.m_BlendOut = m_Args[4];*/
     /*m_Ani.m_Flags = m_Args[5];*/
     /*m_Ani.m_Asc = m_Args[6];*/
-    /*m_Ani.m_Dir = m_Args[7];*/
+    /**/
     /*m_Ani.mStartFrame = m_Args[8];*/
     /*m_Ani.mEndFrame = m_Args[9];*/
     // TODO: Read FPS
