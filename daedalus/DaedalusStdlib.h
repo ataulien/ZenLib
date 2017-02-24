@@ -549,9 +549,12 @@ namespace Daedalus
 
         struct C_Info : Instance
         {
-            // important is optional in scripts, so we must to set a default value
+            // important, permanent and nr are optional in scripts, so we must to set a default value
             C_Info() :
-                important(0)
+                nr(0),
+                important(0),
+                condition(0),
+                permanent(0)
             {}
             int32_t npc;
             int32_t nr;
