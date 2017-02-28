@@ -20,15 +20,15 @@ void Daedalus::registerDaedalusStdLib(Daedalus::DaedalusVM& vm, bool enableVerbo
     });
 
     vm.registerExternalFunction("floattoint", [l](Daedalus::DaedalusVM& vm){
-        float x = *reinterpret_cast<float*>(vm.popDataValue());
-        vm.setReturn(static_cast<int32_t>(x));
+        int32_t x = vm.popDataValue();
+        float f = reinterpret_cast<float&>(x);
+        vm.setReturn(static_cast<int32_t>(f));
     });
 
     vm.registerExternalFunction("inttofloat", [l](Daedalus::DaedalusVM& vm){
         int32_t x = vm.popDataValue();
-        float y = static_cast<float>(x);
-
-        vm.setReturn(*reinterpret_cast<int32_t*>(&y));
+        float f = static_cast<float>(x);
+        vm.setReturn(reinterpret_cast<int32_t&>(f));
     });
 
     vm.registerExternalFunction("concatstrings", [l](Daedalus::DaedalusVM& vm){
