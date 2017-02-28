@@ -24,14 +24,6 @@ namespace Daedalus
             DaedalusDialogManager(Daedalus::DaedalusVM &vm, const std::string &ou_bin);
 
             /**
-			 * Registers the externals used for dialog-processing
-			 * @param onAIOutput Callback in case an NPC is saying something (self, target, message)
-			 */
-            void registerExternals(
-                    std::function<void(NpcHandle, NpcHandle, const ZenLoad::oCMsgConversationData &)> onAIOutput,
-                    std::function<void(NpcHandle, std::vector<InfoHandle>)> onStartConversation);
-
-            /**
 			 * Sets the given info-instance as "known" to the given NPC-Instance
 			 */
             void setNpcInfoKnown(size_t npcInstance, size_t infoInstance);
@@ -45,15 +37,20 @@ namespace Daedalus
             bool doesNpcKnowInfo(size_t npcInstance, size_t infoInstance);
 
             /**
-             * Calls AI_ProcessInfos for the given NPC
+             * get vector of InfoHandles for this npc
              * @param npc NPC to process infos for
              */
-            void processInfosFor(NpcHandle npc);
+            std::vector<InfoHandle> getInfos(NpcHandle npc);
 
             /**
              * @return Map of NPC-Symbols -> All info they know
              */
             const std::map<size_t, std::set<size_t>>& getKnownNPCInformation(){ return m_KnownNpcInfoSymbolsByNpcSymbols; };
+
+            /**
+             * @return MessageLib
+             */
+            ZenLoad::zCCSLib& getMessageLib() { return m_MessageLib; }
         private:
 
             /**
@@ -65,12 +62,6 @@ namespace Daedalus
 			 * Message library
 			 */
             ZenLoad::zCCSLib m_MessageLib;
-
-            /**
-			 * Callback in case an NPC is saying something (self, target, message)
-			 */
-            std::function<void(NpcHandle, NpcHandle, const ZenLoad::oCMsgConversationData &)> m_OnAIOutput;
-			std::function<void(NpcHandle, std::vector<InfoHandle>)> m_OnStartConversation;
 
             /**
 			 * Current daedalus VM
