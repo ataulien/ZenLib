@@ -48,7 +48,6 @@ namespace Daedalus
                 LT_Note = 1
             };
 
-            std::string topic;
             std::vector<std::string> entries;
 
             ELogStatus status;
@@ -204,7 +203,7 @@ namespace Daedalus
             RegisteredObjects &getRegisteredObjects()
             { return m_RegisteredObjects; }
 
-            const std::map<std::string, LogTopic>& getPlayerLog()
+            std::map<std::string, LogTopic>& getPlayerLog()
             { return m_PlayerLog; };
 
             const std::list<ItemHandle>& getInventoryOf(NpcHandle npc)

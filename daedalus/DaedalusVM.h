@@ -13,7 +13,7 @@ namespace Daedalus
     class DaedalusVM
     {
     public:
-        DaedalusVM(const std::string& file, const std::string& main="main");
+        DaedalusVM(const std::string& file, const std::string& main="main", bool registerZenLibExternals=false);
 
         /**
          * @brief Performs a single instruction on the stack

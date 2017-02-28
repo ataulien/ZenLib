@@ -16,7 +16,7 @@ const int NUM_FAKE_STRING_SYMBOLS = 5;
 using namespace ZenLoad;
 using namespace Daedalus;
 
-DaedalusVM::DaedalusVM(const std::string& file, const std::string& main)
+DaedalusVM::DaedalusVM(const std::string& file, const std::string& main, bool registerZenLibExternals)
     : m_GameState(*this)
 {
     m_PC = 0;
@@ -35,7 +35,9 @@ DaedalusVM::DaedalusVM(const std::string& file, const std::string& main)
     for(size_t i=0;i<NUM_FAKE_STRING_SYMBOLS;i++)
         m_FakeStringSymbols.push(m_DATFile.addSymbol());
 
-    m_GameState.registerExternals();
+    // REGoth: don't register ZenLib externals
+    if (registerZenLibExternals)
+        m_GameState.registerExternals();
 
     m_CurrentInstanceHandle.invalidate();
 }

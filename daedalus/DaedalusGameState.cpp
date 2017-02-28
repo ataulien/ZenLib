@@ -105,7 +105,6 @@ void DaedalusGameState::registerExternals()
         int32_t section = vm.popDataValue();
         std::string name = vm.popString();
         m_PlayerLog[name].section = static_cast<LogTopic::ESection>(section);
-        m_PlayerLog[name].topic = name;
 
         if(m_GameExternals.log_createtopic)
             m_GameExternals.log_createtopic(name);
