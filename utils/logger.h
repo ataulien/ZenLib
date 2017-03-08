@@ -17,6 +17,10 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
+// HACK: Work around windows.h messing this up with its define
+#ifdef DialogBox
+#undef DialogBox
+#endif
 #endif
 
 #if defined(__ANDROID__)
