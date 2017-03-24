@@ -520,7 +520,7 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     instData->instanceSymbol = symIdx;
 
     // Empty retstack, so we can stop execution after this call
-    std::stack<size_t> backUpRetStack = m_RetStack; // (std::move(m_RetStack));
+    std::stack<size_t> backUpRetStack = std::move(m_RetStack);
     m_RetStack = std::stack<size_t>();
 
     // Point the PC to the instance-constructor
@@ -537,7 +537,7 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 
     // Return to old location and continue like nothing ever happened
     m_PC = pc;
-    m_RetStack = backUpRetStack; //std::move(backUpRetStack);
+    m_RetStack = std::move(backUpRetStack);
 
     // Reset state
     //m_DATFile.getSymbolByName("SELF").instanceDataHandle = oldSelfInstance;
