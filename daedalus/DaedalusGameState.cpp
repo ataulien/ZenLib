@@ -194,8 +194,11 @@ NpcHandle DaedalusGameState::createNPC()
 ItemHandle DaedalusGameState::createItem()
 {
     auto h = m_RegisteredObjects.items.createObject();
+    auto& cItem = getItem(h);
 
-    getItem(h).userPtr = nullptr;
+    // overwrite data with default C_Item
+    // TODO: Fix also createNPC, createItemReact, ...
+    cItem = GEngineClasses::C_Item();
 
     if(m_OnInstanceCreated)
         m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Item);
@@ -319,8 +322,13 @@ ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle n
 
     item.count[0] = count;
 
+    assert(item.description == "");
     // Run the script-constructor
     m_VM.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(itemSymbol), IC_Item);
+
+    // use name for description if initialization is missing
+    if (item.description == "")
+        item.description = item.name;
 
     // Put inside its inventory
     addItemToInventory(h, npc);
