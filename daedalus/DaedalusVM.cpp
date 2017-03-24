@@ -327,7 +327,6 @@ PARStackOpCode DaedalusVM::getCurrentInstruction()
 
 void DaedalusVM::doCallOperation(uint32_t target)
 {
-    m_RetStack.push(m_PC);
     m_PC = target;
     m_CallStack.push_back(target);
 }
@@ -494,7 +493,6 @@ void DaedalusVM::setInstance(const std::string& instSymbol, ZMemory::BigHandle h
 
 void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, EInstanceClass classIdx)
 {
-    auto retStackSizeBefore = m_RetStack.size();
     pushState();
 
     if(symIdx == m_DATFile.getSymbolIndexByName("GRD_282_NEK"))
@@ -519,10 +517,6 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     GEngineClasses::Instance* instData = m_GameState.getByClass(instance, classIdx);
     instData->instanceSymbol = symIdx;
 
-    // Empty retstack, so we can stop execution after this call
-    std::stack<size_t> backUpRetStack = std::move(m_RetStack);
-    m_RetStack = std::stack<size_t>();
-
     // Point the PC to the instance-constructor
     doCallOperation(s.address);
 
@@ -537,7 +531,6 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 
     // Return to old location and continue like nothing ever happened
     m_PC = pc;
-    m_RetStack = std::move(backUpRetStack);
 
     // Reset state
     //m_DATFile.getSymbolByName("SELF").instanceDataHandle = oldSelfInstance;
@@ -546,9 +539,6 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     m_CurrentInstanceClass = currentInstanceClass;
 
     popState();
-
-    // make sure that the return stack was saved and restored correctly
-    assert(m_RetStack.size() == retStackSizeBefore);
 }
 
 void DaedalusVM::setCurrentInstance(size_t symIdx)
@@ -565,18 +555,16 @@ void* DaedalusVM::getCurrentInstanceDataPtr()
 
 void DaedalusVM::pushState()
 {
-	return;
+    return;
     VMState s;
     s.m_CurrentInstanceClass = m_CurrentInstanceClass;
     s.m_CurrentInstanceHandle = m_CurrentInstanceHandle;
     s.m_PC = m_PC;
-    s.m_RetStack = m_RetStack;
     s.m_Stack = m_Stack;
     s.m_Self = m_DATFile.getSymbolByName("self");
     s.m_CallStack = m_CallStack;
 
     m_PC = 0;
-    m_RetStack = std::stack<size_t>();
     m_Stack = std::stack<uint32_t>();
     m_CurrentInstanceHandle.invalidate();
     m_CallStack.clear();
@@ -586,9 +574,8 @@ void DaedalusVM::pushState()
 
 void DaedalusVM::popState()
 {
-	return; 
+    return;
     m_PC = m_StateStack.top().m_PC;
-    m_RetStack = m_StateStack.top().m_RetStack;
     m_Stack = m_StateStack.top().m_Stack;
     m_CallStack = m_StateStack.top().m_CallStack;
 

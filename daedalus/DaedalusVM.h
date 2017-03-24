@@ -158,7 +158,6 @@ namespace Daedalus
         size_t m_PC;
 
         std::stack<uint32_t> m_Stack;
-        std::stack<size_t> m_RetStack;
         std::vector<size_t> m_CallStack; // Debugging only
 
         /**
@@ -195,7 +194,6 @@ namespace Daedalus
             size_t m_PC;
 
             std::stack<uint32_t> m_Stack;
-            std::stack<size_t> m_RetStack;
             std::vector<size_t> m_CallStack;
 
             PARSymbol m_Self;
