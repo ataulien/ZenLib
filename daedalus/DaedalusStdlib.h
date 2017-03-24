@@ -523,6 +523,17 @@ namespace Daedalus
             std::string description;
             std::string text[ITM_TEXT_MAX];
             int32_t count[ITM_TEXT_MAX];
+
+            std::string& getInventoryName()
+            {
+                if (description != "")
+                {
+                    return description;
+                } else
+                {
+                    return name;
+                }
+            }
         };
 
         struct C_Focus : Instance
