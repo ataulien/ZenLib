@@ -494,6 +494,7 @@ void DaedalusVM::setInstance(const std::string& instSymbol, ZMemory::BigHandle h
 
 void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, EInstanceClass classIdx)
 {
+    auto retStackSizeBefore = m_RetStack.size();
     pushState();
 
     if(symIdx == m_DATFile.getSymbolIndexByName("GRD_282_NEK"))
@@ -518,12 +519,13 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     GEngineClasses::Instance* instData = m_GameState.getByClass(instance, classIdx);
     instData->instanceSymbol = symIdx;
 
+    // Empty retstack, so we can stop execution after this call
+    std::stack<size_t> backUpRetStack = m_RetStack; // (std::move(m_RetStack));
+    m_RetStack = std::stack<size_t>();
+
     // Point the PC to the instance-constructor
     doCallOperation(s.address);
 
-    // Empty retstack, so we can stop execution after this call
-    std::stack<size_t> retStack = m_RetStack;
-    m_RetStack = std::stack<size_t>();
     size_t pc = m_PC;
 
     m_CallStack.clear();
@@ -531,13 +533,11 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     // Run script code to initialize the object
     while(doStack());
 
-	// Reset to old "self"
-	m_DATFile.getSymbolByName("self") = selfCpy;
+    m_DATFile.getSymbolByName("self") = selfCpy;
 
     // Return to old location and continue like nothing ever happened
     m_PC = pc;
-    m_RetStack = retStack;
-
+    m_RetStack = backUpRetStack; //std::move(backUpRetStack);
 
     // Reset state
     //m_DATFile.getSymbolByName("SELF").instanceDataHandle = oldSelfInstance;
@@ -546,6 +546,9 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     m_CurrentInstanceClass = currentInstanceClass;
 
     popState();
+
+    // make sure that the return stack was saved and restored correctly
+    assert(m_RetStack.size() == retStackSizeBefore);
 }
 
 void DaedalusVM::setCurrentInstance(size_t symIdx)
