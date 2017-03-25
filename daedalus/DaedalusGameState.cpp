@@ -308,7 +308,7 @@ ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle n
         // Just add to the count here
         if(item.instanceSymbol == itemSymbol)
         {
-            item.count[0] += count;
+            item.amount += count;
             return h;
         }
     }
@@ -320,7 +320,7 @@ ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle n
     ItemHandle h = createItem();
     GEngineClasses::C_Item& item = getItem(h);
 
-    item.count[0] = count;
+    item.amount = count;
 
     // Run the script-constructor
     m_VM.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(itemSymbol), IC_Item);
@@ -343,7 +343,7 @@ ItemHandle DaedalusGameState::addItemToInventory(ItemHandle item, NpcHandle npc)
         // Just add to the count here
         if(i.instanceSymbol == getItem(item).instanceSymbol)
         {
-            i.count[0]++;
+            i.amount++;
             return h;
         }
     }
@@ -366,10 +366,10 @@ bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc, un
 
         if(item.instanceSymbol == itemSymbol)
         {
-            item.count[0] -= std::min(item.count[0], (int32_t)count); // Handle overflow;
+            item.amount -= std::min(item.amount, count); // Handle overflow;
 
             // Remove if count reached 0
-            if(item.count[0] == 0)
+            if(item.amount == 0)
             {
                 removeItem(*it);
 

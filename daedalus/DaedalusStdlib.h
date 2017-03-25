@@ -460,6 +460,7 @@ namespace Daedalus
                 spell = 0;
                 range = 0;
                 mag_circle = 0;
+                amount = 0;
             }
 
             // Für alle Items
@@ -523,6 +524,9 @@ namespace Daedalus
             std::string description;
             std::string text[ITM_TEXT_MAX];
             int32_t count[ITM_TEXT_MAX];
+
+            // REGoth member, number of items
+            uint32_t amount;
 
             std::string& getInventoryName()
             {
