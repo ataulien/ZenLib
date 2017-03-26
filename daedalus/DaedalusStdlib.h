@@ -527,17 +527,6 @@ namespace Daedalus
 
             // REGoth member, number of items
             uint32_t amount;
-
-            std::string& getInventoryName()
-            {
-                if (description != "")
-                {
-                    return description;
-                } else
-                {
-                    return name;
-                }
-            }
         };
 
         struct C_Focus : Instance
