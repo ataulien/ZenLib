@@ -1,8 +1,9 @@
 #pragma once
-#include <stdint.h>
-#include <stdlib.h>
+#include <cstdint>
+#include <cstdlib>
 #include <string>
-#include <string.h>
+#include <cstring>
+#include <vector>
 
 namespace Daedalus
 {
@@ -551,6 +552,11 @@ namespace Daedalus
             int32_t mob_prio;        //	Priorität
         };
 
+        struct SubChoice{
+            std::string text;
+            uint32_t functionSym;
+        };
+
         struct C_Info : Instance
         {
             // important, permanent and nr are optional in scripts, so we must to set a default value
@@ -568,6 +574,15 @@ namespace Daedalus
             std::string description;
             int32_t trade;
             int32_t permanent;
+            std::vector<SubChoice> subChoices;
+            void addChoice(const SubChoice& subChoice)
+            {
+                subChoices.insert(subChoices.begin(), subChoice);
+            }
+            void removeChoice(std::size_t index)
+            {
+                subChoices.erase(subChoices.begin() + index);
+            }
         };
 
         struct C_ItemReact : Instance
