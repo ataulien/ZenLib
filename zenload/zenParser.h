@@ -200,7 +200,7 @@ namespace ZenLoad
 		template<typename T>
 		void readStructure(T& s) 
 		{
-            if (ssize_t(m_Seek) <= ssize_t(m_Data.size()) - ssize_t(sizeof(T)))
+            if (m_Seek + sizeof(T) <= m_Data.size())
             {
                 void* _s = (void*)&s;
                 memcpy(_s, &m_Data[m_Seek], sizeof(T));
