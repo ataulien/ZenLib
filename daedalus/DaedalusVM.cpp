@@ -495,9 +495,6 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 {
     pushState();
 
-    if(symIdx == m_DATFile.getSymbolIndexByName("GRD_282_NEK"))
-        LogInfo() << "Nek!";
-
     PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
 
     // Enter address into instance-symbol
