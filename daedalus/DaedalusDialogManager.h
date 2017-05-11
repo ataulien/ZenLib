@@ -71,7 +71,7 @@ namespace Daedalus
             /**
 			 * Map of NPC-Sym-Handles and their C_Infos
 			 */
-            std::map<size_t, std::vector<InfoHandle>> m_NpcInfosByNpcSymbols;
+            std::vector<InfoHandle> m_NpcInfos;
             std::map<size_t, std::set<size_t>> m_KnownNpcInfoSymbolsByNpcSymbols;
         };
     }

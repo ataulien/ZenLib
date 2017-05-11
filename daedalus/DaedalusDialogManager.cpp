@@ -24,15 +24,12 @@ void DaedalusDialogManager::gatherNpcInformation()
         Daedalus::GEngineClasses::C_Info& info = m_VM.getGameState().getInfo(h);
         m_VM.initializeInstance(ZMemory::toBigHandle(h), i, Daedalus::IC_Info);
 
-        // Add to map
-        m_NpcInfosByNpcSymbols[info.npc].push_back(h);
+        // Add to vector
+        m_NpcInfos.push_back(h);
     });
 
     // Messages are in wrong order. Fix this.
-    for(auto& v : m_NpcInfosByNpcSymbols)
-    {
-        std::reverse(v.second.begin(),v.second.end());
-    }
+    std::reverse(m_NpcInfos.begin(), m_NpcInfos.end());
 }
 
 void DaedalusDialogManager::setNpcInfoKnown(size_t npcInstance, size_t infoInstance)
@@ -44,7 +41,14 @@ void DaedalusDialogManager::setNpcInfoKnown(size_t npcInstance, size_t infoInsta
 std::vector<InfoHandle> DaedalusDialogManager::getInfos(NpcHandle hnpc)
 {
     Daedalus::GEngineClasses::C_Npc& npc = m_VM.getGameState().getNpc(hnpc);
-    return m_NpcInfosByNpcSymbols[npc.instanceSymbol];
+    std::vector<InfoHandle> result;
+    for (auto& infoHandle : m_NpcInfos){
+        Daedalus::GEngineClasses::C_Info& info = m_VM.getGameState().getInfo(infoHandle);
+        if (info.npc == npc.instanceSymbol) {
+            result.push_back(infoHandle);
+        }
+    }
+    return result;
 }
 
 bool DaedalusDialogManager::doesNpcKnowInfo(size_t npcInstance, size_t infoInstance)

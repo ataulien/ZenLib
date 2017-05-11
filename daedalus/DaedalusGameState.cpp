@@ -231,7 +231,10 @@ MissionHandle DaedalusGameState::createMission()
 InfoHandle DaedalusGameState::createInfo()
 {
     auto h = m_RegisteredObjects.infos.createObject();
-    getInfo(h).userPtr = nullptr;
+    auto& cInfo = getInfo(h);
+
+    // overwrite data with default C_Info
+    cInfo = GEngineClasses::C_Info();
 
     if(m_OnInstanceCreated)
         m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Info);

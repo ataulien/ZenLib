@@ -564,7 +564,8 @@ namespace Daedalus
                 nr(0),
                 important(0),
                 condition(0),
-                permanent(0)
+                permanent(0),
+                npc(0)
             {}
             int32_t npc;
             int32_t nr;
