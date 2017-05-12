@@ -99,7 +99,7 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER("C_Npc", npc, spawnDelay);
         REGISTER("C_Npc", npc, senses);
         REGISTER("C_Npc", npc, senses_range);
-        REGISTER("C_Npc", npc, ai);
+        REGISTER("C_Npc", npc, aivar);
         REGISTER("C_Npc", npc, wp);
         REGISTER("C_Npc", npc, exp);
         REGISTER("C_Npc", npc, exp_next);

@@ -327,7 +327,7 @@ namespace Daedalus
 				spawnDelay = 0;
 				senses = 0;
 				senses_range = 0;
-				memset(ai, 0, sizeof(ai));
+				memset(aivar, 0, sizeof(aivar));
 				exp = 0;
 				exp_next = 0;
 				lp = 0;
@@ -368,7 +368,7 @@ namespace Daedalus
             // **********************
             // Feel free to use
             // **********************
-            int32_t ai[50];
+            int32_t aivar[50];
             std::string wp;
 
             // **********************
