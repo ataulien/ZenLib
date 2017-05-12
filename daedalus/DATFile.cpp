@@ -66,6 +66,13 @@ DATFile::DATFile(const std::string& file, bool verbose) :
         m_Parser(file),
         m_Verbose(verbose)
 {
+    /*
+    std::string end = "GOTHIC.DAT";
+    //end = "PARTICLEFX.DAT";
+    auto pos = file.size() - end.size();
+    bool endsWith = end.size() <= file.size() && file.find(end, pos) != std::string::npos;
+    m_Verbose = endsWith;
+     */
     parseFile();
 }
 
@@ -111,8 +118,11 @@ void DATFile::readSymTable()
 
         m_Parser.readBinaryRaw(&s.properties, sizeof(s.properties));
 
-        if(m_Verbose) LogInfo() << "Properties: " << "Count: " << s.properties.elemProps.count
-                                                  << " Type: " << s.properties.elemProps.type;
+        if(m_Verbose)
+        {
+            auto typeName = eParTypeToString(EParType(s.properties.elemProps.type));
+            LogInfo() << "Properties: " << typeName << "[" <<  s.properties.elemProps.count << "]";
+        }
 
         if(0 == (s.properties.elemProps.flags & EParFlag_ClassVar))
         {

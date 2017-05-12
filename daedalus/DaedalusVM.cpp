@@ -33,7 +33,12 @@ DaedalusVM::DaedalusVM(const std::string& file, const std::string& main, bool re
 
     // Make fake-strings
     for(size_t i=0;i<NUM_FAKE_STRING_SYMBOLS;i++)
-        m_FakeStringSymbols.push(m_DATFile.addSymbol());
+    {
+        auto symIndex = m_DATFile.addSymbol();
+        // make sure there is enough space for 1 string
+        m_DATFile.getSymbolByIndex(symIndex).strData.resize(1);
+        m_FakeStringSymbols.push(symIndex);
+    }
 
     // REGoth: don't register ZenLib externals
     if (registerZenLibExternals)
@@ -95,15 +100,15 @@ bool DaedalusVM::doStack(bool verbose)
 
             break;
         case EParOp_LogOr:
-            // Note: This can't be done in one line because || wouldn't pop the second piece of the stack
-            // if the first was 1
+            // Note: This can't be done in one line because the second pop might not be executed,
+            // due to c++'s short-circuit evaluation
             a = popDataValue();
             b = popDataValue();
             pushInt(a || b ? 1 : 0);
             break;
         case EParOp_LogAnd:
-            // Note: This can't be done in one line because || wouldn't pop the second piece of the stack
-            // if the first was 1
+            // Note: This can't be done in one line because the second pop might not be executed,
+            // due to c++'s short-circuit evaluation
             a = popDataValue();
             b = popDataValue();
             pushInt(a && b ? 1 : 0);
@@ -474,8 +479,7 @@ void DaedalusVM::pushVar(const std::string& symName)
 void DaedalusVM::pushString(const std::string& str)
 {
     size_t symIdx = m_FakeStringSymbols.front();
-
-        Daedalus::PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
+    Daedalus::PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
     m_FakeStringSymbols.push(m_FakeStringSymbols.front());
     m_FakeStringSymbols.pop();
 
