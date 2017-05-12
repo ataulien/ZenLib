@@ -197,7 +197,8 @@ namespace Daedalus
 			if(baseAddr && dataOffset != -1)
 				return reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(int32_t) * idx));
 
-			if(intData.size() <= idx) {
+			if(intData.size() <= idx)
+            {
 				warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
 				intData.resize(idx+1);
 			}
@@ -209,7 +210,8 @@ namespace Daedalus
 			if(baseAddr && dataOffset != -1)
 				return reinterpret_cast<std::string*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(std::string) * idx));
 
-			if(strData.size() <= idx) {
+			if(strData.size() <= idx)
+            {
 				warnIndexOutOfBounds(idx, strData.size(), EParType_String);
 				strData.resize(idx+1);
 			}
@@ -221,7 +223,8 @@ namespace Daedalus
 			if(baseAddr && dataOffset != -1)
 				return *reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(int32_t) * idx));
 
-			if(intData.size() <= idx) {
+			if(intData.size() <= idx)
+            {
 				warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
 				intData.resize(idx+1);
 			}
@@ -233,25 +236,31 @@ namespace Daedalus
 			switch(properties.elemProps.type)
 			{
 				case EParType_Int:
-					if(intData.size() <= idx) {
+					if(baseAddr && dataOffset != -1)
+					{
+						*reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(int32_t) * idx)) = v;
+						break;
+					}
+					if(intData.size() <= idx)
+                    {
 						warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
 						intData.resize(idx+1);
 					}
 					intData[idx] = v;
-
-					if(baseAddr && dataOffset != -1)
-						*reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(int32_t) * idx)) = v;
 					break;
 
 				case EParType_Float:
-					if(floatData.size() <= idx) {
+					if(baseAddr && dataOffset != -1){
+						*reinterpret_cast<float*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(float) * idx)) = *reinterpret_cast<float*>(&v);
+						break;
+					}
+					if(floatData.size() <= idx)
+                    {
 						warnIndexOutOfBounds(idx, floatData.size(), EParType_Float);
 						floatData.resize(idx+1);
 					}
 					floatData[idx] = *reinterpret_cast<float*>(&v);
 
-					if(baseAddr && dataOffset != -1)
-						*reinterpret_cast<float*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(float) * idx)) = *reinterpret_cast<float*>(&v);
 					break;
 
 				case EParType_Func:
@@ -265,11 +274,18 @@ namespace Daedalus
 
 		void set(const std::string& v, size_t idx=0, void* baseAddr=nullptr)
 		{
-			if(strData.size() <= idx) strData.resize(idx+1);
-			strData[idx] = v;
-
 			if(baseAddr && dataOffset != -1)
-				*reinterpret_cast<std::string*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(float) * idx)) = v;
+			{
+				*reinterpret_cast<std::string*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(std::string) * idx)) = v;
+				return;
+			}
+
+			if(strData.size() <= idx)
+            {
+                warnIndexOutOfBounds(idx, strData.size(), EParType_String);
+                strData.resize(idx+1);
+            }
+			strData[idx] = v;
 		}
 
 		bool isDataSame(const PARSymbol& other) const
