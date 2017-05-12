@@ -284,11 +284,39 @@ void DATFile::readStack()
     }
 }
 
+std::string Daedalus::eParTypeToString(EParType type)
+{
+    switch (type)
+    {
+        case EParType_Void:
+            return "void";
+        case EParType_Float:
+            return "float";
+        case EParType_Int:
+            return "int";
+        case EParType_String:
+            return "string";
+        case EParType_Class:
+            return "class";
+        case EParType_Func:
+            return "func";
+        case EParType_Prototype:
+            return "prototype";
+        case EParType_Instance:
+            return "instance";
+        default:
+            return "unknown_type";
+    }
+}
+
 PARSymbol& DATFile::getSymbolByName(const std::string& symName)
 {
     std::string n = std::string(symName);
     std::transform(n.begin(), n.end(), n.begin(), ::toupper);
-
+    //assert(hasSymbolName(n));
+    if (!hasSymbolName(n)){
+        LogWarn() << "symbol " << symName << " not found";
+    }
     return m_SymTable.symbols[m_SymTable.symbolsByName[n]];
 }
 

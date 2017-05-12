@@ -4,6 +4,7 @@
 #include <map>
 #include <zenload/zenParser.h>
 #include <utils/staticReferencedAllocator.h>
+#include <utils/logger.h>
 
 namespace Daedalus
 {
@@ -112,6 +113,8 @@ namespace Daedalus
     	EParOp_PushArrayVar    = 245   // EParOp_PushVar + EParOp_Array
     };
 
+	std::string eParTypeToString(EParType type);
+
     struct PARSymbol
     {
 		PARSymbol()
@@ -184,12 +187,20 @@ namespace Daedalus
 
         uint32_t parent; // 0xFFFFFFFF (-1) = none
 
+		void warnIndexOutOfBounds(size_t index, size_t size, EParType arrayType){
+			std::string typeName = eParTypeToString(arrayType);
+			LogWarn() << "index out of range for: " << typeName << " " << name << "[" << size << "], index = " << index;
+		}
+
 		int32_t* getIntAddr(size_t idx = 0, void* baseAddr=nullptr)
 		{
 			if(baseAddr && dataOffset != -1)
 				return reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(int32_t) * idx));
 
-			if(intData.size() <= idx) intData.resize(idx+1);
+			if(intData.size() <= idx) {
+				warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
+				intData.resize(idx+1);
+			}
 			return &intData[idx];
 		}
 
@@ -198,7 +209,10 @@ namespace Daedalus
 			if(baseAddr && dataOffset != -1)
 				return reinterpret_cast<std::string*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(std::string) * idx));
 
-			if(strData.size() <= idx) strData.resize(idx+1);
+			if(strData.size() <= idx) {
+				warnIndexOutOfBounds(idx, strData.size(), EParType_String);
+				strData.resize(idx+1);
+			}
 			return &strData[idx];
 		}
 
@@ -207,7 +221,10 @@ namespace Daedalus
 			if(baseAddr && dataOffset != -1)
 				return *reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + dataOffset + (sizeof(int32_t) * idx));
 
-			if(intData.size() <= idx) intData.resize(idx+1);
+			if(intData.size() <= idx) {
+				warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
+				intData.resize(idx+1);
+			}
 			return intData[idx];
 		}
 
@@ -216,7 +233,10 @@ namespace Daedalus
 			switch(properties.elemProps.type)
 			{
 				case EParType_Int:
-					if(intData.size() <= idx) intData.resize(idx+1);
+					if(intData.size() <= idx) {
+						warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
+						intData.resize(idx+1);
+					}
 					intData[idx] = v;
 
 					if(baseAddr && dataOffset != -1)
@@ -224,7 +244,10 @@ namespace Daedalus
 					break;
 
 				case EParType_Float:
-					if(floatData.size() <= idx) floatData.resize(idx+1);
+					if(floatData.size() <= idx) {
+						warnIndexOutOfBounds(idx, floatData.size(), EParType_Float);
+						floatData.resize(idx+1);
+					}
 					floatData[idx] = *reinterpret_cast<float*>(&v);
 
 					if(baseAddr && dataOffset != -1)
