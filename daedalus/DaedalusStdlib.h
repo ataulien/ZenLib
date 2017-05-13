@@ -9,10 +9,20 @@ namespace Daedalus
 {
     class DaedalusVM;
 
+    /**
+	 * Basic gametype. Needed for registering C_Class members and sky configuration in REGoth
+	 */
+    enum GameType
+    {
+        GT_Gothic1,
+        GT_Gothic2
+    };
+
     namespace GEngineClasses
     {
         const int MAX_CHAPTER = 5;
         const int MAX_MISSIONS = 5;
+        const int MAX_HITCHANCE = 5;
         const int ATR_INDEX_MAX = 8;
         const int ITM_TEXT_MAX = 6;
 
@@ -165,6 +175,22 @@ namespace Daedalus
             float					    mrkFadeSpeed;
             std::string					mrkTexture_S;
             float					    mrkSize;
+
+            // flocking
+            std::string					flockMode;
+            float   					flockStrength;
+
+            // local frame of reference override
+            // calculates the position of the particles each frame relative to the emitters pos/rot
+            // can be expensive
+            // WARNING: in comb with flyCollDet_B this can be a performance-hog deluxe
+            int32_t 					useEmittersFOR;
+
+            // optional you can set a valid timeperiod in which this pfx should be rendered (e.g. "8 22": should be rendererd from 8 to 22 o clock")
+            std::string					timeStartEnd_S;
+
+            // with the next setting you can define weather this pfx is an ambient pfx, thus can be disabled in the gothic.ini with the value [ENGINE]/noAmbientPFX
+            int32_t						m_bIsAmbientPFX;
         };
 
         struct C_Menu : Instance
@@ -254,6 +280,7 @@ namespace Daedalus
                 memset(userfloat, 0, sizeof(userfloat));
                 frameSizeX = 0;
                 frameSizeY = 0;
+                hideOnValue = 0;
             }
 
             std::string 	fontName;
@@ -278,6 +305,9 @@ namespace Daedalus
             std::string 	userString[MenuConstants::MAX_USERVARS];
             int32_t		    frameSizeX;
             int32_t		    frameSizeY;
+            std::string     hideIfOptionSectionSet;
+            std::string     hideIfOptionSet;
+            int32_t         hideOnValue;
         };
 
         struct C_Npc : Instance
@@ -310,7 +340,8 @@ namespace Daedalus
 				id = 0;
 				npcType = 0;
 				flags = EFLAG_NONE;
-				memset(attribute, 0, sizeof(attribute));
+                memset(attribute, 0, sizeof(attribute));
+                memset(hitChance, 0, sizeof(hitChance));
 				memset(protection, 0, sizeof(protection));
 				memset(damage, 0, sizeof(damage));
 				memset(mission, 0, sizeof(mission));
@@ -331,14 +362,18 @@ namespace Daedalus
 				exp = 0;
 				exp_next = 0;
 				lp = 0;
+                bodyStateInterruptableOverride = 0;
+                noFocus = 0;
 			}
 
             int32_t id;
             std::string name[5];
             std::string slot;
+            std::string effect;
             int32_t npcType;
             ENPCFlag flags;
             int32_t attribute[EATR_MAX];
+            int32_t hitChance[MAX_HITCHANCE];
             int32_t protection[PROT_INDEX_MAX];
             int32_t damage[DAM_INDEX_MAX];
             int32_t damagetype;
@@ -377,6 +412,11 @@ namespace Daedalus
             int32_t exp;
             int32_t exp_next;
             int32_t lp;
+
+            // If this is set to TRUE, the Npc can't be interrupted in any action (e.g. BS_FLAG_INTERRUPTABLE for anis is being ignored)
+            int32_t bodyStateInterruptableOverride;
+            // if "noFocus" is set to TRUE, the focus name and health bar will not be drawn of this nsc (hi, stefan!)
+            int32_t noFocus;
         };
 
         struct C_Mission : Instance
@@ -461,6 +501,11 @@ namespace Daedalus
                 spell = 0;
                 range = 0;
                 mag_circle = 0;
+                inv_zbias = 0;
+                inv_rotx = 0;
+                inv_roty = 0;
+                inv_rotz = 0;
+                inv_animate = 0;
                 amount = 0;
             }
 
@@ -510,6 +555,7 @@ namespace Daedalus
 
             // Veränderung des NSC-Meshes beim Anlegen dieses Gegenstandes
             std::string visual_change;        //	ASC - File
+            std::string effect;
             int32_t visual_skin;
 
             std::string scemeName;
@@ -525,6 +571,13 @@ namespace Daedalus
             std::string description;
             std::string text[ITM_TEXT_MAX];
             int32_t count[ITM_TEXT_MAX];
+
+            // inventory darstellungs geschichten, wird nur benutzt, falls von 0 abweichend
+            int32_t inv_zbias;								//  wie weit ist das item im inventory richtung far plane verschoben (integer scale 100=1)
+            int32_t inv_rotx;								//  wieviel grad um die x achse ist das item im inv gedreht
+            int32_t inv_roty;								//  wieviel grad um die y achse ist das item im inv gedreht
+            int32_t inv_rotz;								//  wieviel grad um die z achse ist das item im inv gedreht
+            int32_t inv_animate;							//  soll das item in inv rotiert werden
 
             // REGoth member, number of items
             uint32_t amount;
@@ -586,6 +639,22 @@ namespace Daedalus
             }
         };
 
+        struct C_Spell : Instance
+        {
+            float time_per_mana;			// Zeit pro investierten Manapunkt (ms)
+            int32_t damage_per_level;		// Schaden pro Level
+            int32_t damageType;				// CAN BE ONLY ONE DAMAGE TYPE
+            int32_t spellType;				// Good, Neutral or Bad
+            int32_t canTurnDuringInvest;
+            int32_t canChangeTargetDuringInvest;
+            int32_t isMultiEffect;			// Effect Class is oCVisFX_MultiTarget if set to 1 (e.g. the effect can have multiple trajectorys (massdeath)
+            int32_t targetCollectAlgo;
+            int32_t targetCollectType;
+            int32_t targetCollectRange;
+            int32_t targetCollectAzi;
+            int32_t targetCollectElev;
+        };
+
         struct C_ItemReact : Instance
         {
             int32_t npc;
@@ -622,5 +691,5 @@ namespace Daedalus
     /**
      * @brief Links the classes known to the engine to the VM.
      */
-    void registerGothicEngineClasses(DaedalusVM& vm);
+    void registerGothicEngineClasses(DaedalusVM& vm, GameType gameType);
 }

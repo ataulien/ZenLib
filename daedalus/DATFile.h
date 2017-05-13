@@ -202,28 +202,7 @@ namespace Daedalus
             return reinterpret_cast<T*>(reinterpret_cast<char*>(baseAddr) + classMemberOffset);
         }
 
-		int32_t& getInt(size_t idx = 0, void* baseAddr=nullptr)
-		{
-            bool isClassVar = static_cast<bool>(properties.elemProps.flags & EParFlag_ClassVar);
-			if(baseAddr && classMemberOffset != -1)
-            {
-                if (idx >= classMemberArraySize){
-                    warnIndexOutOfBounds(idx, classMemberArraySize, EParType_Int);
-                    throw std::runtime_error("fatal VM error: index out of range for registered class data member");
-                }
-                LogInfo() << "type = " << properties.elemProps.flags;
-                assert(isClassVar);
-                return getClassMember<int32_t>(baseAddr)[idx];
-            }
-
-			if(intData.size() <= idx)
-            {
-				warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
-				intData.resize(idx+1);
-			}
-            assert(!isClassVar);
-			return intData[idx];
-		}
+		int32_t& getInt(size_t idx = 0, void* baseAddr=nullptr);
 
 		std::string* getStrAddr(size_t idx = 0, void* baseAddr=nullptr)
 		{
