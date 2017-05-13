@@ -229,7 +229,7 @@ namespace Daedalus
 			// read from symbol's data if not isClassVar or the above failed. (the latter should not happen)
 			if(data.size() <= idx)
 			{
-				if (not isClassVar) // only print error message if we did not fall through from above
+				if (!isClassVar) // only print error message if we did not fall through from above
 					warnIndexOutOfBounds(idx, data.size());
 				data.resize(idx+1);
 			}
