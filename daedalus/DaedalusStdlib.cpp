@@ -7,8 +7,7 @@
 #include "DaedalusVM.h"
 #include "DATFile.h"
 
-#define OFFSET(c, v) (int32_t)(((char*)v) - ((char*)c))
-#define REGISTER(cname, obj, var) vm.getDATFile().getSymbolByName(cname "." #var).dataOffset = OFFSET(&obj, &obj.var);
+#define REGISTER(cname, obj, var) datFile.registerMember(cname "." #var, obj, obj.var);
 
 void Daedalus::registerDaedalusStdLib(Daedalus::DaedalusVM& vm, bool enableVerboseLogging)
 {
@@ -67,6 +66,7 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
     GEngineClasses::C_Menu_Item menuItem;
     GEngineClasses::C_SFX sfx;
     GEngineClasses::C_ParticleFX pfx;
+    auto& datFile = vm.getDATFile();
 
     // the vm of the GOTHIC.DAT does not contain C_Menu and MENU.DAT's vm does not contain C_NPC
     // so we need to register only class members of existing classes
