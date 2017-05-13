@@ -192,9 +192,8 @@ namespace Daedalus
 
         uint32_t parent; // 0xFFFFFFFF (-1) = none
 
-		void warnIndexOutOfBounds(size_t index, size_t size, EParType arrayType){
-			std::string typeName = eParTypeToString(arrayType);
-			LogWarn() << "index out of range for: " << typeName << " " << name << "[" << size << "], index = " << index;
+		void warnIndexOutOfBounds(size_t index, size_t size){
+			LogWarn() << "index out of range for: " << name << "[" << size << "], index = " << index;
 		}
 
         template <class T>
@@ -203,18 +202,37 @@ namespace Daedalus
         }
 
 		int32_t& getInt(size_t idx = 0, void* baseAddr=nullptr);
+		std::string& getString(size_t idx = 0, void* baseAddr=nullptr);
 
-		std::string* getStrAddr(size_t idx = 0, void* baseAddr=nullptr)
+		template <class T>
+		T& getValue(std::vector<T>& data, size_t idx = 0, void* baseAddr=nullptr)
 		{
-			if(baseAddr && classMemberOffset != -1)
-				return reinterpret_cast<std::string*>(reinterpret_cast<char*>(baseAddr) + classMemberOffset + (sizeof(std::string) * idx));
-
-			if(strData.size() <= idx)
-            {
-				warnIndexOutOfBounds(idx, strData.size(), EParType_String);
-				strData.resize(idx+1);
+			bool isClassVar = static_cast<bool>(properties.elemProps.flags & EParFlag_ClassVar);
+			if (isClassVar)
+			{
+				bool isRegistered = classMemberOffset != -1;
+				if (not isRegistered)
+				{
+					LogError() << "VM error: class data member not registered: " << name;
+				} else if (baseAddr == nullptr)
+				{
+					LogError() << "VM error: base address of C_Class is nullptr: " << name;
+				} else if (idx >= classMemberArraySize){
+					warnIndexOutOfBounds(idx, classMemberArraySize);
+					LogError() << "VM error: index out of range for registered class data member: " << name;
+				} else {
+					return getClassMember<T>(baseAddr)[idx];
+				}
+				//assert(false);
 			}
-			return &strData[idx];
+			// read from symbol's data if not isClassVar or the above failed. (the latter should not happen)
+			if(data.size() <= idx)
+			{
+				if (not isClassVar) // only print error message if we did not fall through from above
+					warnIndexOutOfBounds(idx, data.size());
+				data.resize(idx+1);
+			}
+			return data[idx];
 		}
 
 		void set(int32_t v, size_t idx = 0, void* baseAddr=nullptr)
@@ -229,7 +247,7 @@ namespace Daedalus
 					}
 					if(intData.size() <= idx)
                     {
-						warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
+						warnIndexOutOfBounds(idx, intData.size());
 						intData.resize(idx+1);
 					}
 					intData[idx] = v;
@@ -242,7 +260,7 @@ namespace Daedalus
 					}
 					if(floatData.size() <= idx)
                     {
-						warnIndexOutOfBounds(idx, floatData.size(), EParType_Float);
+						warnIndexOutOfBounds(idx, floatData.size());
 						floatData.resize(idx+1);
 					}
 					floatData[idx] = *reinterpret_cast<float*>(&v);
@@ -268,7 +286,7 @@ namespace Daedalus
 
 			if(strData.size() <= idx)
             {
-                warnIndexOutOfBounds(idx, strData.size(), EParType_String);
+                warnIndexOutOfBounds(idx, strData.size());
                 strData.resize(idx+1);
             }
 			strData[idx] = v;

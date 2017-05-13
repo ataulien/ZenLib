@@ -464,25 +464,11 @@ void DATFile::iterateSymbolsOfClass(const std::string& className, std::function<
     }
 }
 
-
 int32_t& PARSymbol::getInt(size_t idx, void *baseAddr)
 {
-    bool isClassVar = static_cast<bool>(properties.elemProps.flags & EParFlag_ClassVar);
-    if(baseAddr && classMemberOffset != -1)
-    {
-        if (idx >= classMemberArraySize){
-            warnIndexOutOfBounds(idx, classMemberArraySize, EParType_Int);
-            throw std::runtime_error("fatal VM error: index out of range for registered class data member");
-        }
-        assert(isClassVar);
-        return getClassMember<int32_t>(baseAddr)[idx];
-    }
+    return getValue(intData, idx, baseAddr);
+}
 
-    if(intData.size() <= idx)
-    {
-        warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
-        intData.resize(idx+1);
-    }
-    assert(!isClassVar);
-    return intData[idx];
+std::string& PARSymbol::getString(size_t idx, void *baseAddr) {
+    return getValue(strData, idx, baseAddr);
 }

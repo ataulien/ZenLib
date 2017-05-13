@@ -203,7 +203,7 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm, GameType gameType)
         if (isGothic2) REGISTER("C_Item", item, inv_animate);
     }
 
-    if (isGothic2 and classExists("C_Spell")){
+    if (isGothic2 && classExists("C_Spell")){
         REGISTER("C_Spell", spell, time_per_mana);
         REGISTER("C_Spell", spell, damage_per_level);
         REGISTER("C_Spell", spell, damageType);

@@ -244,11 +244,11 @@ bool DaedalusVM::doStack(bool verbose)
             }
 
             sym = m_DATFile.getSymbolByIndex(a);
-            straddr = m_DATFile.getSymbolByIndex(a).getStrAddr(arr, getCurrentInstanceDataPtr());
+            straddr = &m_DATFile.getSymbolByIndex(a).getString(arr, getCurrentInstanceDataPtr());
 
             {
                 //std::string s1 = *straddr;
-                std::string s2 = *m_DATFile.getSymbolByIndex(b).getStrAddr(arr2, getCurrentInstanceDataPtr());
+                std::string s2 = m_DATFile.getSymbolByIndex(b).getString(arr2, getCurrentInstanceDataPtr());
 
                 //LogInfo() << "s1 (" << sym.name << "): " << s1 << " s2: " << s2;
 
@@ -436,7 +436,7 @@ std::string DaedalusVM::popString(bool toUpper)
     uint32_t arr;
     uint32_t idx = popVar(arr);
 
-    std::string s = *m_DATFile.getSymbolByIndex(idx).getStrAddr(arr, getCurrentInstanceDataPtr());
+    std::string s = m_DATFile.getSymbolByIndex(idx).getString(arr, getCurrentInstanceDataPtr());
 
     if(toUpper)
         std::transform(s.begin(), s.end(), s.begin(), ::toupper);
@@ -510,9 +510,15 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 
     setCurrentInstance(symIdx);
 
-    // Set self
-	PARSymbol selfCpy = m_DATFile.getSymbolByName("self"); // Copy of "self"-symbol
-    setInstance("self", instance, classIdx);
+    PARSymbol selfCpy;
+    bool selfExists = m_DATFile.hasSymbolName("self");
+    // Particle and Menu VM do not have a self symbol
+    if (selfExists)
+    {
+        selfCpy = m_DATFile.getSymbolByName("self"); // Copy of "self"-symbol
+        // Set self
+        setInstance("self", instance, classIdx);
+    }
 
     // Place the assigning symbol into the instance
     GEngineClasses::Instance* instData = m_GameState.getByClass(instance, classIdx);
@@ -528,7 +534,8 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     // Run script code to initialize the object
     while(doStack());
 
-    m_DATFile.getSymbolByName("self") = selfCpy;
+    if (selfExists)
+        m_DATFile.getSymbolByName("self") = selfCpy;
 
     // Return to old location and continue like nothing ever happened
     m_PC = pc;
