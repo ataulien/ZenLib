@@ -184,7 +184,7 @@ namespace Daedalus
 		// Defacto reflections. Offset of the class member to be able to access class members via name
 		int32_t classMemberOffset; // Not stored in files, only valid for classes to directly write to engine memory
 		// Store array size of the class member var. 1 for scalar members. Useful for bounds checking.
-		int32_t classMemberArraySize; // Not stored in files, only valid for classes to directly write to engine memory
+		uint32_t classMemberArraySize; // Not stored in files, only valid for classes to directly write to engine memory
 
 		void* instanceData; // Not stored in files, only valid for classes to directly write to engine memory
 		ZMemory::BigHandle instanceDataHandle;
@@ -415,7 +415,7 @@ namespace Daedalus
             int32_t offset = static_cast<int32_t>(((char*)&member) - ((char*)&obj));
             auto& parSymbol = getSymbolByName(symbolName);
             parSymbol.classMemberOffset = offset;
-            parSymbol.classMemberArraySize = static_cast<int32_t>(arraySize(member));
+            parSymbol.classMemberArraySize = static_cast<uint32_t>(arraySize(member));
         }
 
     private:

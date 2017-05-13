@@ -368,7 +368,7 @@ namespace Daedalus
             // **********************
             // Feel free to use
             // **********************
-            int32_t aivar[50];
+            int32_t aivar[100];
             std::string wp;
 
             // **********************
