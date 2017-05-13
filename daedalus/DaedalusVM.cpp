@@ -90,7 +90,7 @@ bool DaedalusVM::doStack(bool verbose)
 
             if(log) LogInfo() << " - a: " << a << ", arr: " << arr;
 
-            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
+            addr = &m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
             b = *addr;
             *addr = popDataValue();
             if(log) LogInfo() << " - " << b << " -> " << *addr;
@@ -121,7 +121,7 @@ bool DaedalusVM::doStack(bool verbose)
         case EParOp_GreaterOrEqual:pushInt(popDataValue() >= popDataValue() ? 1 : 0);break;
         case EParOp_AssignAdd:
             a = popVar(arr);
-            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
+            addr = &m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
             *addr += popDataValue();
 
             if(m_OnSymbolValueChanged)
@@ -129,7 +129,7 @@ bool DaedalusVM::doStack(bool verbose)
             break;
         case EParOp_AssignSubtract:
             a = popVar(arr);
-            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
+            addr = &m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
             *addr -= popDataValue();
 
             if(m_OnSymbolValueChanged)
@@ -137,7 +137,7 @@ bool DaedalusVM::doStack(bool verbose)
             break;
         case EParOp_AssignMultiply:
             a = popVar(arr);
-            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
+            addr = &m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
             *addr *= popDataValue();
 
             if(m_OnSymbolValueChanged)
@@ -145,7 +145,7 @@ bool DaedalusVM::doStack(bool verbose)
             break;
         case EParOp_AssignDivide:
             a = popVar(arr);
-            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
+            addr = &m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
             *addr /= popDataValue();
 
             if(m_OnSymbolValueChanged)
@@ -379,7 +379,7 @@ int32_t DaedalusVM::popDataValue()
         case EParOp_PushVar:
             arrIdx = m_Stack.top();
             m_Stack.pop(); // Pop array index
-            return m_DATFile.getSymbolByIndex(v).getIntValue(arrIdx, getCurrentInstanceDataPtr());
+            return m_DATFile.getSymbolByIndex(v).getInt(arrIdx, getCurrentInstanceDataPtr());
 
         default:
             return 0;

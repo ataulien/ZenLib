@@ -197,15 +197,23 @@ namespace Daedalus
 			LogWarn() << "index out of range for: " << typeName << " " << name << "[" << size << "], index = " << index;
 		}
 
-		int32_t* getIntAddr(size_t idx = 0, void* baseAddr=nullptr)
+        template <class T>
+        T* getClassMember(void* baseAddr){
+            return reinterpret_cast<T*>(reinterpret_cast<char*>(baseAddr) + classMemberOffset);
+        }
+
+		int32_t& getInt(size_t idx = 0, void* baseAddr=nullptr)
 		{
+            bool isClassVar = static_cast<bool>(properties.elemProps.flags & EParFlag_ClassVar);
 			if(baseAddr && classMemberOffset != -1)
             {
                 if (idx >= classMemberArraySize){
                     warnIndexOutOfBounds(idx, classMemberArraySize, EParType_Int);
                     throw std::runtime_error("fatal VM error: index out of range for registered class data member");
                 }
-                return reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + classMemberOffset + (sizeof(int32_t) * idx));
+                LogInfo() << "type = " << properties.elemProps.flags;
+                assert(isClassVar);
+                return getClassMember<int32_t>(baseAddr)[idx];
             }
 
 			if(intData.size() <= idx)
@@ -213,7 +221,8 @@ namespace Daedalus
 				warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
 				intData.resize(idx+1);
 			}
-			return &intData[idx];
+            assert(!isClassVar);
+			return intData[idx];
 		}
 
 		std::string* getStrAddr(size_t idx = 0, void* baseAddr=nullptr)
@@ -227,19 +236,6 @@ namespace Daedalus
 				strData.resize(idx+1);
 			}
 			return &strData[idx];
-		}
-
-		int32_t getIntValue(size_t idx=0, void* baseAddr=nullptr)
-		{
-			if(baseAddr && classMemberOffset != -1)
-				return *reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + classMemberOffset + (sizeof(int32_t) * idx));
-
-			if(intData.size() <= idx)
-            {
-				warnIndexOutOfBounds(idx, intData.size(), EParType_Int);
-				intData.resize(idx+1);
-			}
-			return intData[idx];
 		}
 
 		void set(int32_t v, size_t idx = 0, void* baseAddr=nullptr)
