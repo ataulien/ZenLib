@@ -86,19 +86,21 @@ bool DaedalusVM::doStack(bool verbose)
             break;*/
 
         case EParOp_Assign:
+        {
             a = popVar(arr);
-
             if(log) LogInfo() << " - a: " << a << ", arr: " << arr;
+            b = popDataValue();
 
-            addr = &m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
-            b = *addr;
-            *addr = popDataValue();
-            if(log) LogInfo() << " - " << b << " -> " << *addr;
+            int32_t& aInt = m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
+            if (log) LogInfo() << " - " << aInt << " -> " << b;
+            aInt = b;
 
             if(m_OnSymbolValueChanged)
                 m_OnSymbolValueChanged((unsigned)a, EParOp_Assign);
 
             break;
+
+        }
         case EParOp_LogOr:
             // Note: This can't be done in one line because the second pop might not be executed,
             // due to c++'s short-circuit evaluation
@@ -269,8 +271,10 @@ bool DaedalusVM::doStack(bool verbose)
         case EParOp_AssignFloat:
             a = popVar(arr);
             b = popDataValue();
-
-            m_DATFile.getSymbolByIndex(a).set(b, arr, getCurrentInstanceDataPtr());
+            {
+                float& aFloat = m_DATFile.getSymbolByIndex(a).getFloat(arr, getCurrentInstanceDataPtr());
+                aFloat = reinterpret_cast<float&>(b);
+            }
 
             if(m_OnSymbolValueChanged)
                 m_OnSymbolValueChanged((unsigned)a, EParOp_AssignFloat);
@@ -483,7 +487,7 @@ void DaedalusVM::pushString(const std::string& str)
     m_FakeStringSymbols.push(m_FakeStringSymbols.front());
     m_FakeStringSymbols.pop();
 
-    s.set(str, 0);
+    s.getString(0) = str;
 
     pushVar(symIdx, 0);
 }

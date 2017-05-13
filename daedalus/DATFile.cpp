@@ -472,3 +472,7 @@ int32_t& PARSymbol::getInt(size_t idx, void *baseAddr)
 std::string& PARSymbol::getString(size_t idx, void *baseAddr) {
     return getValue(strData, idx, baseAddr);
 }
+
+float &PARSymbol::getFloat(size_t idx, void *baseAddr) {
+    return getValue(floatData, idx, baseAddr);
+}

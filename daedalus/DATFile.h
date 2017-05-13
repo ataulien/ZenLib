@@ -202,7 +202,8 @@ namespace Daedalus
         }
 
 		int32_t& getInt(size_t idx = 0, void* baseAddr=nullptr);
-		std::string& getString(size_t idx = 0, void* baseAddr=nullptr);
+        std::string& getString(size_t idx = 0, void* baseAddr=nullptr);
+        float& getFloat(size_t idx = 0, void* baseAddr=nullptr);
 
 		template <class T>
 		T& getValue(std::vector<T>& data, size_t idx = 0, void* baseAddr=nullptr)
@@ -211,7 +212,7 @@ namespace Daedalus
 			if (isClassVar)
 			{
 				bool isRegistered = classMemberOffset != -1;
-				if (not isRegistered)
+				if (!isRegistered)
 				{
 					LogError() << "VM error: class data member not registered: " << name;
 				} else if (baseAddr == nullptr)
@@ -239,57 +240,15 @@ namespace Daedalus
 		{
 			switch(properties.elemProps.type)
 			{
-				case EParType_Int:
-					if(baseAddr && classMemberOffset != -1)
-					{
-						*reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + classMemberOffset + (sizeof(int32_t) * idx)) = v;
-						break;
-					}
-					if(intData.size() <= idx)
-                    {
-						warnIndexOutOfBounds(idx, intData.size());
-						intData.resize(idx+1);
-					}
-					intData[idx] = v;
-					break;
-
-				case EParType_Float:
-					if(baseAddr && classMemberOffset != -1){
-						*reinterpret_cast<float*>(reinterpret_cast<char*>(baseAddr) + classMemberOffset + (sizeof(float) * idx)) = *reinterpret_cast<float*>(&v);
-						break;
-					}
-					if(floatData.size() <= idx)
-                    {
-						warnIndexOutOfBounds(idx, floatData.size());
-						floatData.resize(idx+1);
-					}
-					floatData[idx] = *reinterpret_cast<float*>(&v);
-
-					break;
-
 				case EParType_Func:
 					address = v;
 
 					if(baseAddr && classMemberOffset != -1)
 						*reinterpret_cast<int32_t*>(reinterpret_cast<char*>(baseAddr) + classMemberOffset + (sizeof(int32_t) * idx)) = v;
 					break;
-			}
-		}
-
-		void set(const std::string& v, size_t idx=0, void* baseAddr=nullptr)
-		{
-			if(baseAddr && classMemberOffset != -1)
-			{
-				*reinterpret_cast<std::string*>(reinterpret_cast<char*>(baseAddr) + classMemberOffset + (sizeof(std::string) * idx)) = v;
-				return;
-			}
-
-			if(strData.size() <= idx)
-            {
-                warnIndexOutOfBounds(idx, strData.size());
-                strData.resize(idx+1);
+                default:
+                    assert(false);
             }
-			strData[idx] = v;
 		}
 
 		bool isDataSame(const PARSymbol& other) const
