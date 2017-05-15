@@ -36,9 +36,10 @@ namespace Daedalus
          * Runs a complete function with the arguments given by pushing onto the stack
          * Note: Must be prepared first, using prepareRunFunction.
          * @param symIdx Symbol-index of the function to call
+         * @param clearDataStack indicates whether any leftovers from previous runs should be removed (default=true)
          * @return value returned by the function
          */
-        int32_t runFunctionBySymIndex(size_t symIdx);
+        int32_t runFunctionBySymIndex(size_t symIdx, bool clearDataStack = true);
 
         /**
          * @brief sets the program counter

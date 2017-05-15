@@ -612,15 +612,16 @@ void DaedalusVM::prepareRunFunction()
     pushState();
 }
 
-int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
+int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx, bool clearDataStack)
 {
+    if (clearDataStack)
+        m_Stack = std::stack<uint32_t>();
+
     CallStackFrame frame(*this, symIdx, CallStackFrame::SymbolIndex);
     auto& functionSymbol = getDATFile().getSymbolByIndex(symIdx);
     auto& address = functionSymbol.address;
 	if(address == 0)
 		return -1;
-
-    int before = m_Stack.size();
 
     // Place the call-operation
     setProgramCounter(address);
@@ -638,11 +639,9 @@ int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
             LogWarn() << "DaedalusVM: function " << functionSymbol.name << " forgot to push a return value";
     }
 
-    int after = m_Stack.size();
-    int grow = after - before;
-    if (grow > 0)
+    if (!m_Stack.empty())
     {
-        LogWarn() << "DaedalusVM: stack growth to " + std::to_string(grow) + " after function " << functionSymbol.name;
+        LogWarn() << "DaedalusVM: stack not empty (" + std::to_string(m_Stack.size()) + ") after function " << functionSymbol.name;
     }
 
     // Restore to previous VM-State
