@@ -354,6 +354,10 @@ PARSymbol& DATFile::getSymbolByIndex(size_t idx)
     return m_SymTable.symbols[idx];
 }
 
+size_t DATFile::getFunctionIndexByAddress(size_t address) {
+    return m_SymTable.functionsByAddress[address];
+}
+
 PARStackOpCode DATFile::getStackOpCode(size_t pc)
 {
     m_Parser.setSeek(m_Stack.stackOffset + pc);

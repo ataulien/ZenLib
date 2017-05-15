@@ -159,6 +159,26 @@ namespace Daedalus
         std::vector<size_t> m_CallStack; // Debugging only
 
         /**
+         * pushing/popping function symbol index to the debug callstack using RAII concept
+         * can be used to keep track of ALL function calls
+         */
+        class CallStackFrame{
+        public:
+            CallStackFrame(DaedalusVM& vm, size_t functionSymbolIndex) :
+                    vm(vm)
+            {
+                // LogInfo() << vm.getCallStack();
+                vm.m_CallStack.push_back(functionSymbolIndex);
+            }
+            ~CallStackFrame()
+            {
+                vm.m_CallStack.pop_back();
+            }
+        private:
+            DaedalusVM& vm;
+        };
+
+        /**
          * @brief External functions mapped by their symbols index value
          */
         std::unordered_map<size_t, std::function<void(DaedalusVM&)>> m_ExternalsByIndex;

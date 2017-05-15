@@ -312,6 +312,10 @@ namespace Daedalus
 		PARSymbol& getSymbolByIndex(size_t idx);
 
 		/**
+		 * @return Function symbol index that points to the given address
+		 */
+		size_t getFunctionIndexByAddress(size_t address);
+		/**
 		 * Goes through all symbols and calls the given callback for every instance of the specified class
 		 */
 		void iterateSymbolsOfClass(const std::string& className, std::function<void(size_t, PARSymbol&)> callback);

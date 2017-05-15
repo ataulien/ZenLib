@@ -187,8 +187,12 @@ bool DaedalusVM::doStack(bool verbose)
 			EInstanceClass currentInstanceClass = m_CurrentInstanceClass;
 			size_t PC = m_PC;
            
-			m_PC = (size_t)op.address;
-			while(doStack());
+			setProgramCounter((size_t)op.address);
+            {
+                auto functionSymbolIndex = getDATFile().getFunctionIndexByAddress(op.address);
+                CallStackFrame frame(*this, functionSymbolIndex);
+                while(doStack());
+            }
 
 			m_PC = PC;
 			m_CurrentInstanceHandle = currentInstanceHandle;
@@ -209,9 +213,10 @@ bool DaedalusVM::doStack(bool verbose)
                 if(m_OnExternalCalled)
                     m_OnExternalCalled((unsigned)op.symbol);
 
-                m_CallStack.push_back(op.symbol);
-                (*it).second(*this);
-                m_CallStack.pop_back();
+                {
+                    CallStackFrame frame(*this, op.symbol);
+                    (*it).second(*this);
+                }
             }
 
 			m_PC = PC;
@@ -529,13 +534,8 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     GEngineClasses::Instance* instData = m_GameState.getByClass(instance, classIdx);
     instData->instanceSymbol = symIdx;
 
-    // Point the PC to the instance-constructor
-    setProgramCounter(s.address);
-
-    m_CallStack.push_back(symIdx);
     // Run script code to initialize the object
-    while(doStack());
-    m_CallStack.pop_back();
+    runFunctionBySymIndex(symIdx);
 
     if (selfExists)
         m_DATFile.getSymbolByName("self") = selfCpy;
@@ -615,9 +615,9 @@ void DaedalusVM::prepareRunFunction()
 
 int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
 {
-    m_CallStack.push_back(symIdx);
+    CallStackFrame frame(*this, symIdx);
     auto& parSymbol = getDATFile().getSymbolByIndex(symIdx);
-    auto addr = parSymbol.address;
+    auto& addr = parSymbol.address;
 	if(addr == 0)
 		return -1;
 
@@ -644,7 +644,6 @@ int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
     }
 
     // Restore to previous VM-State
-    m_CallStack.pop_back();
     popState();
     return ret;
 }
