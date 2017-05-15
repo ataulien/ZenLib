@@ -186,8 +186,14 @@ void DATFile::readSymTable()
 		if(!s.name.empty())
 			m_SymTable.symbolsByName.emplace(s.name, i);
 
-        if (s.properties.elemProps.type == EParType_Func)
+        // check for callable object
+        if (s.isEParType(EParType_Prototype) || // is a Prototype
+                (s.isEParType(EParType_Func) // or a function, which
+            && !s.hasEParFlag(EParFlag_ClassVar) // is no class-member (skip class members of type func)
+            && s.hasEParFlag(EParFlag_Const))) // and is const (skip function params of type func)
+        {
             m_SymTable.functionsByAddress.emplace(s.address, i);
+        }
 
 		m_SymTable.symbols[i] = std::move(s);
     }
@@ -355,7 +361,11 @@ PARSymbol& DATFile::getSymbolByIndex(size_t idx)
 }
 
 size_t DATFile::getFunctionIndexByAddress(size_t address) {
-    return m_SymTable.functionsByAddress[address];
+    auto it = m_SymTable.functionsByAddress.find(address);
+    if (it != m_SymTable.functionsByAddress.end())
+        return it->second;
+    else
+        return static_cast<size_t>(-1);
 }
 
 PARStackOpCode DATFile::getStackOpCode(size_t pc)

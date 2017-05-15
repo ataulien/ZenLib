@@ -175,6 +175,16 @@ namespace Daedalus
 
         } properties;
 
+		bool hasEParFlag(EParFlag eParFlag)
+		{
+			return static_cast<bool>(properties.elemProps.flags & eParFlag);
+		}
+
+		bool isEParType(EParType eParType)
+		{
+			return properties.elemProps.type == eParType;
+		}
+
         std::vector<float> floatData;
         std::vector<int32_t> intData;
         std::vector<std::string> strData;
@@ -193,7 +203,7 @@ namespace Daedalus
         uint32_t parent; // 0xFFFFFFFF (-1) = none
 
 		void warnIndexOutOfBounds(size_t index, size_t size){
-			LogWarn() << "index out of range for: " << name << "[" << size << "], index = " << index;
+			LogWarn() << "DaedalusVM: index out of range for: " << name << "[" << size << "], index = " << index;
 		}
 
         template <class T>
@@ -208,19 +218,19 @@ namespace Daedalus
 		template <class T>
 		T& getValue(std::vector<T>& data, size_t idx = 0, void* baseAddr=nullptr)
 		{
-			bool isClassVar = static_cast<bool>(properties.elemProps.flags & EParFlag_ClassVar);
+			bool isClassVar = this->hasEParFlag(EParFlag_ClassVar);
 			if (isClassVar)
 			{
 				bool isRegistered = classMemberOffset != -1;
 				if (!isRegistered)
 				{
-					LogError() << "VM error: class data member not registered: " << name;
+					LogError() << "DaedalusVM: class data member not registered: " << name;
 				} else if (baseAddr == nullptr)
 				{
-					LogError() << "VM error: base address of C_Class is nullptr: " << name;
+					LogError() << "DaedalusVM: base address of C_Class is nullptr: " << name;
 				} else if (idx >= classMemberArraySize){
 					warnIndexOutOfBounds(idx, classMemberArraySize);
-					LogError() << "VM error: index out of range for registered class data member: " << name;
+					LogError() << "DaedalusVM: index out of range for registered class data member: " << name;
 				} else {
 					return getClassMember<T>(baseAddr)[idx];
 				}
@@ -312,7 +322,7 @@ namespace Daedalus
 		PARSymbol& getSymbolByIndex(size_t idx);
 
 		/**
-		 * @return Function symbol index that points to the given address
+		 * @return Function symbol index that points to the given address. returns -1 if address was not found
 		 */
 		size_t getFunctionIndexByAddress(size_t address);
 		/**

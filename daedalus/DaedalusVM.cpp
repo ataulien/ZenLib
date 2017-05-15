@@ -189,8 +189,7 @@ bool DaedalusVM::doStack(bool verbose)
            
 			setProgramCounter((size_t)op.address);
             {
-                auto functionSymbolIndex = getDATFile().getFunctionIndexByAddress(op.address);
-                CallStackFrame frame(*this, functionSymbolIndex);
+                CallStackFrame frame(*this, op.address, CallStackFrame::Address);
                 while(doStack());
             }
 
@@ -214,7 +213,7 @@ bool DaedalusVM::doStack(bool verbose)
                     m_OnExternalCalled((unsigned)op.symbol);
 
                 {
-                    CallStackFrame frame(*this, op.symbol);
+                    CallStackFrame frame(*this, op.symbol, CallStackFrame::SymbolIndex);
                     (*it).second(*this);
                 }
             }
@@ -570,7 +569,7 @@ void DaedalusVM::pushState()
     s.m_PC = m_PC;
     s.m_Stack = m_Stack;
     s.m_Self = m_DATFile.getSymbolByName("self");
-    s.m_CallStack = m_CallStack;
+    // s.m_CallStack = m_CallStack;
 
     m_PC = 0;
     m_Stack = std::stack<uint32_t>();
@@ -585,7 +584,7 @@ void DaedalusVM::popState()
     return;
     m_PC = m_StateStack.top().m_PC;
     m_Stack = m_StateStack.top().m_Stack;
-    m_CallStack = m_StateStack.top().m_CallStack;
+    // m_CallStack = m_StateStack.top().m_CallStack;
 
     m_CurrentInstanceHandle = m_StateStack.top().m_CurrentInstanceHandle;
     m_CurrentInstanceClass= m_StateStack.top().m_CurrentInstanceClass;
@@ -598,9 +597,9 @@ void DaedalusVM::popState()
 std::vector<std::string> DaedalusVM::getCallStack()
 {
     std::vector<std::string> symbolNames;
-    for(size_t symIndex : m_CallStack)
+    for(auto& functionInfo : m_CallStack)
     {
-        symbolNames.push_back(m_DATFile.getSymbolByIndex(symIndex).name);
+        symbolNames.push_back(nameFromFunctionInfo(functionInfo));
     }
     std::reverse(symbolNames.begin(), symbolNames.end());
     return symbolNames;
@@ -615,37 +614,100 @@ void DaedalusVM::prepareRunFunction()
 
 int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
 {
-    CallStackFrame frame(*this, symIdx);
-    auto& parSymbol = getDATFile().getSymbolByIndex(symIdx);
-    auto& addr = parSymbol.address;
-	if(addr == 0)
+    CallStackFrame frame(*this, symIdx, CallStackFrame::SymbolIndex);
+    auto& functionSymbol = getDATFile().getSymbolByIndex(symIdx);
+    auto& address = functionSymbol.address;
+	if(address == 0)
 		return -1;
 
     int before = m_Stack.size();
 
     // Place the call-operation
-    setProgramCounter(addr);
+    setProgramCounter(address);
     // Execute the instructions
     while(doStack());
 
     int32_t ret = 0;
 
-    // Only pop if the VM didn't mess up
-    if(!isStackEmpty())
-        ret = popDataValue();
-    else
-        LogWarn() << "DaedalusVM: Safety int was popped by scriptcode in function " << parSymbol.name;
+    if (functionSymbol.hasEParFlag(EParFlag_Return))
+    {
+        // Only pop if the VM didn't mess up
+        if(!isStackEmpty())
+            ret = popDataValue(); // TODO handle vars?
+        else
+            LogWarn() << "DaedalusVM: function " << functionSymbol.name << " forgot to push a return value";
+    }
 
     int after = m_Stack.size();
     int grow = after - before;
-    if (grow > 0 && false)
+    if (grow > 0)
     {
-        LogWarn() << "stack growth in function " << parSymbol.name;
+        LogWarn() << "DaedalusVM: stack growth to " + std::to_string(grow) + " after function " << functionSymbol.name;
     }
 
     // Restore to previous VM-State
     popState();
     return ret;
+}
+
+std::string DaedalusVM::nameFromFunctionInfo(DaedalusVM::CallStackFrame::FunctionInfo functionInfo) {
+    switch (functionInfo.second)
+    {
+        case CallStackFrame::SymbolIndex:
+        {
+            auto functionSymbolIndex = functionInfo.first;
+            return getDATFile().getSymbolByIndex(functionSymbolIndex).name;
+        }
+        case CallStackFrame::Address:
+        {
+            auto address = functionInfo.first;
+            auto functionSymbolIndex = getDATFile().getFunctionIndexByAddress(address);
+            if (functionSymbolIndex == static_cast<size_t>(-1))
+                return "unknown function with address: " + std::to_string(address);
+            else
+                return getDATFile().getSymbolByIndex(functionSymbolIndex).name;
+        }
+    }
+}
+
+DaedalusVM::CallStackFrame::CallStackFrame(DaedalusVM& vm, size_t addressOrIndex, AddressType addrType, bool xmlLogging) :
+        vm(vm),
+        m_XmlLogging(xmlLogging)
+{
+    // entering function
+    vm.m_CallStack.emplace_back(addressOrIndex, addrType);
+
+    // m_XmlLogging = true;
+    if (m_XmlLogging)
+    {
+        auto current = vm.nameFromFunctionInfo(vm.m_CallStack.back());
+        LogInfo() << indent(-1) << '<' << current << '>';;
+        /*
+        LogInfo() << indent() << "data stack size = " << vm.m_Stack.size();
+         */
+    }
+}
+
+DaedalusVM::CallStackFrame::~CallStackFrame()
+{
+    // leaving function
+    if (m_XmlLogging)
+    {
+        auto current = vm.nameFromFunctionInfo(vm.m_CallStack.back());
+        /*
+        LogInfo() << indent() << "data stack size = " << vm.m_Stack.size();
+        if (vm.m_Stack.size() > 3) // a var is the largest possible object (size=3). A function can only return one thing
+        {
+            LogInfo() << indent() << "suspicious increase of data stack in function " << current;
+        }
+        */
+        LogInfo() << indent(-1) << "</" << current << '>';
+    }
+    vm.m_CallStack.pop_back();
+}
+
+std::string DaedalusVM::CallStackFrame::indent(int add){
+    return std::string(vm.m_CallStack.size() + add, '\t');
 }
 
 

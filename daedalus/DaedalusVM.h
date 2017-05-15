@@ -148,6 +148,27 @@ namespace Daedalus
         }
     private:
 
+        /**
+         * pushing/popping FunctionInfo to the debug callstack using RAII concept
+         * can be used to keep track of ALL function calls
+         */
+        class CallStackFrame
+        {
+        public:
+            enum AddressType{
+                Address,
+                SymbolIndex
+            };
+            using FunctionInfo = std::pair<size_t, CallStackFrame::AddressType>;
+
+            CallStackFrame(DaedalusVM& vm, size_t addressOrIndex, AddressType addrType, bool xmlLogging = false);
+            ~CallStackFrame();
+            std::string indent(int add);
+        private:
+            DaedalusVM& vm;
+            bool m_XmlLogging;
+        };
+
         DATFile m_DATFile;
 
         /**
@@ -156,27 +177,10 @@ namespace Daedalus
         size_t m_PC;
 
         std::stack<uint32_t> m_Stack;
-        std::vector<size_t> m_CallStack; // Debugging only
+        // contains pairs of FunctionInfo, Debugging only
+        std::vector<CallStackFrame::FunctionInfo> m_CallStack;
 
-        /**
-         * pushing/popping function symbol index to the debug callstack using RAII concept
-         * can be used to keep track of ALL function calls
-         */
-        class CallStackFrame{
-        public:
-            CallStackFrame(DaedalusVM& vm, size_t functionSymbolIndex) :
-                    vm(vm)
-            {
-                // LogInfo() << vm.getCallStack();
-                vm.m_CallStack.push_back(functionSymbolIndex);
-            }
-            ~CallStackFrame()
-            {
-                vm.m_CallStack.pop_back();
-            }
-        private:
-            DaedalusVM& vm;
-        };
+        std::string nameFromFunctionInfo(CallStackFrame::FunctionInfo functionInfo);
 
         /**
          * @brief External functions mapped by their symbols index value
