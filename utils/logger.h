@@ -137,10 +137,10 @@ namespace Utils
 
 			for(const T& s : obj)
 			{
-				m_Message << "\n - " << s;
+				m_Message << " - " << s << '\n';
 			}
 
-			m_Message << "\n]";
+			m_Message << ']';
 			return *this;
 		}
 
@@ -157,10 +157,10 @@ namespace Utils
 
 			for(const T& s : obj)
 			{
-				m_Message << "\n - " << s;
+				m_Message << " - " << s << '\n';
 			}
 
-			m_Message << "\n]";
+			m_Message << ']';
 			return *this;
 		}
 
