@@ -209,7 +209,9 @@ bool DaedalusVM::doStack(bool verbose)
                 if(m_OnExternalCalled)
                     m_OnExternalCalled((unsigned)op.symbol);
 
+                m_CallStack.push_back(op.symbol);
                 (*it).second(*this);
+                m_CallStack.pop_back();
             }
 
 			m_PC = PC;
@@ -334,10 +336,9 @@ PARStackOpCode DaedalusVM::getCurrentInstruction()
     return op;
 }
 
-void DaedalusVM::doCallOperation(uint32_t target)
+void DaedalusVM::setProgramCounter(uint32_t target)
 {
     m_PC = target;
-    m_CallStack.push_back(target);
 }
 
 void DaedalusVM::registerExternalFunction(const std::string& symName, const std::function<void(DaedalusVM&)>& fn)
@@ -529,12 +530,12 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     instData->instanceSymbol = symIdx;
 
     // Point the PC to the instance-constructor
-    doCallOperation(s.address);
+    setProgramCounter(s.address);
 
-    m_CallStack.clear();
-
+    m_CallStack.push_back(symIdx);
     // Run script code to initialize the object
     while(doStack());
+    m_CallStack.pop_back();
 
     if (selfExists)
         m_DATFile.getSymbolByName("self") = selfCpy;
@@ -596,21 +597,13 @@ void DaedalusVM::popState()
 
 std::vector<std::string> DaedalusVM::getCallStack()
 {
-    std::vector<std::string> cs;
-
-    for(size_t adr : m_CallStack)
+    std::vector<std::string> symbolNames;
+    for(size_t symIndex : m_CallStack)
     {
-        // Find symbol with that address
-        for(const PARSymbol& s : m_DATFile.getSymTable().symbols)
-        {
-            if(s.address == adr)
-                cs.push_back(s.name);
-        }
+        symbolNames.push_back(m_DATFile.getSymbolByIndex(symIndex).name);
     }
-
-    std::reverse(cs.begin(), cs.end());
-
-    return cs;
+    std::reverse(symbolNames.begin(), symbolNames.end());
+    return symbolNames;
 }
 
 
@@ -622,18 +615,17 @@ void DaedalusVM::prepareRunFunction()
 
 int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
 {
+    m_CallStack.push_back(symIdx);
     auto& parSymbol = getDATFile().getSymbolByIndex(symIdx);
     auto addr = parSymbol.address;
 	if(addr == 0)
 		return -1;
 
-    // Place the call-operation
-    doCallOperation(addr);
-
-    clearCallStack();
-
-    // Execute the instructions
     int before = m_Stack.size();
+
+    // Place the call-operation
+    setProgramCounter(addr);
+    // Execute the instructions
     while(doStack());
 
     int32_t ret = 0;
@@ -647,9 +639,12 @@ int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
     int after = m_Stack.size();
     int grow = after - before;
     if (grow > 0 && false)
+    {
         LogWarn() << "stack growth in function " << parSymbol.name;
+    }
 
     // Restore to previous VM-State
+    m_CallStack.pop_back();
     popState();
     return ret;
 }

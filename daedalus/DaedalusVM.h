@@ -41,9 +41,9 @@ namespace Daedalus
         int32_t runFunctionBySymIndex(size_t symIdx);
 
         /**
-         * @brief Performs a call-instruction with the given address
+         * @brief sets the program counter
          */
-        void doCallOperation(uint32_t target);
+        void setProgramCounter(uint32_t target);
 
         /**
          * @brief Clears the debug-callstack

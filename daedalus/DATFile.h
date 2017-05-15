@@ -261,8 +261,8 @@ namespace Daedalus
     {
         std::vector<uint32_t> sortTable;
         std::vector<PARSymbol> symbols;
-		std::unordered_map<std::string, size_t> symbolsByName;
-
+        std::unordered_map<std::string, size_t> symbolsByName;
+        std::unordered_map<size_t, size_t> functionsByAddress;
     };
 
     struct PARStack

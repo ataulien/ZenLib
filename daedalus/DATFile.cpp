@@ -186,6 +186,9 @@ void DATFile::readSymTable()
 		if(!s.name.empty())
 			m_SymTable.symbolsByName.emplace(s.name, i);
 
+        if (s.properties.elemProps.type == EParType_Func)
+            m_SymTable.functionsByAddress.emplace(s.address, i);
+
 		m_SymTable.symbols[i] = std::move(s);
     }
 
