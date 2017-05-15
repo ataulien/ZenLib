@@ -35,12 +35,10 @@ namespace Daedalus
         /**
          * Runs a complete function with the arguments given by pushing onto the stack
          * Note: Must be prepared first, using prepareRunFunction.
-         * @param fname Symbol-name of the function to look up and call
+         * @param symIdx Symbol-index of the function to call
          * @return value returned by the function
          */
-        int32_t runFunction(const std::string& fname);
         int32_t runFunctionBySymIndex(size_t symIdx);
-        int32_t runFunction(const PARSymbol& parSymbol);
 
         /**
          * @brief Performs a call-instruction with the given address
@@ -149,7 +147,6 @@ namespace Daedalus
             m_OnExternalCalled = callback;
         }
     private:
-        int32_t runFunction(size_t addr, const std::string& functionName);
 
         DATFile m_DATFile;
 

@@ -620,24 +620,10 @@ void DaedalusVM::prepareRunFunction()
     pushState();
 }
 
-int32_t DaedalusVM::runFunction(const std::string& fname)
-{
-    assert(getDATFile().hasSymbolName(fname));
-    return runFunction(getDATFile().getSymbolByName(fname));
-}
-
 int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
 {
-    return runFunction(getDATFile().getSymbolByIndex(symIdx));
-}
-
-int32_t DaedalusVM::runFunction(const PARSymbol& parSymbol)
-{
-    return runFunction(parSymbol.address, parSymbol.name);
-}
-
-int32_t DaedalusVM::runFunction(size_t addr, const std::string& functionName)
-{
+    auto& parSymbol = getDATFile().getSymbolByIndex(symIdx);
+    auto addr = parSymbol.address;
 	if(addr == 0)
 		return -1;
 
@@ -647,6 +633,7 @@ int32_t DaedalusVM::runFunction(size_t addr, const std::string& functionName)
     clearCallStack();
 
     // Execute the instructions
+    int before = m_Stack.size();
     while(doStack());
 
     int32_t ret = 0;
@@ -655,7 +642,12 @@ int32_t DaedalusVM::runFunction(size_t addr, const std::string& functionName)
     if(!isStackEmpty())
         ret = popDataValue();
     else
-        LogWarn() << "DaedalusVM: Safety int was popped by scriptcode!";
+        LogWarn() << "DaedalusVM: Safety int was popped by scriptcode in function " << parSymbol.name;
+
+    int after = m_Stack.size();
+    int grow = after - before;
+    if (grow > 0 && false)
+        LogWarn() << "stack growth in function " << parSymbol.name;
 
     // Restore to previous VM-State
     popState();
