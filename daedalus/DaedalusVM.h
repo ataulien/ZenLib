@@ -39,8 +39,8 @@ namespace Daedalus
          * @return value returned by the function
          */
         int32_t runFunction(const std::string& fname);
-        int32_t runFunction(size_t addr);
         int32_t runFunctionBySymIndex(size_t symIdx);
+        int32_t runFunction(const PARSymbol& parSymbol);
 
         /**
          * @brief Performs a call-instruction with the given address
@@ -149,6 +149,7 @@ namespace Daedalus
             m_OnExternalCalled = callback;
         }
     private:
+        int32_t runFunction(size_t addr, const std::string& functionName);
 
         DATFile m_DATFile;
 

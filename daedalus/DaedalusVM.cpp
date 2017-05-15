@@ -620,15 +620,23 @@ void DaedalusVM::prepareRunFunction()
     pushState();
 }
 
-
 int32_t DaedalusVM::runFunction(const std::string& fname)
 {
     assert(getDATFile().hasSymbolName(fname));
-
-    return runFunction(getDATFile().getSymbolByName(fname).address);
+    return runFunction(getDATFile().getSymbolByName(fname));
 }
 
-int32_t DaedalusVM::runFunction(size_t addr)
+int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
+{
+    return runFunction(getDATFile().getSymbolByIndex(symIdx));
+}
+
+int32_t DaedalusVM::runFunction(const PARSymbol& parSymbol)
+{
+    return runFunction(parSymbol.address, parSymbol.name);
+}
+
+int32_t DaedalusVM::runFunction(size_t addr, const std::string& functionName)
 {
 	if(addr == 0)
 		return -1;
@@ -652,13 +660,6 @@ int32_t DaedalusVM::runFunction(size_t addr)
     // Restore to previous VM-State
     popState();
     return ret;
-}
-
-int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
-{
-    int32_t r = runFunction(getDATFile().getSymbolByIndex(symIdx).address);
-
-    return r;
 }
 
 

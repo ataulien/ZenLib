@@ -338,7 +338,6 @@ bool DATFile::hasSymbolName(const std::string& symName)
     return m_SymTable.symbolsByName.find(n) != m_SymTable.symbolsByName.end();
 }
 
-
 size_t DATFile::getSymbolIndexByName(const std::string& symName)
 {
     std::string n = std::string(symName);
