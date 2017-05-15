@@ -531,8 +531,6 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     // Point the PC to the instance-constructor
     doCallOperation(s.address);
 
-    size_t pc = m_PC;
-
     m_CallStack.clear();
 
     // Run script code to initialize the object
@@ -540,9 +538,6 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 
     if (selfExists)
         m_DATFile.getSymbolByName("self") = selfCpy;
-
-    // Return to old location and continue like nothing ever happened
-    m_PC = pc;
 
     // Reset state
     //m_DATFile.getSymbolByName("SELF").instanceDataHandle = oldSelfInstance;
