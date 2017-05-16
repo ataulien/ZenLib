@@ -79,28 +79,48 @@ namespace Daedalus
             ESection section;
         };
 
+        struct RegisteredObjects
+        {
+            CAllocator<Daedalus::GEngineClasses::C_Npc> NPCs;
+            CAllocator<Daedalus::GEngineClasses::C_Item> items;
+            CAllocator<Daedalus::GEngineClasses::C_ItemReact> itemReacts;
+            CAllocator<Daedalus::GEngineClasses::C_Mission> missions;
+            CAllocator<Daedalus::GEngineClasses::C_Focus> focuses;
+            CAllocator<Daedalus::GEngineClasses::C_Info> infos;
+            CAllocator<Daedalus::GEngineClasses::C_Menu> menus;
+            CAllocator<Daedalus::GEngineClasses::C_Menu_Item> menuItems;
+            CAllocator<Daedalus::GEngineClasses::C_SFX> sfx;
+            CAllocator<Daedalus::GEngineClasses::C_ParticleFX> pfx;
+            template <class T>
+            CAllocator<T>& get();
+        };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_Npc>&
+        RegisteredObjects::get<Daedalus::GEngineClasses::C_Npc>() { return NPCs; };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_Item>&
+        RegisteredObjects::get<Daedalus::GEngineClasses::C_Item>() { return items; };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_Mission>&
+        RegisteredObjects::get<Daedalus::GEngineClasses::C_Mission>() { return missions; };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_Focus>&
+        RegisteredObjects::get<Daedalus::GEngineClasses::C_Focus>() { return focuses; };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_ItemReact>&
+        RegisteredObjects::get<Daedalus::GEngineClasses::C_ItemReact>() { return itemReacts; };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_Info>&
+        RegisteredObjects::get<Daedalus::GEngineClasses::C_Info>() { return infos; };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_Menu>&
+        RegisteredObjects::get<Daedalus::GEngineClasses::C_Menu>() { return menus; };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_Menu_Item>&
+        RegisteredObjects::get<Daedalus::GEngineClasses::C_Menu_Item>() { return menuItems; };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_SFX>&
+        RegisteredObjects::get<Daedalus::GEngineClasses::C_SFX>() { return sfx; };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_ParticleFX>&
+        RegisteredObjects::get<Daedalus::GEngineClasses::C_ParticleFX>() { return pfx; };
+
         /**
 		 * Class holding the current engine-side gamestate of a daedalus-VM
 		 */
         class DaedalusGameState
         {
         public:
-
-            struct RegisteredObjects
-            {
-                CAllocator<Daedalus::GEngineClasses::C_Npc> NPCs;
-                CAllocator<Daedalus::GEngineClasses::C_Item> items;
-                CAllocator<Daedalus::GEngineClasses::C_ItemReact> itemReacts;
-                CAllocator<Daedalus::GEngineClasses::C_Mission> missions;
-                CAllocator<Daedalus::GEngineClasses::C_Focus> focuses;
-                CAllocator<Daedalus::GEngineClasses::C_Info> infos;
-                CAllocator<Daedalus::GEngineClasses::C_Menu> menus;
-                CAllocator<Daedalus::GEngineClasses::C_Menu_Item> menuItems;
-                CAllocator<Daedalus::GEngineClasses::C_SFX> sfx;
-                CAllocator<Daedalus::GEngineClasses::C_ParticleFX> pfx;
-                template <class T>
-                CAllocator<T>& get(); //  { static_assert(false, "unimplemented template spezialization getter"); }
-            };
 
             DaedalusGameState(Daedalus::DaedalusVM &vm);
 
@@ -288,25 +308,5 @@ namespace Daedalus
             std::function<void(ZMemory::BigHandle, EInstanceClass)> m_OnInstanceCreated;
             std::function<void(ZMemory::BigHandle, EInstanceClass)> m_OnInstanceRemoved;
         };
-        template<> inline CAllocator<Daedalus::GEngineClasses::C_Npc>&
-        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_Npc>() { return NPCs; };
-        template<> inline CAllocator<Daedalus::GEngineClasses::C_Item>&
-        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_Item>() { return items; };
-        template<> inline CAllocator<Daedalus::GEngineClasses::C_Mission>&
-        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_Mission>() { return missions; };
-        template<> inline CAllocator<Daedalus::GEngineClasses::C_Focus>&
-        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_Focus>() { return focuses; };
-        template<> inline CAllocator<Daedalus::GEngineClasses::C_ItemReact>&
-        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_ItemReact>() { return itemReacts; };
-        template<> inline CAllocator<Daedalus::GEngineClasses::C_Info>&
-        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_Info>() { return infos; };
-        template<> inline CAllocator<Daedalus::GEngineClasses::C_Menu>&
-        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_Menu>() { return menus; };
-        template<> inline CAllocator<Daedalus::GEngineClasses::C_Menu_Item>&
-        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_Menu_Item>() { return menuItems; };
-        template<> inline CAllocator<Daedalus::GEngineClasses::C_SFX>&
-        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_SFX>() { return sfx; };
-        template<> inline CAllocator<Daedalus::GEngineClasses::C_ParticleFX>&
-        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_ParticleFX>() { return pfx; };
     }
 }
