@@ -185,7 +185,7 @@ template <typename C_Class>
 CHandle<C_Class> DaedalusGameState::create()
 {
     CHandle<C_Class> h = m_RegisteredObjects.get<C_Class>().createObject();
-    get<C_Class>(h) = C_Class();
+    get<C_Class>(h).userPtr = nullptr;
 
     if(m_OnInstanceCreated)
         m_OnInstanceCreated(ZMemory::toBigHandle(h), enumFromClass<C_Class>());
@@ -205,93 +205,42 @@ ItemHandle DaedalusGameState::createItem()
 
 ItemReactHandle DaedalusGameState::createItemReact()
 {
-    auto h = m_RegisteredObjects.itemReacts.createObject();
-    getItemReact(h).userPtr = nullptr;
-
-    if(m_OnInstanceCreated)
-        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_ItemReact);
-
-    return h;
+    return create<GEngineClasses::C_ItemReact>();
 }
 
 MissionHandle DaedalusGameState::createMission()
 {
-    auto h = m_RegisteredObjects.missions.createObject();
-    getMission(h).userPtr = nullptr;
-
-    if(m_OnInstanceCreated)
-        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Mission);
-
-    return h;
+    return create<GEngineClasses::C_Mission>();
 }
 
 InfoHandle DaedalusGameState::createInfo()
 {
-    auto h = m_RegisteredObjects.infos.createObject();
-    auto& cInfo = getInfo(h);
-
-    // overwrite data with default C_Info
-    cInfo = GEngineClasses::C_Info();
-
-    if(m_OnInstanceCreated)
-        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Info);
-
-    return h;
+    return create<GEngineClasses::C_Info>();
 }
 
 FocusHandle DaedalusGameState::createFocus()
 {
-    auto h = m_RegisteredObjects.focuses.createObject();
-    getFocus(h).userPtr = nullptr;
-
-    if(m_OnInstanceCreated)
-        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Focus);
-
-    return h;
+    return create<GEngineClasses::C_Focus>();
 }
 
 SfxHandle DaedalusGameState::createSfx()
 {
-    auto h = m_RegisteredObjects.sfx.createObject();
-    getSfx(h).userPtr = nullptr;
-
-    if(m_OnInstanceCreated)
-        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Sfx);
-
-    return h;
+    return create<GEngineClasses::C_SFX>();
 }
 
 PfxHandle DaedalusGameState::createPfx()
 {
-    auto h = m_RegisteredObjects.pfx.createObject();
-    getPfx(h).userPtr = nullptr;
-
-    if(m_OnInstanceCreated)
-        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Pfx);
-
-    return h;
+    return create<GEngineClasses::C_ParticleFX>();
 }
 
 FocusHandle DaedalusGameState::createMenu()
 {
-    auto h = m_RegisteredObjects.menus.createObject();
-    getMenu(h).userPtr = nullptr;
-
-    if(m_OnInstanceCreated)
-        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Menu);
-
-    return h;
+    return create<GEngineClasses::C_Menu>();
 }
 
 FocusHandle DaedalusGameState::createMenuItem()
 {
-    auto h = m_RegisteredObjects.menuItems.createObject();
-    getMenuItem(h).userPtr = nullptr;
-
-    if(m_OnInstanceCreated)
-        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Item);
-
-    return h;
+    return create<GEngineClasses::C_Menu_Item>();
 }
 
 

@@ -331,7 +331,15 @@ std::string Daedalus::eParTypeToString(EParType type)
 namespace Daedalus
 {
     template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_Npc>() { return IC_Npc; };
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_Mission>() { return IC_Mission; };
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_Info>() { return IC_Info; };
     template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_Item>() { return IC_Item; };
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_ItemReact>() { return IC_ItemReact; };
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_Focus>() { return IC_Focus; };
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_Menu>() { return IC_Menu; };
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_Menu_Item>() { return IC_MenuItem; };
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_SFX>() { return IC_Sfx; };
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_ParticleFX>() { return IC_Pfx; };
 }
 
 PARSymbol& DATFile::getSymbolByName(const std::string& symName)
