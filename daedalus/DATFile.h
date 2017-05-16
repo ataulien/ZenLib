@@ -5,6 +5,7 @@
 #include <zenload/zenParser.h>
 #include <utils/staticReferencedAllocator.h>
 #include <utils/logger.h>
+#include <daedalus/DaedalusStdlib.h>
 
 namespace Daedalus
 {
@@ -23,6 +24,8 @@ namespace Daedalus
 		IC_Pfx
 	};
 
+	template <class C_Class>
+	EInstanceClass enumFromClass();
 
 	enum EParFlag
     {

@@ -328,6 +328,12 @@ std::string Daedalus::eParTypeToString(EParType type)
     }
 }
 
+namespace Daedalus
+{
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_Npc>() { return IC_Npc; };
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_Item>() { return IC_Item; };
+}
+
 PARSymbol& DATFile::getSymbolByName(const std::string& symName)
 {
     std::string n = std::string(symName);

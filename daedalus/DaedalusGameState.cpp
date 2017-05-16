@@ -144,10 +144,10 @@ Daedalus::GEngineClasses::Instance* DaedalusGameState::getByClass(ZMemory::BigHa
 
     switch(instClass)
     {
-        case EInstanceClass::IC_Npc:
+        case IC_Npc:
             return &getNpc(ZMemory::handleCast<NpcHandle>(h));
 
-        case EInstanceClass::IC_Item:
+        case IC_Item:
             return &getItem(ZMemory::handleCast<ItemHandle>(h));
 
         case IC_Mission:
@@ -168,10 +168,10 @@ Daedalus::GEngineClasses::Instance* DaedalusGameState::getByClass(ZMemory::BigHa
         case IC_MenuItem:
             return &getMenuItem(ZMemory::handleCast<MenuItemHandle>(h));
 
-        case EInstanceClass::IC_Sfx:
+        case IC_Sfx:
             return &getSfx(ZMemory::handleCast<SfxHandle>(h));
 
-        case EInstanceClass::IC_Pfx:
+        case IC_Pfx:
             return &getPfx(ZMemory::handleCast<PfxHandle>(h));
 
         default:
@@ -180,30 +180,27 @@ Daedalus::GEngineClasses::Instance* DaedalusGameState::getByClass(ZMemory::BigHa
     }
 }
 
-NpcHandle DaedalusGameState::createNPC()
+
+template <typename C_Class>
+CHandle<C_Class> DaedalusGameState::create()
 {
-    NpcHandle h = m_RegisteredObjects.NPCs.createObject();
-    getNpc(h).userPtr = nullptr;
+    CHandle<C_Class> h = m_RegisteredObjects.get<C_Class>().createObject();
+    get<C_Class>(h) = C_Class();
 
     if(m_OnInstanceCreated)
-        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Npc);
+        m_OnInstanceCreated(ZMemory::toBigHandle(h), enumFromClass<C_Class>());
 
     return h;
 }
 
+NpcHandle DaedalusGameState::createNPC()
+{
+    return create<GEngineClasses::C_Npc>();
+}
+
 ItemHandle DaedalusGameState::createItem()
 {
-    auto h = m_RegisteredObjects.items.createObject();
-    auto& cItem = getItem(h);
-
-    // overwrite data with default C_Item
-    // TODO: Fix also createNPC, createItemReact, ...
-    cItem = GEngineClasses::C_Item();
-
-    if(m_OnInstanceCreated)
-        m_OnInstanceCreated(ZMemory::toBigHandle(h), IC_Item);
-
-    return h;
+    return create<GEngineClasses::C_Item>();
 }
 
 ItemReactHandle DaedalusGameState::createItemReact()
@@ -475,4 +472,3 @@ void DaedalusGameState::removeMenuItem(MenuItemHandle menuItem)
 
     m_RegisteredObjects.menuItems.removeObject(menuItem);
 }
-

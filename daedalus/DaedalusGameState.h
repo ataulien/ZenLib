@@ -5,13 +5,20 @@
 #include <vector>
 #include <list>
 
-const int MAX_NUM_NPCS = 12000;
-const int MAX_NUM_ITEMS = 12000;
-const int MAX_NUM_MISSIONS = 512;
-const int MAX_NUM_INFO = 16000;
-const int MAX_NUM_MISC = 1024;
-const int MAX_NUM_SFX = 4096; // G2 has 1700
-const int MAX_NUM_PFX = 1024;
+constexpr int MAX_NUM_NPCS = 12000;
+constexpr int MAX_NUM_ITEMS = 12000;
+constexpr int MAX_NUM_MISSIONS = 512;
+constexpr int MAX_NUM_INFO = 16000;
+constexpr int MAX_NUM_MISC = 1024;
+constexpr int MAX_NUM_SFX = 4096; // G2 has 1700
+constexpr int MAX_NUM_PFX = 1024;
+
+template <class T>
+constexpr size_t MAX_NUM();
+
+template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Npc>() { return MAX_NUM_NPCS; }
+template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Item>() { return MAX_NUM_ITEMS; }
+
 
 namespace Daedalus
 {
@@ -19,8 +26,13 @@ namespace Daedalus
 
     namespace GameState
     {
-        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Npc, MAX_NUM_NPCS>::Handle NpcHandle;
-        typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Item, MAX_NUM_ITEMS>::Handle ItemHandle;
+        template <class T>
+        using CAllocator = ZMemory::StaticReferencedAllocator<T, MAX_NUM<T>()>;
+        template <typename C_Class>
+        using CHandle = typename CAllocator<C_Class>::Handle;
+
+        typedef CHandle<Daedalus::GEngineClasses::C_Npc> NpcHandle;
+        typedef CHandle<Daedalus::GEngineClasses::C_Item> ItemHandle;
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Mission, MAX_NUM_MISSIONS>::Handle MissionHandle;
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Focus, MAX_NUM_MISC>::Handle FocusHandle;
         typedef ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_ItemReact, MAX_NUM_MISC>::Handle ItemReactHandle;
@@ -63,8 +75,8 @@ namespace Daedalus
 
             struct RegisteredObjects
             {
-                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Npc, MAX_NUM_NPCS> NPCs;
-                ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Item, MAX_NUM_ITEMS> items;
+                CAllocator<Daedalus::GEngineClasses::C_Npc> NPCs;
+                CAllocator<Daedalus::GEngineClasses::C_Item> items;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_ItemReact, MAX_NUM_MISC> itemReacts;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Mission, MAX_NUM_MISSIONS> missions;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Focus, MAX_NUM_MISC> focuses;
@@ -73,6 +85,8 @@ namespace Daedalus
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_Menu_Item, MAX_NUM_MISC> menuItems;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_SFX, MAX_NUM_SFX> sfx;
                 ZMemory::StaticReferencedAllocator<Daedalus::GEngineClasses::C_ParticleFX, MAX_NUM_PFX> pfx;
+                template <class T>
+                CAllocator<T>& get(); //  { static_assert(false, "unimplemented template spezialization getter"); }
             };
 
             DaedalusGameState(Daedalus::DaedalusVM &vm);
@@ -154,6 +168,8 @@ namespace Daedalus
             /**
 			 * Creates scripting relevant objects
 			 */
+            template <typename C_Class>
+            CHandle<C_Class> create();
             NpcHandle createNPC();
             ItemHandle createItem();
             ItemReactHandle createItemReact();
@@ -168,6 +184,10 @@ namespace Daedalus
             /**
 			 * Accessors
 			 */
+            template <typename C_Class>
+            C_Class &get(CHandle<C_Class> h)
+            { return m_RegisteredObjects.get<C_Class>().getElement(h); };
+
             Daedalus::GEngineClasses::C_Npc &getNpc(NpcHandle h)
             { return m_RegisteredObjects.NPCs.getElement(h); };
 
@@ -255,6 +275,9 @@ namespace Daedalus
             std::function<void(ZMemory::BigHandle, EInstanceClass)> m_OnInstanceCreated;
             std::function<void(ZMemory::BigHandle, EInstanceClass)> m_OnInstanceRemoved;
         };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_Npc>&
+        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_Npc>() { return NPCs; };
+        template<> inline CAllocator<Daedalus::GEngineClasses::C_Item>&
+        DaedalusGameState::RegisteredObjects::get<Daedalus::GEngineClasses::C_Item>() { return items; };
     }
-
 }
