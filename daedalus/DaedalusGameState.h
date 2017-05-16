@@ -92,7 +92,9 @@ namespace Daedalus
             CAllocator<Daedalus::GEngineClasses::C_SFX> sfx;
             CAllocator<Daedalus::GEngineClasses::C_ParticleFX> pfx;
             template <class T>
-            CAllocator<T>& get();
+            CAllocator<T>& get(){
+                T::unimplemented_function;
+            }
         };
         template<> inline CAllocator<Daedalus::GEngineClasses::C_Npc>&
         RegisteredObjects::get<Daedalus::GEngineClasses::C_Npc>() { return NPCs; };
