@@ -185,7 +185,8 @@ template <typename C_Class>
 CHandle<C_Class> DaedalusGameState::create()
 {
     CHandle<C_Class> h = m_RegisteredObjects.get<C_Class>().createObject();
-    get<C_Class>(h).userPtr = nullptr;
+    // important! overwrite uninitialized memory with initialized C_Class
+    get<C_Class>(h) = C_Class();
 
     if(m_OnInstanceCreated)
         m_OnInstanceCreated(ZMemory::toBigHandle(h), enumFromClass<C_Class>());
