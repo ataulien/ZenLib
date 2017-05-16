@@ -91,8 +91,8 @@ namespace Daedalus
             CAllocator<Daedalus::GEngineClasses::C_Menu_Item> menuItems;
             CAllocator<Daedalus::GEngineClasses::C_SFX> sfx;
             CAllocator<Daedalus::GEngineClasses::C_ParticleFX> pfx;
-            template <class T>
-            CAllocator<T>& get(){
+            template <class C_Class>
+            CAllocator<C_Class>& get(){
                 T::unimplemented_function;
             }
         };
