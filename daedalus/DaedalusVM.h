@@ -164,7 +164,7 @@ namespace Daedalus
 
             CallStackFrame(DaedalusVM& vm, size_t addressOrIndex, AddressType addrType, bool xmlLogging = false);
             ~CallStackFrame();
-            std::string indent(int add);
+            std::string indent(int add = 0);
         private:
             DaedalusVM& vm;
             bool m_XmlLogging;

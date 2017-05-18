@@ -641,7 +641,8 @@ int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx, bool clearDataStack)
 
     if (!m_Stack.empty())
     {
-        LogWarn() << "DaedalusVM: stack not empty (" + std::to_string(m_Stack.size()) + ") after function " << functionSymbol.name;
+        // too many warnings for now. need a Daedalus compiler that pops unused expressions
+        // LogWarn() << "DaedalusVM: stack not empty (" + std::to_string(m_Stack.size()) + ") after function " << functionSymbol.name;
     }
 
     // Restore to previous VM-State
