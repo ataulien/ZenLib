@@ -27,9 +27,6 @@ void DaedalusDialogManager::gatherNpcInformation()
         // Add to vector
         m_NpcInfos.push_back(h);
     });
-
-    // Messages are in wrong order. Fix this.
-    std::reverse(m_NpcInfos.begin(), m_NpcInfos.end());
 }
 
 void DaedalusDialogManager::setNpcInfoKnown(size_t npcInstance, size_t infoInstance)
