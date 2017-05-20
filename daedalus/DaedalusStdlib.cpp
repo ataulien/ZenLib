@@ -8,6 +8,7 @@
 #include "DATFile.h"
 
 #define REGISTER(cname, obj, var) datFile.registerMember(cname "." #var, obj, obj.var);
+#define REGISTER_IF_EXISTS(cname, obj, var) datFile.registerMember(cname "." #var, obj, obj.var, true);
 
 void Daedalus::registerDaedalusStdLib(Daedalus::DaedalusVM& vm, bool enableVerboseLogging)
 {
@@ -54,7 +55,7 @@ void Daedalus::registerDaedalusStdLib(Daedalus::DaedalusVM& vm, bool enableVerbo
     //
 }
 
-void Daedalus::registerGothicEngineClasses(DaedalusVM& vm, GameType gameType)
+void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
 {
     GEngineClasses::C_Npc npc;
     GEngineClasses::C_Focus focus;
@@ -76,17 +77,15 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm, GameType gameType)
         return exists && (vm.getDATFile().getSymbolByName(className).properties.elemProps.type == EParType_Class);
     };
 
-    bool isGothic2 = gameType == GT_Gothic2;
-
     if (classExists("C_Npc")){
         REGISTER("C_Npc", npc, id);
         REGISTER("C_Npc", npc, name);
         REGISTER("C_Npc", npc, slot);
-        if (isGothic2) REGISTER("C_Npc", npc, effect);
+        REGISTER_IF_EXISTS("C_Npc", npc, effect);
         REGISTER("C_Npc", npc, npcType);
         REGISTER("C_Npc", npc, flags);
         REGISTER("C_Npc", npc, attribute);
-        if (isGothic2) REGISTER("C_Npc", npc, hitChance);
+        REGISTER_IF_EXISTS("C_Npc", npc, hitChance);
         REGISTER("C_Npc", npc, protection);
         REGISTER("C_Npc", npc, damage);
         REGISTER("C_Npc", npc, damagetype);
@@ -109,8 +108,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm, GameType gameType)
         REGISTER("C_Npc", npc, exp);
         REGISTER("C_Npc", npc, exp_next);
         REGISTER("C_Npc", npc, lp);
-        if (isGothic2) REGISTER("C_Npc", npc, bodyStateInterruptableOverride);
-        if (isGothic2) REGISTER("C_Npc", npc, noFocus);
+        REGISTER_IF_EXISTS("C_Npc", npc, bodyStateInterruptableOverride);
+        REGISTER_IF_EXISTS("C_Npc", npc, noFocus);
     }
 
     if (classExists("C_Focus")){
@@ -185,7 +184,7 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm, GameType gameType)
         REGISTER("C_Item", item, disguiseGuild);
         REGISTER("C_Item", item, visual);
         REGISTER("C_Item", item, visual_change );
-        if (isGothic2) REGISTER("C_Item", item, effect);
+        REGISTER_IF_EXISTS("C_Item", item, effect);
         REGISTER("C_Item", item, visual_skin);
         REGISTER("C_Item", item, scemeName);
         REGISTER("C_Item", item, material);
@@ -196,26 +195,26 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm, GameType gameType)
         REGISTER("C_Item", item, description);
         REGISTER("C_Item", item, text);
         REGISTER("C_Item", item, count);
-        if (isGothic2) REGISTER("C_Item", item, inv_zbias);
-        if (isGothic2) REGISTER("C_Item", item, inv_rotx);
-        if (isGothic2) REGISTER("C_Item", item, inv_roty);
-        if (isGothic2) REGISTER("C_Item", item, inv_rotz);
-        if (isGothic2) REGISTER("C_Item", item, inv_animate);
+        REGISTER_IF_EXISTS("C_Item", item, inv_zbias);
+        REGISTER_IF_EXISTS("C_Item", item, inv_rotx);
+        REGISTER_IF_EXISTS("C_Item", item, inv_roty);
+        REGISTER_IF_EXISTS("C_Item", item, inv_rotz);
+        REGISTER_IF_EXISTS("C_Item", item, inv_animate);
     }
 
-    if (isGothic2 && classExists("C_Spell")){
-        REGISTER("C_Spell", spell, time_per_mana);
-        REGISTER("C_Spell", spell, damage_per_level);
-        REGISTER("C_Spell", spell, damageType);
-        REGISTER("C_Spell", spell, spellType);
-        REGISTER("C_Spell", spell, canTurnDuringInvest);
-        REGISTER("C_Spell", spell, canChangeTargetDuringInvest);
-        REGISTER("C_Spell", spell, isMultiEffect);
-        REGISTER("C_Spell", spell, targetCollectAlgo);
-        REGISTER("C_Spell", spell, targetCollectType);
-        REGISTER("C_Spell", spell, targetCollectRange);
-        REGISTER("C_Spell", spell, targetCollectAzi);
-        REGISTER("C_Spell", spell, targetCollectElev);
+    if (classExists("C_Spell")){
+        REGISTER_IF_EXISTS("C_Spell", spell, time_per_mana);
+        REGISTER_IF_EXISTS("C_Spell", spell, damage_per_level);
+        REGISTER_IF_EXISTS("C_Spell", spell, damageType);
+        REGISTER_IF_EXISTS("C_Spell", spell, spellType);
+        REGISTER_IF_EXISTS("C_Spell", spell, canTurnDuringInvest);
+        REGISTER_IF_EXISTS("C_Spell", spell, canChangeTargetDuringInvest);
+        REGISTER_IF_EXISTS("C_Spell", spell, isMultiEffect);
+        REGISTER_IF_EXISTS("C_Spell", spell, targetCollectAlgo);
+        REGISTER_IF_EXISTS("C_Spell", spell, targetCollectType);
+        REGISTER_IF_EXISTS("C_Spell", spell, targetCollectRange);
+        REGISTER_IF_EXISTS("C_Spell", spell, targetCollectAzi);
+        REGISTER_IF_EXISTS("C_Spell", spell, targetCollectElev);
     };
 
     if (classExists("C_Mission")) {
@@ -274,12 +273,9 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm, GameType gameType)
         REGISTER("C_Menu_Item", menuItem, userString);
         REGISTER("C_Menu_Item", menuItem, frameSizeX);
         REGISTER("C_Menu_Item", menuItem, frameSizeY);
-        if (isGothic2)
-        {
-            REGISTER("C_Menu_Item", menuItem, hideIfOptionSectionSet);
-            REGISTER("C_Menu_Item", menuItem, hideIfOptionSet);
-            REGISTER("C_Menu_Item", menuItem, hideOnValue);
-        }
+        REGISTER_IF_EXISTS("C_Menu_Item", menuItem, hideIfOptionSectionSet);
+        REGISTER_IF_EXISTS("C_Menu_Item", menuItem, hideIfOptionSet);
+        REGISTER_IF_EXISTS("C_Menu_Item", menuItem, hideOnValue);
     }
 
     if (classExists("C_SFX")) {
@@ -347,13 +343,11 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm, GameType gameType)
         REGISTER("C_ParticleFX", pfx, mrkFadeSpeed);
         REGISTER("C_ParticleFX", pfx, mrkTexture_S);
         REGISTER("C_ParticleFX", pfx, mrkSize);
-        if (isGothic2){
-            REGISTER("C_ParticleFX", pfx, flockMode);
-            REGISTER("C_ParticleFX", pfx, flockStrength);
-            REGISTER("C_ParticleFX", pfx, useEmittersFOR);
-            REGISTER("C_ParticleFX", pfx, timeStartEnd_S);
-            REGISTER("C_ParticleFX", pfx, m_bIsAmbientPFX);
-        }
+        REGISTER_IF_EXISTS("C_ParticleFX", pfx, flockMode);
+        REGISTER_IF_EXISTS("C_ParticleFX", pfx, flockStrength);
+        REGISTER_IF_EXISTS("C_ParticleFX", pfx, useEmittersFOR);
+        REGISTER_IF_EXISTS("C_ParticleFX", pfx, timeStartEnd_S);
+        REGISTER_IF_EXISTS("C_ParticleFX", pfx, m_bIsAmbientPFX);
     }
 }
 

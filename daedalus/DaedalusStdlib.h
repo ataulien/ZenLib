@@ -12,7 +12,7 @@ namespace Daedalus
     /**
 	 * Basic gametype. Needed for registering C_Class members and sky configuration in REGoth
 	 */
-    enum GameType
+    enum class GameType
     {
         GT_Gothic1,
         GT_Gothic2
@@ -691,5 +691,5 @@ namespace Daedalus
     /**
      * @brief Links the classes known to the engine to the VM.
      */
-    void registerGothicEngineClasses(DaedalusVM& vm, GameType gameType);
+    void registerGothicEngineClasses(DaedalusVM& vm);
 }

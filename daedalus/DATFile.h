@@ -380,9 +380,11 @@ namespace Daedalus
          * @param member this variable reference must be a member of the given obj
          */
         template<class C_Class, class MemberClass>
-        void registerMember(const std::string& symbolName, const C_Class& obj, const MemberClass& member){
-            int32_t offset = static_cast<int32_t>(((char*)&member) - ((char*)&obj));
+        void registerMember(const std::string& symbolName, const C_Class& obj, const MemberClass& member, bool checkIfExists = false){
+			if (checkIfExists && !hasSymbolName(symbolName))
+                return;
             auto& parSymbol = getSymbolByName(symbolName);
+			int32_t offset = static_cast<int32_t>(((char*)&member) - ((char*)&obj));
             parSymbol.classMemberOffset = offset;
             parSymbol.classMemberArraySize = static_cast<uint32_t>(arraySize(member));
         }
