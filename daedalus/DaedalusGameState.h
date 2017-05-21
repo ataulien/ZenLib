@@ -144,6 +144,7 @@ namespace Daedalus
                 // These will all be executed with the content already created
                 std::function<void(NpcHandle, std::string)> wld_insertnpc;
                 std::function<void(NpcHandle)> post_wld_insertnpc;
+                std::function<void(NpcHandle)> wld_removenpc;
                 std::function<void(ItemHandle)> wld_insertitem;
                 std::function<void(ItemHandle, NpcHandle)> createinvitem;
                 std::function<int(void)> wld_GetDay;
@@ -185,6 +186,7 @@ namespace Daedalus
              * @param item Item to remove
              */
             void removeItem(ItemHandle item);
+            void removeNPC(NpcHandle npc);
             void removeMenu(MenuHandle menu);
             void removeMenuItem(MenuItemHandle menuItem);
 
