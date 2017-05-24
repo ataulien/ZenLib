@@ -54,7 +54,7 @@ void ParserImplBinary::readImplHeader()
 	if(!m_pParser->skipString("END"))
 		throw std::runtime_error("No END in header(2)");
 
-	m_pParser->skipSpaces();
+	m_pParser->skipNewLines();
 }
 
 /**

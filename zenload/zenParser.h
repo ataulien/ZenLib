@@ -147,6 +147,11 @@ namespace ZenLoad
 		void skipSpaces();
 
 		/**
+		 * @brief Skips all newline-characters until it hits a non-newline one
+		 */
+		void skipNewLines();
+
+		/**
 		 * @brief Throws an exception if the current seek is behind the file-size
 		 */
 		void checkArraySize();
