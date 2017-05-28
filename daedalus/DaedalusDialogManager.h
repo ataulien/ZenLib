@@ -21,7 +21,9 @@ namespace Daedalus
         class DaedalusDialogManager
         {
         public:
-            DaedalusDialogManager(Daedalus::DaedalusVM &vm, const std::string &ou_bin);
+            DaedalusDialogManager(Daedalus::DaedalusVM &vm,
+                                  const std::string &ou_bin,
+                                  std::map<size_t, std::set<size_t>>& knownInfos);
 
             /**
 			 * Sets the given info-instance as "known" to the given NPC-Instance
@@ -69,10 +71,15 @@ namespace Daedalus
             Daedalus::DaedalusVM &m_VM;
 
             /**
-			 * Map of NPC-Sym-Handles and their C_Infos
+			 * vector of all C_Info handles, can't use map here (infos by npc)
+             * since the VM changes C_Info.npc before talking to an ambient npc
 			 */
             std::vector<InfoHandle> m_NpcInfos;
-            std::map<size_t, std::set<size_t>> m_KnownNpcInfoSymbolsByNpcSymbols;
+
+            /**
+			 * map of all known infoInstances by npcInstance
+			 */
+            std::map<size_t, std::set<size_t>>& m_KnownNpcInfoSymbolsByNpcSymbols;
         };
     }
 }

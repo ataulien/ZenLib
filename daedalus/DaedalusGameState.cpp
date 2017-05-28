@@ -422,3 +422,13 @@ void DaedalusGameState::removeMenuItem(MenuItemHandle menuItem)
 
     m_RegisteredObjects.menuItems.removeObject(menuItem);
 }
+
+void DaedalusGameState::removeNPC(NpcHandle npc) {
+    if(m_GameExternals.wld_removenpc)
+        m_GameExternals.wld_removenpc(npc);
+
+    if(m_OnInstanceRemoved)
+        m_OnInstanceRemoved(ZMemory::toBigHandle(npc), IC_Npc);
+
+    m_RegisteredObjects.NPCs.removeObject(npc);
+}

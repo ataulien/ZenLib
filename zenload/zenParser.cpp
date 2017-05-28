@@ -431,6 +431,15 @@ void ZenParser::skipSpaces()
 }
 
 /**
+ * @brief Skips all newline-characters until it hits a non-newline one
+ */
+void ZenParser::skipNewLines()
+{
+    while(m_Seek < m_Data.size() && m_Data[m_Seek] == '\n')
+        ++m_Seek;
+}
+
+/**
 * @brief Throws an exception if the current seek is behind the file-size
 */
 void ZenParser::checkArraySize()
