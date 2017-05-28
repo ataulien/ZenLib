@@ -494,15 +494,37 @@ void DATFile::iterateSymbolsOfClass(const std::string& className, std::function<
     }
 }
 
+namespace Daedalus
+{
+    // getDataContainer specializations
+    template<>
+    std::vector<int32_t>& PARSymbol::getDataContainer()
+    {
+        return this->intData;
+    }
+
+    template<>
+    std::vector<float>& PARSymbol::getDataContainer()
+    {
+        return this->floatData;
+    }
+
+    template<>
+    std::vector<std::string>& PARSymbol::getDataContainer()
+    {
+        return this->strData;
+    }
+}
+
 int32_t& PARSymbol::getInt(size_t idx, void *baseAddr)
 {
-    return getValue(intData, idx, baseAddr);
+    return getValue<int32_t>(idx, baseAddr);
 }
 
 std::string& PARSymbol::getString(size_t idx, void *baseAddr) {
-    return getValue(strData, idx, baseAddr);
+    return getValue<std::string>(idx, baseAddr);
 }
 
 float &PARSymbol::getFloat(size_t idx, void *baseAddr) {
-    return getValue(floatData, idx, baseAddr);
+    return getValue<float>(idx, baseAddr);
 }
