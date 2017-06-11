@@ -1,6 +1,5 @@
-// ---------------------------
-// LEAGACY CODE AND ONLY FOR COMPATIBILITY TO MASTER
-// ---------------------------
+// FIXME: COMPATIBILITY FOR MASTER - REMOVE LATER! (Complete file)
+
 
 #include "zCModelAni.h"
 #include "zenParser.h"
