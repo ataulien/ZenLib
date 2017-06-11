@@ -13,7 +13,8 @@ namespace Daedalus
     class DaedalusVM
     {
     public:
-        DaedalusVM(const std::string& file, const std::string& main="main", bool registerZenLibExternals=false);
+        DaedalusVM(const DATFile &dat, const std::string &main);
+        DaedalusVM(const std::string& file, const std::string& main="main");
 
         /**
          * @brief Performs a single instruction on the stack
@@ -35,16 +36,17 @@ namespace Daedalus
         /**
          * Runs a complete function with the arguments given by pushing onto the stack
          * Note: Must be prepared first, using prepareRunFunction.
-         * @param symIdx Symbol-index of the function to call
-         * @param clearDataStack indicates whether any leftovers from previous runs should be removed (default=true)
+         * @param fname Symbol-name of the function to look up and call
          * @return value returned by the function
          */
-        int32_t runFunctionBySymIndex(size_t symIdx, bool clearDataStack = true);
+        int32_t runFunction(const std::string& fname);
+        int32_t runFunction(size_t addr);
+        int32_t runFunctionBySymIndex(size_t symIdx);
 
         /**
-         * @brief sets the program counter
+         * @brief Performs a call-instruction with the given address
          */
-        void setProgramCounter(uint32_t target);
+        void doCallOperation(uint32_t target);
 
         /**
          * @brief Clears the debug-callstack
@@ -67,7 +69,7 @@ namespace Daedalus
 
         void setReturn(int32_t v);
         void setReturn(const std::string& v);
-        void setReturn(float f);
+        void setReturn(float v);
         void setReturnVar(int32_t v);
 
         /**
@@ -79,8 +81,7 @@ namespace Daedalus
         /**
          * @brief Pops an int from the stack
          */
-        template <typename T = int32_t>
-        T popDataValue();
+        int32_t popDataValue();
         float popFloatValue();
         uint32_t popVar(){uint32_t arr; return popVar(arr); }
         uint32_t popVar(uint32_t& arrIdx);
@@ -150,27 +151,6 @@ namespace Daedalus
         }
     private:
 
-        /**
-         * pushing/popping FunctionInfo to the debug callstack using RAII concept
-         * can be used to keep track of ALL function calls
-         */
-        class CallStackFrame
-        {
-        public:
-            enum AddressType{
-                Address,
-                SymbolIndex
-            };
-            using FunctionInfo = std::pair<size_t, CallStackFrame::AddressType>;
-
-            CallStackFrame(DaedalusVM& vm, size_t addressOrIndex, AddressType addrType, bool xmlLogging = false);
-            ~CallStackFrame();
-            std::string indent(int add = 0);
-        private:
-            DaedalusVM& vm;
-            bool m_XmlLogging;
-        };
-
         DATFile m_DATFile;
 
         /**
@@ -179,10 +159,8 @@ namespace Daedalus
         size_t m_PC;
 
         std::stack<uint32_t> m_Stack;
-        // contains pairs of FunctionInfo, Debugging only
-        std::vector<CallStackFrame::FunctionInfo> m_CallStack;
-
-        std::string nameFromFunctionInfo(CallStackFrame::FunctionInfo functionInfo);
+        std::stack<size_t> m_RetStack;
+        std::vector<size_t> m_CallStack; // Debugging only
 
         /**
          * @brief External functions mapped by their symbols index value
@@ -218,11 +196,14 @@ namespace Daedalus
             size_t m_PC;
 
             std::stack<uint32_t> m_Stack;
+            std::stack<size_t> m_RetStack;
             std::vector<size_t> m_CallStack;
 
             PARSymbol m_Self;
         };
         std::stack<VMState> m_StateStack;
+
+        void init(const DATFile &dat, const std::string &main);
 
         /**
          * Callback for when a symbol-value changed/External got called

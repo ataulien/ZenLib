@@ -16,11 +16,22 @@ const int NUM_FAKE_STRING_SYMBOLS = 5;
 using namespace ZenLoad;
 using namespace Daedalus;
 
-DaedalusVM::DaedalusVM(const std::string& file, const std::string& main, bool registerZenLibExternals)
+DaedalusVM::DaedalusVM(const DATFile &dat, const std::string &main)
     : m_GameState(*this)
 {
+    init(dat, main);
+}
+
+DaedalusVM::DaedalusVM(const std::string& file, const std::string& main)
+    : m_GameState(*this)
+{
+    init(Daedalus::DATFile(file), main);
+}
+
+void DaedalusVM::init(const DATFile &dat, const std::string& main)
+{
     m_PC = 0;
-    m_DATFile = Daedalus::DATFile(file);
+    m_DATFile = dat;
 
     // See if we find a "main"-function
     if(m_DATFile.hasSymbolName(main))
@@ -33,18 +44,12 @@ DaedalusVM::DaedalusVM(const std::string& file, const std::string& main, bool re
 
     // Make fake-strings
     for(size_t i=0;i<NUM_FAKE_STRING_SYMBOLS;i++)
-    {
-        auto symIndex = m_DATFile.addSymbol();
-        // make sure there is enough space for 1 string
-        m_DATFile.getSymbolByIndex(symIndex).strData.resize(1);
-        m_FakeStringSymbols.push(symIndex);
-    }
+        m_FakeStringSymbols.push(m_DATFile.addSymbol());
 
-    // REGoth: don't register ZenLib externals
-    if (registerZenLibExternals)
-        m_GameState.registerExternals();
+    m_GameState.registerExternals();
 
     m_CurrentInstanceHandle.invalidate();
+
 }
 
 bool DaedalusVM::doStack(bool verbose)
@@ -86,31 +91,29 @@ bool DaedalusVM::doStack(bool verbose)
             break;*/
 
         case EParOp_Assign:
-        {
             a = popVar(arr);
-            if(log) LogInfo() << " - a: " << a << ", arr: " << arr;
-            b = popDataValue();
 
-            int32_t& aInt = m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
-            if (log) LogInfo() << " - " << aInt << " -> " << b;
-            aInt = b;
+            if(log) LogInfo() << " - a: " << a << ", arr: " << arr;
+
+            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
+            b = *addr;
+            *addr = popDataValue();
+            if(log) LogInfo() << " - " << b << " -> " << *addr;
 
             if(m_OnSymbolValueChanged)
                 m_OnSymbolValueChanged((unsigned)a, EParOp_Assign);
 
             break;
-
-        }
         case EParOp_LogOr:
-            // Note: This can't be done in one line because the second pop might not be executed,
-            // due to c++'s short-circuit evaluation
+            // Note: This can't be done in one line because || wouldn't pop the second piece of the stack
+            // if the first was 1
             a = popDataValue();
             b = popDataValue();
             pushInt(a || b ? 1 : 0);
             break;
         case EParOp_LogAnd:
-            // Note: This can't be done in one line because the second pop might not be executed,
-            // due to c++'s short-circuit evaluation
+            // Note: This can't be done in one line because || wouldn't pop the second piece of the stack
+            // if the first was 1
             a = popDataValue();
             b = popDataValue();
             pushInt(a && b ? 1 : 0);
@@ -123,7 +126,7 @@ bool DaedalusVM::doStack(bool verbose)
         case EParOp_GreaterOrEqual:pushInt(popDataValue() >= popDataValue() ? 1 : 0);break;
         case EParOp_AssignAdd:
             a = popVar(arr);
-            addr = &m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
+            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
             *addr += popDataValue();
 
             if(m_OnSymbolValueChanged)
@@ -131,7 +134,7 @@ bool DaedalusVM::doStack(bool verbose)
             break;
         case EParOp_AssignSubtract:
             a = popVar(arr);
-            addr = &m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
+            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
             *addr -= popDataValue();
 
             if(m_OnSymbolValueChanged)
@@ -139,7 +142,7 @@ bool DaedalusVM::doStack(bool verbose)
             break;
         case EParOp_AssignMultiply:
             a = popVar(arr);
-            addr = &m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
+            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
             *addr *= popDataValue();
 
             if(m_OnSymbolValueChanged)
@@ -147,7 +150,7 @@ bool DaedalusVM::doStack(bool verbose)
             break;
         case EParOp_AssignDivide:
             a = popVar(arr);
-            addr = &m_DATFile.getSymbolByIndex(a).getInt(arr, getCurrentInstanceDataPtr());
+            addr = m_DATFile.getSymbolByIndex(a).getIntAddr(arr, getCurrentInstanceDataPtr());
             *addr /= popDataValue();
 
             if(m_OnSymbolValueChanged)
@@ -187,11 +190,8 @@ bool DaedalusVM::doStack(bool verbose)
 			EInstanceClass currentInstanceClass = m_CurrentInstanceClass;
 			size_t PC = m_PC;
            
-			setProgramCounter((size_t)op.address);
-            {
-                CallStackFrame frame(*this, op.address, CallStackFrame::Address);
-                while(doStack());
-            }
+			m_PC = (size_t)op.address;
+			while(doStack());
 
 			m_PC = PC;
 			m_CurrentInstanceHandle = currentInstanceHandle;
@@ -212,10 +212,7 @@ bool DaedalusVM::doStack(bool verbose)
                 if(m_OnExternalCalled)
                     m_OnExternalCalled((unsigned)op.symbol);
 
-                {
-                    CallStackFrame frame(*this, op.symbol, CallStackFrame::SymbolIndex);
-                    (*it).second(*this);
-                }
+                (*it).second(*this);
             }
 
 			m_PC = PC;
@@ -252,11 +249,11 @@ bool DaedalusVM::doStack(bool verbose)
             }
 
             sym = m_DATFile.getSymbolByIndex(a);
-            straddr = &m_DATFile.getSymbolByIndex(a).getString(arr, getCurrentInstanceDataPtr());
+            straddr = m_DATFile.getSymbolByIndex(a).getStrAddr(arr, getCurrentInstanceDataPtr());
 
             {
                 //std::string s1 = *straddr;
-                std::string s2 = m_DATFile.getSymbolByIndex(b).getString(arr2, getCurrentInstanceDataPtr());
+                std::string s2 = *m_DATFile.getSymbolByIndex(b).getStrAddr(arr2, getCurrentInstanceDataPtr());
 
                 //LogInfo() << "s1 (" << sym.name << "): " << s1 << " s2: " << s2;
 
@@ -275,18 +272,13 @@ bool DaedalusVM::doStack(bool verbose)
 
 
         case EParOp_AssignFloat:
-            {
-                a = popVar(arr);
-                float b = popFloatValue();
-                {
-                    float& aFloat = m_DATFile.getSymbolByIndex(a).getFloat(arr, getCurrentInstanceDataPtr());
-                    aFloat = b;
-                }
+            a = popVar(arr);
+            b = popDataValue();
 
-                if(m_OnSymbolValueChanged)
-                    m_OnSymbolValueChanged((unsigned)a, EParOp_AssignFloat);
+            m_DATFile.getSymbolByIndex(a).set(b, arr, getCurrentInstanceDataPtr());
 
-            }
+            if(m_OnSymbolValueChanged)
+                m_OnSymbolValueChanged((unsigned)a, EParOp_AssignFloat);
             break;
 
         case EParOp_AssignInstance:
@@ -343,9 +335,11 @@ PARStackOpCode DaedalusVM::getCurrentInstruction()
     return op;
 }
 
-void DaedalusVM::setProgramCounter(uint32_t target)
+void DaedalusVM::doCallOperation(uint32_t target)
 {
+    m_RetStack.push(m_PC);
     m_PC = target;
+    m_CallStack.push_back(target);
 }
 
 void DaedalusVM::registerExternalFunction(const std::string& symName, const std::function<void(DaedalusVM&)>& fn)
@@ -368,12 +362,11 @@ void DaedalusVM::pushInt(int32_t value)
     pushInt(static_cast<uint32_t>(value));
 }
 
-template <typename T>
-T DaedalusVM::popDataValue()
+int32_t DaedalusVM::popDataValue()
 {
     // Default behavior of the ZenGin is to pop a 0, if nothing is on the stack.
     if(m_Stack.empty())
-        return static_cast<T>(0);
+        return 0;
 
     uint32_t tok = m_Stack.top();
     m_Stack.pop(); // Pop token
@@ -387,15 +380,15 @@ T DaedalusVM::popDataValue()
     {
 
         case EParOp_PushInt:
-            return reinterpret_cast<T&>(v); // reinterpret as float for T=float
+            return v;
 
         case EParOp_PushVar:
             arrIdx = m_Stack.top();
             m_Stack.pop(); // Pop array index
-            return m_DATFile.getSymbolByIndex(v).getValue<T>(arrIdx, getCurrentInstanceDataPtr());
+            return m_DATFile.getSymbolByIndex(v).getIntValue(arrIdx, getCurrentInstanceDataPtr());
 
         default:
-            return static_cast<T>(0);
+            return 0;
     }
 
 }
@@ -449,7 +442,7 @@ std::string DaedalusVM::popString(bool toUpper)
     uint32_t arr;
     uint32_t idx = popVar(arr);
 
-    std::string s = m_DATFile.getSymbolByIndex(idx).getString(arr, getCurrentInstanceDataPtr());
+    std::string s = *m_DATFile.getSymbolByIndex(idx).getStrAddr(arr, getCurrentInstanceDataPtr());
 
     if(toUpper)
         std::transform(s.begin(), s.end(), s.begin(), ::toupper);
@@ -467,9 +460,9 @@ void DaedalusVM::setReturn(const std::string& v)
     pushString(v);
 }
 
-void DaedalusVM::setReturn(float f)
+void DaedalusVM::setReturn(float v)
 {
-    pushInt(reinterpret_cast<int32_t&>(f));
+    pushInt(*reinterpret_cast<int32_t*>(&v));
 }
 
 void DaedalusVM::setReturnVar(int32_t v)
@@ -479,7 +472,8 @@ void DaedalusVM::setReturnVar(int32_t v)
 
 float DaedalusVM::popFloatValue()
 {
-    return popDataValue<float>();
+    int32_t v = popDataValue();
+    return *reinterpret_cast<float*>(&v);
 }
 
 void DaedalusVM::pushVar(const std::string& symName)
@@ -491,11 +485,12 @@ void DaedalusVM::pushVar(const std::string& symName)
 void DaedalusVM::pushString(const std::string& str)
 {
     size_t symIdx = m_FakeStringSymbols.front();
-    Daedalus::PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
+
+        Daedalus::PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
     m_FakeStringSymbols.push(m_FakeStringSymbols.front());
     m_FakeStringSymbols.pop();
 
-    s.getString(0) = str;
+    s.set(str, 0);
 
     pushVar(symIdx, 0);
 }
@@ -511,6 +506,9 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 {
     pushState();
 
+    if(symIdx == m_DATFile.getSymbolIndexByName("GRD_282_NEK"))
+        LogInfo() << "Nek!";
+
     PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
 
     // Enter address into instance-symbol
@@ -522,25 +520,34 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 
     setCurrentInstance(symIdx);
 
-    PARSymbol selfCpy;
-    bool selfExists = m_DATFile.hasSymbolName("self");
-    // Particle and Menu VM do not have a self symbol
-    if (selfExists)
-    {
-        selfCpy = m_DATFile.getSymbolByName("self"); // Copy of "self"-symbol
-        // Set self
-        setInstance("self", instance, classIdx);
-    }
+    // Set self
+	PARSymbol selfCpy = m_DATFile.getSymbolByName("self"); // Copy of "self"-symbol
+    setInstance("self", instance, classIdx);
 
     // Place the assigning symbol into the instance
     GEngineClasses::Instance* instData = m_GameState.getByClass(instance, classIdx);
     instData->instanceSymbol = symIdx;
 
-    // Run script code to initialize the object
-    runFunctionBySymIndex(symIdx);
+    // Point the PC to the instance-constructor
+    doCallOperation(s.address);
 
-    if (selfExists)
-        m_DATFile.getSymbolByName("self") = selfCpy;
+    // Empty retstack, so we can stop execution after this call
+    std::stack<size_t> retStack = m_RetStack;
+    m_RetStack = std::stack<size_t>();
+    size_t pc = m_PC;
+
+    m_CallStack.clear();
+
+    // Run script code to initialize the object
+    while(doStack());
+
+	// Reset to old "self"
+	m_DATFile.getSymbolByName("self") = selfCpy;
+
+    // Return to old location and continue like nothing ever happened
+    m_PC = pc;
+    m_RetStack = retStack;
+
 
     // Reset state
     //m_DATFile.getSymbolByName("SELF").instanceDataHandle = oldSelfInstance;
@@ -565,16 +572,18 @@ void* DaedalusVM::getCurrentInstanceDataPtr()
 
 void DaedalusVM::pushState()
 {
-    return;
+	return;
     VMState s;
     s.m_CurrentInstanceClass = m_CurrentInstanceClass;
     s.m_CurrentInstanceHandle = m_CurrentInstanceHandle;
     s.m_PC = m_PC;
+    s.m_RetStack = m_RetStack;
     s.m_Stack = m_Stack;
     s.m_Self = m_DATFile.getSymbolByName("self");
-    // s.m_CallStack = m_CallStack;
+    s.m_CallStack = m_CallStack;
 
     m_PC = 0;
+    m_RetStack = std::stack<size_t>();
     m_Stack = std::stack<uint32_t>();
     m_CurrentInstanceHandle.invalidate();
     m_CallStack.clear();
@@ -584,10 +593,11 @@ void DaedalusVM::pushState()
 
 void DaedalusVM::popState()
 {
-    return;
+	return; 
     m_PC = m_StateStack.top().m_PC;
+    m_RetStack = m_StateStack.top().m_RetStack;
     m_Stack = m_StateStack.top().m_Stack;
-    // m_CallStack = m_StateStack.top().m_CallStack;
+    m_CallStack = m_StateStack.top().m_CallStack;
 
     m_CurrentInstanceHandle = m_StateStack.top().m_CurrentInstanceHandle;
     m_CurrentInstanceClass= m_StateStack.top().m_CurrentInstanceClass;
@@ -599,13 +609,21 @@ void DaedalusVM::popState()
 
 std::vector<std::string> DaedalusVM::getCallStack()
 {
-    std::vector<std::string> symbolNames;
-    for(auto& functionInfo : m_CallStack)
+    std::vector<std::string> cs;
+
+    for(size_t adr : m_CallStack)
     {
-        symbolNames.push_back(nameFromFunctionInfo(functionInfo));
+        // Find symbol with that address
+        for(const PARSymbol& s : m_DATFile.getSymTable().symbols)
+        {
+            if(s.address == adr)
+                cs.push_back(s.name);
+        }
     }
-    std::reverse(symbolNames.begin(), symbolNames.end());
-    return symbolNames;
+
+    std::reverse(cs.begin(), cs.end());
+
+    return cs;
 }
 
 
@@ -615,102 +633,45 @@ void DaedalusVM::prepareRunFunction()
     pushState();
 }
 
-int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx, bool clearDataStack)
-{
-    if (clearDataStack)
-        m_Stack = std::stack<uint32_t>();
 
-    CallStackFrame frame(*this, symIdx, CallStackFrame::SymbolIndex);
-    auto& functionSymbol = getDATFile().getSymbolByIndex(symIdx);
-    auto& address = functionSymbol.address;
-	if(address == 0)
+int32_t DaedalusVM::runFunction(const std::string& fname)
+{
+    assert(getDATFile().hasSymbolName(fname));
+
+    return runFunction(getDATFile().getSymbolByName(fname).address);
+}
+
+int32_t DaedalusVM::runFunction(size_t addr)
+{
+	if(addr == 0)
 		return -1;
 
     // Place the call-operation
-    setProgramCounter(address);
+    doCallOperation(addr);
+
+    clearCallStack();
+
     // Execute the instructions
     while(doStack());
 
     int32_t ret = 0;
 
-    if (functionSymbol.hasEParFlag(EParFlag_Return))
-    {
-        // Only pop if the VM didn't mess up
-        if(!isStackEmpty())
-            ret = popDataValue(); // TODO handle vars?
-        else
-            LogWarn() << "DaedalusVM: function " << functionSymbol.name << " forgot to push a return value";
-    }
-
-    if (!m_Stack.empty())
-    {
-        // too many warnings for now. need a Daedalus compiler that pops unused expressions
-        // LogWarn() << "DaedalusVM: stack not empty (" + std::to_string(m_Stack.size()) + ") after function " << functionSymbol.name;
-    }
+    // Only pop if the VM didn't mess up
+    if(!isStackEmpty())
+        ret = popDataValue();
+    else
+        LogWarn() << "DaedalusVM: Safety int was popped by scriptcode!";
 
     // Restore to previous VM-State
     popState();
     return ret;
 }
 
-std::string DaedalusVM::nameFromFunctionInfo(DaedalusVM::CallStackFrame::FunctionInfo functionInfo) {
-    switch (functionInfo.second)
-    {
-        case CallStackFrame::SymbolIndex:
-        {
-            auto functionSymbolIndex = functionInfo.first;
-            return getDATFile().getSymbolByIndex(functionSymbolIndex).name;
-        }
-        case CallStackFrame::Address:
-        {
-            auto address = functionInfo.first;
-            auto functionSymbolIndex = getDATFile().getFunctionIndexByAddress(address);
-            if (functionSymbolIndex == static_cast<size_t>(-1))
-                return "unknown function with address: " + std::to_string(address);
-            else
-                return getDATFile().getSymbolByIndex(functionSymbolIndex).name;
-        }
-    }
-}
-
-DaedalusVM::CallStackFrame::CallStackFrame(DaedalusVM& vm, size_t addressOrIndex, AddressType addrType, bool xmlLogging) :
-        vm(vm),
-        m_XmlLogging(xmlLogging)
+int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx)
 {
-    // entering function
-    vm.m_CallStack.emplace_back(addressOrIndex, addrType);
+    int32_t r = runFunction(getDATFile().getSymbolByIndex(symIdx).address);
 
-    // m_XmlLogging = true;
-    if (m_XmlLogging)
-    {
-        auto current = vm.nameFromFunctionInfo(vm.m_CallStack.back());
-        LogInfo() << indent(-1) << '<' << current << '>';;
-        /*
-        LogInfo() << indent() << "data stack size = " << vm.m_Stack.size();
-         */
-    }
-}
-
-DaedalusVM::CallStackFrame::~CallStackFrame()
-{
-    // leaving function
-    if (m_XmlLogging)
-    {
-        auto current = vm.nameFromFunctionInfo(vm.m_CallStack.back());
-        /*
-        LogInfo() << indent() << "data stack size = " << vm.m_Stack.size();
-        if (vm.m_Stack.size() > 3) // a var is the largest possible object (size=3). A function can only return one thing
-        {
-            LogInfo() << indent() << "suspicious increase of data stack in function " << current;
-        }
-        */
-        LogInfo() << indent(-1) << "</" << current << '>';
-    }
-    vm.m_CallStack.pop_back();
-}
-
-std::string DaedalusVM::CallStackFrame::indent(int add){
-    return std::string(vm.m_CallStack.size() + add, '\t');
+    return r;
 }
 
 
