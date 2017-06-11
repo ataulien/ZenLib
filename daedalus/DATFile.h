@@ -218,8 +218,11 @@ namespace Daedalus
         std::string& getString(size_t idx = 0, void* baseAddr=nullptr);
         float& getFloat(size_t idx = 0, void* baseAddr=nullptr);
 
+		template <typename T>
+		std::vector<T>& getDataContainer();
+
 		template <class T>
-		T& getValue(std::vector<T>& data, size_t idx = 0, void* baseAddr=nullptr)
+		T& getValue(size_t idx = 0, void* baseAddr=nullptr)
 		{
 			bool isClassVar = this->hasEParFlag(EParFlag_ClassVar);
 			if (isClassVar)
@@ -239,6 +242,7 @@ namespace Daedalus
 				}
 				//assert(false);
 			}
+			std::vector<T>& data = getDataContainer<T>();
 			// read from symbol's data if not isClassVar or the above failed. (the latter should not happen)
 			if(data.size() <= idx)
 			{
