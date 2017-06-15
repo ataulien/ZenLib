@@ -85,7 +85,8 @@ namespace ZMemory
     class StaticReferencedAllocator
     {
     public:
-        typedef GenericHandle<numberOfBits(NUM), std::min(32u, GENERIC_HANDLE_MAX_SIZE_BITS - numberOfBits(NUM))> Handle;
+        //typedef GenericHandle<numberOfBits(NUM), std::min(32u, GENERIC_HANDLE_MAX_SIZE_BITS - numberOfBits(NUM))> Handle;
+        typedef GenericHandle<numberOfBits(NUM), 32u> Handle;
 
         /**
          * Outside-Mirror for the type this can create
