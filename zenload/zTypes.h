@@ -393,6 +393,7 @@ namespace ZenLoad
 		std::vector<zCVobData> rootVobs;
 		zCWayNetData waynet;
 		zCBspTreeData bspTree;
+		size_t numVobsTotal;
 	};
 
 

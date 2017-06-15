@@ -16,7 +16,7 @@ namespace ZenLoad
 			VERSION_G26fix = 0
 		};
 
-		static void readVobTree(ZenParser& parser, std::vector<zCVobData>& target, WorldVersion worldversion)
+		static size_t readVobTree(ZenParser& parser, std::vector<zCVobData>& target, WorldVersion worldversion)
 		{
 			uint32_t numChildren;
 
@@ -30,7 +30,7 @@ namespace ZenLoad
 				// Read how many vobs this one has as child
 				parser.getImpl()->readEntry("", &numChildren, sizeof(numChildren), ZenLoad::ParserImpl::ZVT_INT);
 
-				return;
+				return 0;
 			}
 
 			// Read vob data, followed by the count of the children of this vob
@@ -48,12 +48,14 @@ namespace ZenLoad
 
 			// Read children
 			target.back().childVobs.reserve(numChildren);
+
+			size_t num = 1; // 1 + children
 			for(uint32_t i = 0; i < numChildren; i++)
 			{
-				readVobTree(parser, target.back().childVobs, worldversion);
+				num += readVobTree(parser, target.back().childVobs, worldversion);
 			}
 			
-			
+			return num;
 		}
 
 		/**
@@ -93,9 +95,10 @@ namespace ZenLoad
 					info.rootVobs.reserve(numChildren);
 
 					// Read children
+					info.numVobsTotal = 0;
 					for(uint32_t i = 0; i < numChildren; i++)
 					{
-						readVobTree(parser, info.rootVobs, version);
+						info.numVobsTotal += readVobTree(parser, info.rootVobs, version);
 					}
 					parser.readChunkEnd();
 				}else if(header.name == "WayNet")

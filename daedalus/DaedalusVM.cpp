@@ -275,15 +275,18 @@ bool DaedalusVM::doStack(bool verbose)
 
 
         case EParOp_AssignFloat:
-            a = popVar(arr);
-            b = popDataValue();
             {
-                float& aFloat = m_DATFile.getSymbolByIndex(a).getFloat(arr, getCurrentInstanceDataPtr());
-                aFloat = reinterpret_cast<float&>(b);
-            }
+                a = popVar(arr);
+                float b = popFloatValue();
+                {
+                    float& aFloat = m_DATFile.getSymbolByIndex(a).getFloat(arr, getCurrentInstanceDataPtr());
+                    aFloat = b;
+                }
 
-            if(m_OnSymbolValueChanged)
-                m_OnSymbolValueChanged((unsigned)a, EParOp_AssignFloat);
+                if(m_OnSymbolValueChanged)
+                    m_OnSymbolValueChanged((unsigned)a, EParOp_AssignFloat);
+
+            }
             break;
 
         case EParOp_AssignInstance:
@@ -365,11 +368,12 @@ void DaedalusVM::pushInt(int32_t value)
     pushInt(static_cast<uint32_t>(value));
 }
 
-int32_t DaedalusVM::popDataValue()
+template <typename T>
+T DaedalusVM::popDataValue()
 {
     // Default behavior of the ZenGin is to pop a 0, if nothing is on the stack.
     if(m_Stack.empty())
-        return 0;
+        return static_cast<T>(0);
 
     uint32_t tok = m_Stack.top();
     m_Stack.pop(); // Pop token
@@ -383,15 +387,15 @@ int32_t DaedalusVM::popDataValue()
     {
 
         case EParOp_PushInt:
-            return v;
+            return reinterpret_cast<T&>(v); // reinterpret as float for T=float
 
         case EParOp_PushVar:
             arrIdx = m_Stack.top();
             m_Stack.pop(); // Pop array index
-            return m_DATFile.getSymbolByIndex(v).getInt(arrIdx, getCurrentInstanceDataPtr());
+            return m_DATFile.getSymbolByIndex(v).getValue<T>(arrIdx, getCurrentInstanceDataPtr());
 
         default:
-            return 0;
+            return static_cast<T>(0);
     }
 
 }
@@ -463,9 +467,9 @@ void DaedalusVM::setReturn(const std::string& v)
     pushString(v);
 }
 
-void DaedalusVM::setReturn(float v)
+void DaedalusVM::setReturn(float f)
 {
-    pushInt(*reinterpret_cast<int32_t*>(&v));
+    pushInt(reinterpret_cast<int32_t&>(f));
 }
 
 void DaedalusVM::setReturnVar(int32_t v)
@@ -475,8 +479,7 @@ void DaedalusVM::setReturnVar(int32_t v)
 
 float DaedalusVM::popFloatValue()
 {
-    int32_t v = popDataValue();
-    return *reinterpret_cast<float*>(&v);
+    return popDataValue<float>();
 }
 
 void DaedalusVM::pushVar(const std::string& symName)

@@ -67,7 +67,7 @@ namespace Daedalus
 
         void setReturn(int32_t v);
         void setReturn(const std::string& v);
-        void setReturn(float v);
+        void setReturn(float f);
         void setReturnVar(int32_t v);
 
         /**
@@ -79,7 +79,8 @@ namespace Daedalus
         /**
          * @brief Pops an int from the stack
          */
-        int32_t popDataValue();
+        template <typename T = int32_t>
+        T popDataValue();
         float popFloatValue();
         uint32_t popVar(){uint32_t arr; return popVar(arr); }
         uint32_t popVar(uint32_t& arrIdx);
