@@ -104,7 +104,7 @@ namespace ZenLoad
 
     struct zCModelScriptEventSfx
     {
-        uint32_t m_Frame = 0;
+        int32_t m_Frame = 0;
         std::string m_Name;
 
         /**

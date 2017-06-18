@@ -6,9 +6,44 @@
 
 namespace ZenLoad
 {
+    enum class MaterialGroup : int {
+        UNDEF	= 0	,
+        METAL,
+        STONE,
+        WOOD,
+        EARTH,
+        WATER,
+        SNOW,
+        NUM_MAT_GROUPS
+    };
+
+    static const std::string MaterialGroupNames[(int)MaterialGroup::NUM_MAT_GROUPS] = {
+            "UNDEF",
+            "METAL",
+            "STONE",
+            "WOOD",
+            "EARTH",
+            "WATER",
+            "SNOW",
+    };
+
     class zCMaterial
     {
     public:
+
+        /**
+         * Converts the given material-group enum value to the regarding string
+         */
+        static std::string getMatGroupString(MaterialGroup group)
+        {
+            if((int)group >= (int)MaterialGroup::NUM_MAT_GROUPS)
+            {
+                return MaterialGroupNames[(int)MaterialGroup::UNDEF];
+            }
+
+            return MaterialGroupNames[(int)group];
+        }
+
         /**
          * Reads this object from an internal zen
          */
