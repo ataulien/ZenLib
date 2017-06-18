@@ -688,7 +688,7 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseSfxEvent()
     m_Sfx.m_Frame = (uint32_t)std::stoi(m_Args[0]);
     m_Sfx.m_Name = m_Args[1];
 
-    for(size_t i=2;i<std::min(m_Args.size(), 4UL);i++)
+    for(size_t i=2;i<std::min(m_Args.size(), static_cast<size_t>(4));i++)
     {
         // Look for optional arguments (First 2 args are required)
         if(m_Args[i].find("R:") != std::string::npos)
