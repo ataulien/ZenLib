@@ -1,6 +1,5 @@
 #include "fileIndex.h"
 #include "utils/logger.h"
-#include "archive_virtual.h"
 #include <locale>
 #include <algorithm>
 #include <physfs.h>

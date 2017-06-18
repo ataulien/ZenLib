@@ -4,9 +4,6 @@
 #include <vector>
 #include <set>
 
-
-#include "archive_virtual.h"
-
 namespace VDFS
 {
 	// TODO: Repace with general class and make a forward decl!
