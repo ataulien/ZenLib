@@ -126,8 +126,12 @@ void ModelScriptBinParser::readSfx()
 {
     m_Sfx.m_Frame = m_Zen.readBinaryDWord();
     m_Sfx.m_Name = m_Zen.readLine(true);
-    m_Sfx.m_Value1 = m_Zen.readLine(true);
-    m_Sfx.m_Value2 = m_Zen.readLine(true);
+
+    float range = m_Zen.readBinaryFloat();
+    float emptySlot = m_Zen.readBinaryFloat();
+
+    m_Sfx.m_Range = range;
+    m_Sfx.m_EmptySlot = emptySlot > 0.0f; // They encoded this as float for some reason...
 }
 
 ModelScriptTextParser::ModelScriptTextParser(ZenParser &zen)
@@ -674,8 +678,27 @@ ModelScriptTextParser::Result ModelScriptTextParser::parsePfxStopEvent()
 ModelScriptTextParser::Result ModelScriptTextParser::parseSfxEvent()
 {
     Result res = parseArguments();
-    if (res != Success)
+    if (res != Success || m_Args.size() < 2 || m_Args.size() > 4)
         return Error;
+
+    m_Sfx.m_Frame = (uint32_t)std::stoi(m_Args[0]);
+    m_Sfx.m_Name = m_Args[1];
+
+    for(size_t i=2;i<std::min(m_Args.size(), 4UL);i++)
+    {
+        // Look for optional arguments (First 2 args are required)
+        if(m_Args[i].find("R:") != std::string::npos)
+        {
+            m_Sfx.m_Range = std::stof(m_Args[i].substr(m_Args[i].find("R:")));
+        }else if(m_Args[i] == "EMPTY_SLOT")
+        {
+            m_Sfx.m_EmptySlot = true;
+        }else
+        {
+            LogWarn() << "MODELSCRIPT: Invalid eventSFX-Option: " << m_Args[i];
+        }
+
+    }
 
     // TODO: assign
 
