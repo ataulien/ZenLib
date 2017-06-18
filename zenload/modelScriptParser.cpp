@@ -39,21 +39,25 @@ ModelScriptBinParser::EChunkType ModelScriptBinParser::parse()
 
     switch(chunk.id)
     {
-    case CHUNK_ANI:
-        readAni();
-        m_Zen.setSeek(chunk_end);
-        return CHUNK_ANI;
-    case CHUNK_ANI_ALIAS:
-        readAlias();
-        m_Zen.setSeek(chunk_end);
-        return CHUNK_ANI_ALIAS;
-    case CHUNK_EVENT_SFX:
-        readSfx();
-        m_Zen.setSeek(chunk_end);
-        return CHUNK_EVENT_SFX;
-    default:
-        m_Zen.setSeek(chunk_end);
-        return parse(); // skip unknown chunk
+        case CHUNK_ANI:
+            readAni();
+            m_Zen.setSeek(chunk_end);
+            return CHUNK_ANI;
+        case CHUNK_ANI_ALIAS:
+            readAlias();
+            m_Zen.setSeek(chunk_end);
+            return CHUNK_ANI_ALIAS;
+        case CHUNK_EVENT_SFX:
+            readSfx();
+            m_Zen.setSeek(chunk_end);
+            return CHUNK_EVENT_SFX;
+        case CHUNK_EVENT_SFX_GRND:
+            readSfx();
+            m_Zen.setSeek(chunk_end);
+            return CHUNK_EVENT_SFX_GRND;
+        default:
+            m_Zen.setSeek(chunk_end);
+            return parse(); // skip unknown chunk
     }
 
     return CHUNK_EOF;
@@ -62,7 +66,7 @@ ModelScriptBinParser::EChunkType ModelScriptBinParser::parse()
 static uint32_t makeAniFlags(ZenParser &zen)
 {
     uint32_t flags = 0;
-    std::string flag_str = zen.readString();
+    std::string flag_str = zen.readLine(true);
     for (auto ch : flag_str)
     {
         switch (ch)
@@ -89,19 +93,19 @@ static uint32_t makeAniFlags(ZenParser &zen)
 
 static EModelScriptAniDir makeAniDir(ZenParser &zen)
 {
-    std::string str = zen.readString();
+    std::string str = zen.readLine();
     return (!str.empty() && str[0] == 'R') ? MSB_BACKWARD : MSB_FORWARD;
 }
 
 void ModelScriptBinParser::readAni()
 {
-    m_Ani.m_Name = m_Zen.readLine(true);
+    m_Ani.m_Name = m_Zen.readLine();
     m_Ani.m_Layer = m_Zen.readBinaryDWord();
-    m_Ani.m_Next = m_Zen.readLine(true);
+    m_Ani.m_Next = m_Zen.readLine();
     m_Ani.m_BlendIn = m_Zen.readBinaryFloat();
     m_Ani.m_BlendOut = m_Zen.readBinaryFloat();
     m_Ani.m_Flags = makeAniFlags(m_Zen);
-    m_Ani.m_Asc = m_Zen.readLine(true);
+    m_Ani.m_Asc = m_Zen.readLine();
     m_Ani.m_Dir = makeAniDir(m_Zen);
     m_Ani.m_FirstFrame = m_Zen.readBinaryDWord();
     m_Ani.m_LastFrame = m_Zen.readBinaryDWord();
