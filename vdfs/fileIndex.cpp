@@ -6,14 +6,18 @@
 
 using namespace VDFS;
 
-FileIndex::FileIndex(const char *argv0)
+FileIndex::FileIndex()
 {
-    if (!PHYSFS_isInit()) PHYSFS_init(argv0);
 }
 
 FileIndex::~FileIndex()
 {
     if (PHYSFS_isInit()) PHYSFS_deinit();
+}
+
+void FileIndex::Init(const char *argv0)
+{
+    if (!PHYSFS_isInit()) PHYSFS_init(argv0);
 }
 
 /**

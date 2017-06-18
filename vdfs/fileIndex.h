@@ -6,26 +6,16 @@
 
 namespace VDFS
 {
-	// TODO: Repace with general class and make a forward decl!
-	class ArchiveVirtual;
-
-	/**
-	 * @brief Information about in which archive the file is and on what offset it starts
-	 */
-	struct FileInfo
-	{
-		std::string fileName;
-		uint32_t fileSize;
-		ArchiveVirtual* targetArchive; 
-		uint32_t archiveOffset; // 0 for physical files
-		uint32_t priority;
-	};
-
 	class FileIndex
 	{
 	public:
-		FileIndex(const char *argv0);
+		FileIndex();
 		~FileIndex();
+
+        /*
+         * @brief Initializes the VDFS
+         */
+        void Init(const char *argv0);
 
 		/**
 		 * @brief Loads a VDF-File and initializes everything
