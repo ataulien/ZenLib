@@ -27,71 +27,27 @@ namespace VDFS
 	class FileIndex
 	{
 	public:
-		FileIndex();
+		FileIndex(const char *argv0);
 		~FileIndex();
 
 		/**
 		 * @brief Loads a VDF-File and initializes everything
 		 */
-		bool loadVDF(const std::string& vdf, uint32_t priority = 0);
-
-		/**
-		 * @brief Places a file into the index
-		 * @return True if the file was new, false otherwise
-		 */
-		bool addFile(const FileInfo& inf);
-
-		/**
-		 * @brief Replaces a file matching the same name
-		 * @return True, if the file was actually replaced. False if it was just added because it didn't exist
-		 */
-		bool replaceFileByName(const FileInfo& inf);
-
-		/**
-		 * @brief Fills the given pointer with the information about the provided filename.
-		 * @return False, if the file was not found
-		 */
-		bool getFileByName(const std::string& name, FileInfo* outinf) const;
+		bool loadVDF(const std::string& vdf, uint32_t priority = 0, const std::string& mountPoint = "/");
 
 		/**
 		 * @brief Fills a vector with the data of the given file
 		 */
-		bool getFileData(const FileInfo& inf, std::vector<uint8_t>& data) const;
 		bool getFileData(const std::string& file, std::vector<uint8_t>& data) const;
-
-		/**
-		 * @brief Clears the complete index and all registered files
-		 */
-		void clearIndex();
 
 		/**
 		 * @brief Returnst the list of all known files
 		 */
-		const std::vector<FileInfo>& getKnownFiles(){return m_KnownFiles;}
+        std::vector<std::string> getKnownFiles(const std::string& path = "/") const;
 
 		/**
 		 * @return Whether a file with the given name exists
 		 */
          bool hasFile(const std::string& name) const;
-	private:
-		/**
-		 * @brief Vector of all known files
-		 */
-		std::vector<FileInfo> m_KnownFiles;
-
-		/**
-		 * @brief Map of indices of m_KnownFiles by their filenames 
-		 */
-		std::unordered_map<std::string, size_t> m_FileIndicesByName;
-
-		/**
-		 * @brief all currently loaded virtual archives
-		 */
-		std::vector<ArchiveVirtual*> m_LoadedVirtualArchives;
-
-		/** 
-		 * @brief set of all loaded archives
-		 */
-		std::set<std::string> m_LoadedArchives;
 	};
 }

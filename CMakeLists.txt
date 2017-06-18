@@ -14,9 +14,11 @@ endif()
 
 # 3rd-party dependencies
 add_subdirectory(lib/libsquish)
+add_subdirectory(lib/physfs)
 
 include_directories(lib/glm/glm)
 include_directories(lib/libsquish)
+include_directories(lib/physfs/src)
 include_directories(.)
 
 # Internal libraries
