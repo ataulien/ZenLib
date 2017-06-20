@@ -38,6 +38,8 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
 */
 bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data) const
 {
+    if (!PHYSFS_exists(file.c_str())) return false;
+
     PHYSFS_File *handle = PHYSFS_openRead(file.c_str());
     if (!handle)
     {
