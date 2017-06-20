@@ -128,14 +128,15 @@ void ModelScriptBinParser::readAlias()
 
 void ModelScriptBinParser::readSfx()
 {
-    m_Sfx.m_Frame = m_Zen.readBinaryDWord();
-    m_Sfx.m_Name = m_Zen.readLine(true);
+    m_Sfx.emplace_back();
+    m_Sfx.back().m_Frame = m_Zen.readBinaryDWord();
+    m_Sfx.back().m_Name = m_Zen.readLine(true);
 
     float range = m_Zen.readBinaryFloat();
     float emptySlot = m_Zen.readBinaryFloat();
 
-    m_Sfx.m_Range = range;
-    m_Sfx.m_EmptySlot = emptySlot > 0.0f; // They encoded this as float for some reason...
+    m_Sfx.back().m_Range = range;
+    m_Sfx.back().m_EmptySlot = emptySlot > 0.0f; // They encoded this as float for some reason...
 }
 
 ModelScriptTextParser::ModelScriptTextParser(ZenParser &zen)
@@ -614,7 +615,15 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseAni()
         }
     }
 
-    m_Ani.m_Dir = m_Args[7] != "R" ? EModelScriptAniDir::MSB_FORWARD : EModelScriptAniDir::MSB_BACKWARD;
+    if(m_Args.size() >= 10)
+    {
+        std::string firstFrame = m_Args[8];
+        std::string lastFrame = m_Args[9];
+
+        m_Ani.m_FirstFrame = std::stoi(firstFrame);
+        m_Ani.m_LastFrame = std::stoi(lastFrame);
+    }
+
 
     /*m_Ani.m_BlendIn = m_Args[3];*/
     /*m_Ani.m_BlendOut = m_Args[4];*/
@@ -685,18 +694,19 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseSfxEvent()
     if (res != Success || m_Args.size() < 2 || m_Args.size() > 4)
         return Error;
 
-    m_Sfx.m_Frame = (uint32_t)std::stoi(m_Args[0]);
-    m_Sfx.m_Name = m_Args[1];
+    m_Sfx.emplace_back();
+    m_Sfx.back().m_Frame = (uint32_t)std::stoi(m_Args[0]);
+    m_Sfx.back().m_Name = m_Args[1];
 
     for(size_t i=2;i<std::min(m_Args.size(), static_cast<size_t>(4));i++)
     {
         // Look for optional arguments (First 2 args are required)
         if(m_Args[i].find("R:") != std::string::npos)
         {
-            m_Sfx.m_Range = std::stof(m_Args[i].substr(m_Args[i].find("R:")));
+            m_Sfx.back().m_Range = std::stof(m_Args[i].substr(m_Args[i].find("R:") + 2)); // 2: Skip R:
         }else if(m_Args[i] == "EMPTY_SLOT")
         {
-            m_Sfx.m_EmptySlot = true;
+            m_Sfx.back().m_EmptySlot = true;
         }else
         {
             LogWarn() << "MODELSCRIPT: Invalid eventSFX-Option: " << m_Args[i];
@@ -704,18 +714,34 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseSfxEvent()
 
     }
 
-    // TODO: assign
-
     return Success;
 }
 
 ModelScriptTextParser::Result ModelScriptTextParser::parseSfxGrndEvent()
 {
     Result res = parseArguments();
-    if (res != Success)
+    if (res != Success || m_Args.size() < 2 || m_Args.size() > 4)
         return Error;
 
-    // TODO: assign
+    m_SfxGround.emplace_back();
+    m_SfxGround.back().m_Frame = (uint32_t)std::stoi(m_Args[0]);
+    m_SfxGround.back().m_Name = m_Args[1];
+
+    for(size_t i=2;i<std::min(m_Args.size(), static_cast<size_t>(4));i++)
+    {
+        // Look for optional arguments (First 2 args are required)
+        if(m_Args[i].find("R:") != std::string::npos)
+        {
+            m_Sfx.back().m_Range = std::stof(m_Args[i].substr(m_Args[i].find("R:") + 2)); // 2: Skip R:
+        }else if(m_Args[i] == "EMPTY_SLOT")
+        {
+            m_Sfx.back().m_EmptySlot = true;
+        }else
+        {
+            LogWarn() << "MODELSCRIPT: Invalid eventSFX-Option: " << m_Args[i];
+        }
+
+    }
 
     return Success;
 }

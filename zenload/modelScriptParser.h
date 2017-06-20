@@ -76,10 +76,12 @@ public:
     /** Returns the sfx event.
      *
      * Call this if parse() returns CHUNK_EVENT_SFX or CHUNK_EVENT_SFX_GRND.
+     * Also call it after an ani-chunk was parsed, in case this is a textfole
      *
      * @return The event read during the last call to parse().
      */
-    const zCModelScriptEventSfx     &sfx() const { return m_Sfx; }
+    std::vector<zCModelScriptEventSfx>     &sfx() { return m_Sfx; }
+    std::vector<zCModelScriptEventSfx>     &sfxGround() { return m_SfxGround; }
 
     /** Reads the next chunk.
      *
@@ -94,7 +96,8 @@ protected:
 
     zCModelScriptAni                m_Ani;
     zCModelScriptAniAlias           m_Alias;
-    zCModelScriptEventSfx           m_Sfx;
+    std::vector<zCModelScriptEventSfx>           m_Sfx;
+    std::vector<zCModelScriptEventSfx>           m_SfxGround;
 };
 
 /** Streaming parser for .MSB files.
