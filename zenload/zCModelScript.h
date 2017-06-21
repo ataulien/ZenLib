@@ -96,10 +96,11 @@ namespace ZenLoad
         std::string m_Name;
     };
 
-    struct zCModelScriptTag
+    struct zCModelScriptEventTag
     {
+        int32_t m_Frame;
         std::string m_Tag;
-        std::string m_Values[ANIEVENT_MAX_NUM_VALUES];
+        std::string m_Argument;
     };
 
     struct zCModelScriptEventSfx

@@ -345,13 +345,15 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseArguments()
 
         if (m_ArgCount < m_Args.size())
         {
-            std::string &arg = m_Args[m_ArgCount];
+            std::string& arg = m_Args[m_ArgCount];
             arg.clear();
             arg.insert(arg.begin(), m_Token.text.begin(), m_Token.text.end());
+
         } else
             m_Args.emplace_back(m_Token.text);
 
         m_ArgCount++;
+
 
         if (!m_NextToken.text.empty() && m_NextToken.text[0] == ')')
             break;
@@ -749,10 +751,21 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseSfxGrndEvent()
 ModelScriptTextParser::Result ModelScriptTextParser::parseTagEvent()
 {
     Result res = parseArguments();
-    if (res != Success)
+    if (res != Success || m_Args.size() < 2)
         return Error;
 
-    // TODO: assign
+    m_Tag.emplace_back();
+
+    // atoi is used here since some original MDS files have invalid arguments, which relay on atoi returning 0
+    // on anything that is not a number. For example, t_BSANVIL_S1_2_S0 in HUMANS.MDS has a double opening
+    // brace on one of the EventTags.
+    m_Tag.back().m_Frame = (uint32_t)atoi(m_Args[0].c_str());
+    m_Tag.back().m_Tag = m_Args[1];
+
+    if(m_Args.size() >= 3)
+    {
+        m_Tag.back().m_Argument = m_Args[2];
+    }
 
     return Success;
 }

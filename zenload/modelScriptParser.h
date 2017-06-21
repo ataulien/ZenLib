@@ -82,6 +82,7 @@ public:
      */
     std::vector<zCModelScriptEventSfx>     &sfx() { return m_Sfx; }
     std::vector<zCModelScriptEventSfx>     &sfxGround() { return m_SfxGround; }
+    std::vector<zCModelScriptEventTag>          &tag() { return m_Tag; }
 
     /** Reads the next chunk.
      *
@@ -98,6 +99,7 @@ protected:
     zCModelScriptAniAlias           m_Alias;
     std::vector<zCModelScriptEventSfx>           m_Sfx;
     std::vector<zCModelScriptEventSfx>           m_SfxGround;
+    std::vector<zCModelScriptEventTag>                m_Tag;
 };
 
 /** Streaming parser for .MSB files.
