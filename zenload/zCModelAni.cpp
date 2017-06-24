@@ -161,7 +161,7 @@ void zCModelAni::readObjectData(ZenParser& parser)
                 uint32_t numAniEvents = parser.readBinaryDWord();
                 m_AniEvents.resize(numAniEvents);
 
-                for(int i = 0; i < numAniEvents; i++)
+                for(uint32_t i = 0; i < numAniEvents; i++)
                     m_AniEvents[i].load(parser);
             }
                 break;

@@ -200,7 +200,7 @@ namespace ZenLoad
 			break;
 		case ZTEXFMT_A8B8G8R8:
 			DdsHeader.ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
-			/*  DdsHeader.ddpfPixelFormat.dwFourCC             = D3DFMT_A8B8G8R8; /* 32 */
+			// DdsHeader.ddpfPixelFormat.dwFourCC             = D3DFMT_A8B8G8R8; /* 32 */
 			DdsHeader.ddpfPixelFormat.dwRGBBitCount = 32;
 			DdsHeader.ddpfPixelFormat.dwRBitMask = 0x000000FF;
 			DdsHeader.ddpfPixelFormat.dwGBitMask = 0x0000FF00;
@@ -209,7 +209,7 @@ namespace ZenLoad
 			break;
 		case ZTEXFMT_A8R8G8B8:
 			DdsHeader.ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
-			/*  DdsHeader.ddpfPixelFormat.dwFourCC             = D3DFMT_A8R8G8B8; /* 21 */
+			// DdsHeader.ddpfPixelFormat.dwFourCC             = D3DFMT_A8R8G8B8; /* 21 */
 			DdsHeader.ddpfPixelFormat.dwRGBBitCount = 32;
 			DdsHeader.ddpfPixelFormat.dwRBitMask = 0x00FF0000;
 			DdsHeader.ddpfPixelFormat.dwGBitMask = 0x0000FF00;
@@ -225,7 +225,7 @@ namespace ZenLoad
 			break;
 		case ZTEXFMT_R8G8B8:
 			DdsHeader.ddpfPixelFormat.dwFlags = DDPF_RGB;
-			/*  DdsHeader.ddpfPixelFormat.dwFourCC         = D3DFMT_R8G8B8; /* 20 */
+			// DdsHeader.ddpfPixelFormat.dwFourCC         = D3DFMT_R8G8B8; /* 20 */
 			DdsHeader.ddpfPixelFormat.dwRGBBitCount = 24;
 			DdsHeader.ddpfPixelFormat.dwRBitMask = 0x00FF0000;
 			DdsHeader.ddpfPixelFormat.dwGBitMask = 0x0000FF00;
@@ -233,7 +233,7 @@ namespace ZenLoad
 			break;
 		case ZTEXFMT_A4R4G4B4:
 			DdsHeader.ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
-			/*  DdsHeader.ddpfPixelFormat.dwFourCC             = D3DFMT_A4R4G4B4; /* 26 */
+			// DdsHeader.ddpfPixelFormat.dwFourCC             = D3DFMT_A4R4G4B4; /* 26 */
 			DdsHeader.ddpfPixelFormat.dwRGBBitCount = 16;
 			DdsHeader.ddpfPixelFormat.dwRBitMask = 0x00000F00;
 			DdsHeader.ddpfPixelFormat.dwGBitMask = 0x000000F0;
@@ -242,7 +242,7 @@ namespace ZenLoad
 			break;
 		case ZTEXFMT_A1R5G5B5:
 			DdsHeader.ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_ALPHAPIXELS;
-			/*  DdsHeader.ddpfPixelFormat.dwFourCC             = D3DFMT_A1R5G5B5; /* 25 */
+			// DdsHeader.ddpfPixelFormat.dwFourCC             = D3DFMT_A1R5G5B5; /* 25 */
 			DdsHeader.ddpfPixelFormat.dwRGBBitCount = 16;
 			DdsHeader.ddpfPixelFormat.dwRBitMask = 0x00007C00;
 			DdsHeader.ddpfPixelFormat.dwGBitMask = 0x000003E0;
@@ -251,7 +251,7 @@ namespace ZenLoad
 			break;
 		case ZTEXFMT_R5G6B5:
 			DdsHeader.ddpfPixelFormat.dwFlags = DDPF_RGB;
-			/*  DdsHeader.ddpfPixelFormat.dwFourCC         = D3DFMT_R5G6B5; /* 23 */
+			// DdsHeader.ddpfPixelFormat.dwFourCC         = D3DFMT_R5G6B5; /* 23 */
 			DdsHeader.ddpfPixelFormat.dwRGBBitCount = 16;
 			DdsHeader.ddpfPixelFormat.dwRBitMask = 0x0000F800;
 			DdsHeader.ddpfPixelFormat.dwGBitMask = 0x000007E0;
@@ -259,7 +259,7 @@ namespace ZenLoad
 			break;
 		case ZTEXFMT_P8:
 			DdsHeader.ddpfPixelFormat.dwFlags = DDPF_PALETTEINDEXED8;
-			/*  DdsHeader.ddpfPixelFormat.dwFourCC = D3DFMT_P8; /* 41 */
+			// DdsHeader.ddpfPixelFormat.dwFourCC = D3DFMT_P8; /* 41 */
 			break;
 		case ZTEXFMT_DXT1:
 			DdsHeader.ddpfPixelFormat.dwFlags = DDPF_FOURCC;

@@ -181,7 +181,7 @@ namespace ZMath
         {
             t_vector<T,S...> rs;
 
-            for(int i=0;i<sizeof(T) / sizeof(float);i++) // Fixme: Doesn't work for double-vectors! Also, not very nice solution.
+            for(size_t i=0;i<sizeof(T) / sizeof(float);i++) // Fixme: Doesn't work for double-vectors! Also, not very nice solution.
             {
                 rs.v[i] = T::v[i] * s;
             }

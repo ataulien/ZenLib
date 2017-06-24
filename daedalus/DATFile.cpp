@@ -457,6 +457,9 @@ PARStackOpCode DATFile::getStackOpCode(size_t pc)
             s.opSize += sizeof(uint8_t);
 
             break;
+
+        default:
+            break;
     }
 
     return s;

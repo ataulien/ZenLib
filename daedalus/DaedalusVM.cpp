@@ -665,12 +665,14 @@ std::string DaedalusVM::nameFromFunctionInfo(DaedalusVM::CallStackFrame::Functio
         {
             auto address = functionInfo.first;
             auto functionSymbolIndex = getDATFile().getFunctionIndexByAddress(address);
-            if (functionSymbolIndex == static_cast<size_t>(-1))
-                return "unknown function with address: " + std::to_string(address);
-            else
+            if (functionSymbolIndex != static_cast<size_t>(-1))
                 return getDATFile().getSymbolByIndex(functionSymbolIndex).name;
         }
+        default:
+            LogError() << "Unhandled CallStackFrame::AddressType case in switch";
+            assert(false);
     }
+    return "unknown function with address: " + std::to_string(functionInfo.first);
 }
 
 DaedalusVM::CallStackFrame::CallStackFrame(DaedalusVM& vm, size_t addressOrIndex, AddressType addrType, bool xmlLogging) :
