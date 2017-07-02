@@ -13,5 +13,5 @@ if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX")
 endif()
 
-
+target_link_libraries(vdfs physfs-static) 
 set_target_properties(vdfs PROPERTIES LINKER_LANGUAGE C)

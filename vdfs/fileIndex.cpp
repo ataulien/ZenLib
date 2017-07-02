@@ -1,8 +1,8 @@
 #include "fileIndex.h"
 #include "utils/logger.h"
-#include "archive_virtual.h"
 #include <locale>
 #include <algorithm>
+#include <physfs.h>
 
 using namespace VDFS;
 
@@ -12,147 +12,65 @@ FileIndex::FileIndex()
 
 FileIndex::~FileIndex()
 {
-	for(auto& a : m_LoadedVirtualArchives)
-		delete a;
+    if (PHYSFS_isInit()) PHYSFS_deinit();
+}
 
-	m_LoadedVirtualArchives.clear();
+void FileIndex::Init(const char *argv0)
+{
+    if (!PHYSFS_isInit()) PHYSFS_init(argv0);
 }
 
 /**
 * @brief Loads a VDF-File and initializes everything
 */
-bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority)
+bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::string& mountPoint)
 {
-	// Check if this was already loaded
-	std::string upper = vdf;
-	std::transform(upper.begin(), upper.end(),upper.begin(), ::toupper);
-	if(m_LoadedArchives.find(upper) != m_LoadedArchives.end())
-		return true; // Already loaded, don't do it again
-
-	ArchiveVirtual* a = new ArchiveVirtual();
-
-	// Load the archive
-	if(!a->loadVDF(vdf, priority))
-	{
-		delete a;
-		return false;
-	}
-
-	// Grab files and handle load-priority
-	a->insertFilesIntoIndex(*this);
-
-	LogInfo() << "Successfully loaded VDF-Archive: " << vdf;
-
-	// Put into list of archives
-	m_LoadedVirtualArchives.emplace_back(a);
-
-	// Add to loaded archive set
-	m_LoadedArchives.insert(upper);
-
+    if (!PHYSFS_mount(vdf.c_str(), mountPoint.c_str(), 1))
+    {
+        LogInfo() << "Couldn't load VDF-Archive " << vdf << ": " << PHYSFS_getLastError();
+        return false;
+    }
 	return true;
-}
-
-/**
-* @brief Places a file into the index
-* @return True if the file was new, false otherwise
-*/
-bool FileIndex::addFile(const FileInfo& inf)
-{
-	// Already exists?
-	auto it = m_FileIndicesByName.find(inf.fileName);
-	if(it != m_FileIndicesByName.end())
-	{
-		// Check priority
-		if(inf.priority <= m_KnownFiles[(*it).second].priority)
-			return false;
-
-		// Overwrite if new priority is greater
-		m_KnownFiles[(*it).second] = inf;
-		return true;
-	}
-
-	// Add to known files and register in the index-map
-	m_KnownFiles.push_back(inf);
-	m_FileIndicesByName[inf.fileName] = m_KnownFiles.size() - 1;
-
-	return true;
-}
-
-/**
-* @brief Replaces a file matching the same name
-* @return True, if the file was actually replaced. False if it was just added because it didn't exist
-*/
-bool FileIndex::replaceFileByName(const FileInfo& inf)
-{
-	// Check if the file even exists first
-	auto it = m_FileIndicesByName.find(inf.fileName);
-	if(it == m_FileIndicesByName.end())
-	{
-		// It doesn't, just add it
-		addFile(inf);
-		return false;
-	}
-
-	// It does exist, replace it
-	m_KnownFiles[(*it).second] = inf;
-	return true;
-}
-
-/**
-* @brief Fills the given pointer with the information about the provided filename.
-* @return False, if the file was not found
-*/
-bool FileIndex::getFileByName(const std::string& name, FileInfo* outinf) const
-{
-	// Does the file even exist?
-	std::string upper = name;
-	std::transform(upper.begin(), upper.end(),upper.begin(), ::toupper);
-
-	auto it = m_FileIndicesByName.find(upper);
-	if(it == m_FileIndicesByName.end())
-		return false;
-
-	// Output the file information
-	if(outinf)*outinf = m_KnownFiles[(*it).second];
-
-	return true;
-}
-
-/**
-* @brief Clears the complete index and all registered files
-*/
-void FileIndex::clearIndex()
-{
-	m_FileIndicesByName.clear();
-	m_KnownFiles.clear();
 }
 
 /**
 * @brief Fills a vector with the data of the given file
 */
-bool FileIndex::getFileData(const FileInfo& inf, std::vector<uint8_t>& data) const
-{
-	return inf.targetArchive->extractFile(inf, data);
-}
-
 bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data) const
 {
-	std::string upper = file;
-	std::transform(upper.begin(), upper.end(),upper.begin(), ::toupper);
+    if (!PHYSFS_exists(file.c_str())) return false;
 
-	FileInfo inf;
-	if(getFileByName(upper, &inf))
-		return inf.targetArchive->extractFile(inf, data);
+    PHYSFS_File *handle = PHYSFS_openRead(file.c_str());
+    if (!handle)
+    {
+        LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getLastError();
+        return false;
+    }
 
-	//LogError() << "File not found: " << file;
-
-	return false;
+    auto length = PHYSFS_fileLength(handle);
+    data.resize(length);
+    if (PHYSFS_read(handle, data.data(), 1, length) < length)
+    {
+        LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getLastError();
+        PHYSFS_close(handle);
+        return false;
+    }
+    PHYSFS_close(handle);
+    return true;
 }
 
 bool FileIndex::hasFile(const std::string& name) const
 {
-	std::string upper = name;
-	std::transform(upper.begin(), upper.end(),upper.begin(), ::toupper);
+    return PHYSFS_exists(name.c_str());
+}
 
-	return m_FileIndicesByName.find(upper) != m_FileIndicesByName.end();
+std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
+{
+    char **files = PHYSFS_enumerateFiles(path.c_str());
+    char **i;
+    std::vector<std::string> vec;
+    for (i = files; *i != NULL; i++)
+        vec.push_back(*i);
+    PHYSFS_freeList(files);
+    return vec;
 }
