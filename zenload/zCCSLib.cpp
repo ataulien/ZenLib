@@ -5,6 +5,7 @@
 #include <vdfs/fileIndex.h>
 #include <utils/logger.h>
 #include <assert.h>
+#include <algorithm>
 
 using namespace ZenLoad;
 
@@ -117,16 +118,21 @@ void zCCSLib::readObjectData(ZenParser& parser)
 		parser.readChunkEnd();
 
         info.blocks.push_back(blk.atomicBlockData);
-        m_MessagesByName[blk.blockName] = info.blocks.size()-1;
-        //LogInfo() << blk.blockName;
 
+        auto nameUppered = blk.blockName;
+        std::transform(nameUppered.begin(), nameUppered.end(), nameUppered.begin(), ::toupper);
+        //LogInfo() << "message = " << blk.blockName;
+        m_MessagesByName[nameUppered] = info.blocks.size()-1;
     }
 
 }
 
 const oCMsgConversationData& zCCSLib::getMessageByName(const std::string& name)
 {
-    size_t idx = m_MessagesByName[name];
+    auto nameUppered = name;
+    std::transform(nameUppered.begin(), nameUppered.end(), nameUppered.begin(), ::toupper);
+    assert(m_MessagesByName.find(nameUppered) != m_MessagesByName.end());
+    size_t idx = m_MessagesByName[nameUppered];
     return m_Data.blocks[idx].command;
 }
 

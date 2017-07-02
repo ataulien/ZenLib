@@ -112,8 +112,7 @@ namespace ZenLoad
 	template<typename... T>
 	static void ReadObjectProperties(ZenParser& ZenParser, std::unordered_map<std::string, std::string>& rval, std::pair<const char*, T*>... d)
 	{
-		auto values = std::make_tuple(d...);
-		Utils::for_each_in_tuple(values, [&](auto pair)
+        auto fn = [&](auto pair)
 		{
 			std::string outStr;
 
@@ -122,7 +121,12 @@ namespace ZenLoad
 
 			// Save the read value as string
 			//rval[pair.first] = outStr; 
-		});
+		};
+        
+        auto x = {(fn(d), 0)...};
+        
+		//auto values = std::make_tuple(d...);
+		//Utils::for_each_in_tuple(values, );
 	}
 
 	template<typename S>

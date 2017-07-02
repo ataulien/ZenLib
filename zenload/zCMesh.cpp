@@ -389,7 +389,7 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
                                 {
                                     // Triangulate a triangle-fan
                                     //for(unsigned int i = p.polyNumVertices - 2; i >= 1; i--)
-                                    for (unsigned int i = 1; i < p.polyNumVertices - 1; i++)
+                                    for (int i = 1; i < p.polyNumVertices - 1; i++)
                                     {
                                         m_Indices.emplace_back(p.indices[0].VertexIndex);
                                         m_Indices.emplace_back(p.indices[i].VertexIndex);
@@ -574,7 +574,7 @@ void zCMesh::packMesh(PackedMesh& mesh, float scale, bool removeDoubles)
 
 	// Store triangles with more information attached as well
 	mesh.triangles.reserve(m_Triangles.size());
-	for(int i = 0; i < m_Triangles.size(); i++)
+	for(size_t i = 0; i < m_Triangles.size(); i++)
 	{
       // Add submesh index to this triangle
 		m_Triangles[i].submeshIndex = newMaterialSlotsByMatIndex[materialsByTexture[m_Materials[m_TriangleMaterialIndices[i]].texture]];
