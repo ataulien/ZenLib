@@ -228,19 +228,22 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
 
 ModelScriptTextParser::Result ModelScriptTextParser::skipSpace()
 {
-    while (isspace(m_Zen.getData()[m_Zen.getSeek()])
-           || m_Zen.getData()[m_Zen.getSeek()] == '\n')
-    {
-        if (m_Zen.getData()[m_Zen.getSeek()] == '\n')
-            m_Line++;
+	while (true)
+	{
+		if (isEof())
+			return End;
 
-        if (isEof())
-            return End;
+		auto& zd = m_Zen.getData()[m_Zen.getSeek()];
+		if (!isspace(zd) && zd != '\n')
+			break;
 
-        m_Zen.readBinaryByte();
-    }
+		if (zd == '\n')
+			m_Line++;
 
-    return Success;
+		m_Zen.readBinaryByte();
+	}
+
+	return Success;
 }
 
 ModelScriptTextParser::Result ModelScriptTextParser::expectChar(char ch)

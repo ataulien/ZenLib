@@ -484,8 +484,11 @@ float ZenParser::readBinaryFloat()
 
 void ZenParser::readBinaryRaw(void* target, size_t numBytes)
 {
-	memcpy(target, &m_Data[m_Seek], numBytes);
-	m_Seek += numBytes;
+	if (target != nullptr && numBytes != 0)
+	{
+		std::memcpy(target, &m_Data[m_Seek], numBytes);
+		m_Seek += numBytes;
+	}
 }
 
 
