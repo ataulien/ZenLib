@@ -153,7 +153,15 @@ void DATFile::readSymTable()
                         uint8_t b = m_Parser.readBinaryByte();
                         while(b != 0x0A)
                         {
-                            if(b != 0xFF) // FIXME: This happens at INSTANCE_HELP?
+							// Fix parsing of newline
+							if (b == '\\')
+							{
+							    s.strData[j] += '\n';
+								b = m_Parser.readBinaryByte();
+								b = m_Parser.readBinaryByte();
+							}
+                            
+							if(b != 0xFF) // FIXME: This happens at INSTANCE_HELP?
                                 s.strData[j] += b;
 
                             b = m_Parser.readBinaryByte();
