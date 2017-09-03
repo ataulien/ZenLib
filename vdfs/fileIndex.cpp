@@ -3,6 +3,7 @@
 #include <locale>
 #include <algorithm>
 #include <physfs.h>
+#include <cstring>
 #include "../lib/physfs/extras/ignorecase.h"
 
 using namespace VDFS;
@@ -28,7 +29,7 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
 {
     if (!PHYSFS_mount(vdf.c_str(), mountPoint.c_str(), 1))
     {
-        LogInfo() << "Couldn't load VDF-Archive " << vdf << ": " << PHYSFS_getLastError();
+        LogInfo() << "Couldn't load VDF-Archive " << vdf << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         return false;
     }
 	return true;
@@ -43,30 +44,31 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
     memcpy(filePathBuffer, file.c_str(), file.length() + 1);
     bool exists = PHYSFSEXT_locateCorrectCase(filePathBuffer) == 0;
 
-    if (!exists) goto fail;
+    if (!exists) {
+        delete filePathBuffer;
+        return false;
+    }
 
     PHYSFS_File *handle = PHYSFS_openRead(filePathBuffer);
     if (!handle)
     {
-        LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getLastError();
-        goto fail;
+        LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        delete filePathBuffer;
+        return false;
     }
 
     auto length = PHYSFS_fileLength(handle);
     data.resize(length);
-    if (PHYSFS_read(handle, data.data(), 1, length) < length)
+    if (PHYSFS_readBytes(handle, data.data(), length) < length)
     {
-        LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getLastError();
+        LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         PHYSFS_close(handle);
-        goto fail;
+        delete filePathBuffer;
+        return false;
     }
     delete filePathBuffer;
     PHYSFS_close(handle);
     return true;
-
-fail:
-    delete filePathBuffer;
-    return false;
 }
 
 bool FileIndex::hasFile(const std::string& name) const
