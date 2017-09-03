@@ -3,6 +3,7 @@
 #include <locale>
 #include <algorithm>
 #include <physfs.h>
+#include "../lib/physfs/extras/ignorecase.h"
 
 using namespace VDFS;
 
@@ -38,13 +39,17 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
 */
 bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data) const
 {
-    if (!PHYSFS_exists(file.c_str())) return false;
+    char* filePathBuffer = new char[file.length() + 1];
+    memcpy(filePathBuffer, file.c_str(), file.length() + 1);
+    bool exists = PHYSFSEXT_locateCorrectCase(filePathBuffer) == 0;
 
-    PHYSFS_File *handle = PHYSFS_openRead(file.c_str());
+    if (!exists) goto fail;
+
+    PHYSFS_File *handle = PHYSFS_openRead(filePathBuffer);
     if (!handle)
     {
         LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getLastError();
-        return false;
+        goto fail;
     }
 
     auto length = PHYSFS_fileLength(handle);
@@ -53,24 +58,42 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
     {
         LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getLastError();
         PHYSFS_close(handle);
-        return false;
+        goto fail;
     }
+    delete filePathBuffer;
     PHYSFS_close(handle);
     return true;
+
+fail:
+    delete filePathBuffer;
+    return false;
 }
 
 bool FileIndex::hasFile(const std::string& name) const
 {
-    return PHYSFS_exists(name.c_str());
+    char* filePathBuffer = new char[name.length() + 1];
+    memcpy(filePathBuffer, name.c_str(), name.length() + 1);
+    bool exists = PHYSFSEXT_locateCorrectCase(filePathBuffer) == 0;
+    delete filePathBuffer;
+    return exists;
 }
 
 std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
 {
-    char **files = PHYSFS_enumerateFiles(path.c_str());
-    char **i;
     std::vector<std::string> vec;
+    char* filePathBuffer = new char[path.length() + 1];
+    memcpy(filePathBuffer, path.c_str(), path.length() + 1);
+    bool exists = PHYSFSEXT_locateCorrectCase(filePathBuffer) == 0;
+    if (!exists) {
+        delete filePathBuffer;
+        return vec;
+    }
+
+    char **files = PHYSFS_enumerateFiles(filePathBuffer);
+    char **i;
     for (i = files; *i != NULL; i++)
         vec.push_back(*i);
     PHYSFS_freeList(files);
+    delete filePathBuffer;
     return vec;
 }
