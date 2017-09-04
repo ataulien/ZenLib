@@ -39,13 +39,12 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
 */
 bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data) const
 {
-    std::vector<char> filePath(file.begin(), file.end());
-    filePath.push_back('\0');
-    bool exists = PHYSFSEXT_locateCorrectCase(filePath.data()) == 0;
+    std::string filePath(file);
+    bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
 
     if (!exists) return false;
 
-    PHYSFS_File *handle = PHYSFS_openRead(filePath.data());
+    PHYSFS_File *handle = PHYSFS_openRead(filePath.c_str());
     if (!handle)
     {
         LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
@@ -66,21 +65,21 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
 
 bool FileIndex::hasFile(const std::string& name) const
 {
-    std::vector<char> filePath(name.begin(), name.end());
-    filePath.push_back('\0');
-    bool exists = PHYSFSEXT_locateCorrectCase(filePath.data()) == 0;
+    std::string filePath(name);
+    bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
     return exists;
 }
 
 std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
 {
+    std::string filePath(path);
     std::vector<std::string> vec;
-    std::vector<char> filePath(path.begin(), path.end());
-    filePath.push_back('\0');
-    bool exists = PHYSFSEXT_locateCorrectCase(filePath.data()) == 0;
-    if (!exists) return vec;
+    bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
+    if (!exists) {
+        return vec;
+    }
 
-    char **files = PHYSFS_enumerateFiles(filePath.data());
+    char **files = PHYSFS_enumerateFiles(filePath.c_str());
     char **i;
     for (i = files; *i != NULL; i++)
         vec.push_back(*i);
