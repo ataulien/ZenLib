@@ -11,6 +11,9 @@ namespace ZenLoad
     class ZenParser;
     class zCBspTree
     {
+    private:
+        static void connectPortals(zCBspTreeData& info);
+
     public:
 
         enum EVersion
@@ -207,7 +210,43 @@ namespace ZenLoad
                         break;
 
                     case CHUNK_BSP_OUTDOOR_SECTORS:
-                        parser.setSeek(chunkEnd); // Skip chunk
+                    {
+                        uint32_t numSectors = parser.readBinaryDWord();
+
+                        // Sectors
+                        for(uint32_t i = 0; i < numSectors; i++)
+                        {
+                            info.sectors.emplace_back();
+                            zCSector& sector = info.sectors.back();
+
+                            sector.thisIndex = info.sectors.size() - 1;
+                            sector.name = parser.readLine(false);
+                            uint32_t numSectorNodes = parser.readBinaryDWord();
+                            uint32_t numSectorPortals = parser.readBinaryDWord();
+
+                            // Read Nodes this sector belongs to
+                            for(int j = 0; j < numSectorNodes; j++)
+                            {
+                                uint32_t nodeIndex = parser.readBinaryDWord();
+                                sector.bspNodeIndices.push_back(static_cast<size_t>(nodeIndex));
+                            }
+
+                            // Read portals in/out of this sector
+                            for(int j = 0; j < numSectorPortals; j++)
+                            {
+                                uint32_t portalPolyIndex = parser.readBinaryDWord();
+                                sector.portalPolygonIndices.push_back(static_cast<size_t>(portalPolyIndex));
+                            }
+                        }
+
+                        // Portal-list
+                        uint32_t numPortals = parser.readBinaryDWord();
+                        for(uint32_t i = 0; i < numSectors; i++)
+                        {
+                            uint32_t portalPolyIndex = parser.readBinaryDWord();
+                            info.portalPolyIndices.push_back(portalPolyIndex);
+                        }
+                    }
                         break;
 
                     case CHUNK_BSP_END:
@@ -232,6 +271,8 @@ namespace ZenLoad
             parser.setSeek(meshPosition);
             mesh->readObjectData(parser, nonLodPolys);
 
+            // Make access to portals and sectors easier by packing them in better structures
+            connectPortals(info, mesh);
 
             parser.setSeek(binFileEnd);
 
@@ -262,5 +303,96 @@ namespace ZenLoad
         }
 
     private:
+
+        static SectorIndex findSectorIndexByName(zCBspTreeData& info, const std::string& sectorname)
+        {
+            for(size_t i = 0; i < info.sectors.size(); i++)
+            {
+                if(info.sectors[i].name == sectorname)
+                    return i;
+            }
+
+            return SECTOR_INDEX_INVALID;
+        }
+
+        /**
+         * Given a material name of "X:abcd_efgh", returns "abcd".
+         */
+        static std::string extractSourceSectorFromMaterialName(std::string name)
+        {
+            std::string sectorsOnly = name.substr(name.find_first_of(':') + 1);
+
+            return sectorsOnly.substr(0, sectorsOnly.find_first_of('_'));
+        }
+
+        /**
+         * Given a material name of "X:abcd_efgh", returns "efgh".
+         */
+        static std::string extractDestSectorFromMaterial(std::string name)
+        {
+            std::string sectorsOnly = name.substr(name.find_first_of(':') + 1);
+
+            return sectorsOnly.substr(sectorsOnly.find_first_of('_') + 1);
+        }
+
+        static bool isMaterialForPortal(const zCMaterialData& m)
+        {
+            return m.matName.substr(0, 2) == "P:";
+        }
+
+        static bool isMaterialForSector(const zCMaterialData& m)
+        {
+            return m.matName.substr(0, 2) == "S:";
+        }
+
+        /**
+         * Extracts the information given by the various indices inside the BspTree-Structure and packs them
+         * into accessible objects.
+         * @param info Loaded BSP-Tree data
+         * @param worldMesh Loaded world mesh. Needed to access material names, which encode portal information
+         */
+        static void connectPortals(zCBspTreeData& info, zCMesh* worldMesh)
+        {
+            for(const zCMaterialData& m : worldMesh->getMaterials())
+            {
+                if(isMaterialForPortal(m))
+                {
+                    std::string from = extractSourceSectorFromMaterialName(m.matName);
+                    std::string to   = extractDestSectorFromMaterial(m.matName);
+
+                    info.portals.emplace_back();
+                    zCPortal& portal = info.portals.back();
+
+                    portal.frontSectorName = from;
+                    portal.backSectorName = to;
+
+                    portal.frontSectorIndex = findSectorIndexByName(info, from);
+                    portal.backSectorIndex =  findSectorIndexByName(info, to);
+
+                    //LogInfo() << "Portal material: " << m.matName;
+                    //LogInfo() << " - Source: " << extractSourceSectorFromMaterialName(m.matName);
+                    //LogInfo() << " - Dest: " << extractDestSectorFromMaterial(m.matName);
+                }
+                else if(isMaterialForSector(m))
+                {
+                    std::string to = extractDestSectorFromMaterial(m.matName);
+
+                    info.portals.emplace_back();
+                    zCPortal& portal = info.portals.back();
+
+                    // Inner sector portals get the same sector as front and back.
+                    // They're named like "S:_dest"
+                    portal.backSectorIndex =  findSectorIndexByName(info, to);
+                    portal.frontSectorIndex = portal.backSectorIndex;
+
+                    portal.frontSectorName = to;
+                    portal.backSectorName = to;
+
+                    //LogInfo() << "Sector material: " << m.matName;
+                    //LogInfo() << " - Source: " << extractSourceSectorFromMaterialName(m.matName);
+                    //LogInfo() << " - Dest: " << extractDestSectorFromMaterial(m.matName);
+                }
+            }
+        }
     };
 }

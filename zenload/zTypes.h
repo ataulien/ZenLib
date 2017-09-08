@@ -32,6 +32,9 @@ namespace ZenLoad
 		SVT_ELLIPSOID
 	};
 
+    typedef size_t SectorIndex;
+    enum : size_t { SECTOR_INDEX_INVALID = (size_t)-1 };
+
 	/**
 	 * @brief Maximum amount of nodes a skeletal mesh can render
 	 */
@@ -257,6 +260,32 @@ namespace ZenLoad
 		std::vector<zCVobData> childVobs;
 	};
 
+	struct zCPortal
+	{
+		/**
+		 * Names of the sectors facing front/back.
+		 * An empty string means that there is no sector. (ie. at the border from an inside-room to the outside world)
+		 *
+		 */
+		std::string frontSectorName;
+		std::string backSectorName;
+
+		SectorIndex frontSectorIndex; // Index to zCBspTreeData::sectors. Can be SECTOR_INDEX_INVALID.
+		SectorIndex backSectorIndex;  // Index to zCBspTreeData::sectors. Can be SECTOR_INDEX_INVALID.
+	};
+
+	/**
+	 * A Sector defines inside-regions in an outdoor world. Using sectors, you can check if the player
+	 * entered the house of an other person, for example.
+	 */
+	struct zCSector
+	{
+		size_t thisIndex;                         // Index of this sector inside zCBspTreeData::sectors
+		std::string name;
+		std::vector<size_t> bspNodeIndices;       // Indices to zCBspTreeData::nodes
+		std::vector<size_t> portalPolygonIndices; // Indices to polygons of the worldmesh
+	};
+
 	struct zCBspNode
 	{
 		enum : size_t { INVALID_NODE = static_cast<size_t>(-1) };
@@ -292,6 +321,10 @@ namespace ZenLoad
 		std::vector<zCBspNode> nodes;
 		std::vector<uint32_t > leafIndices;
 		std::vector<uint32_t> treePolyIndices;
+		std::vector<uint32_t> portalPolyIndices;
+
+		std::vector<zCSector> sectors;
+		std::vector<zCPortal> portals;
 	};
 
 	struct zCBspTreeData2
