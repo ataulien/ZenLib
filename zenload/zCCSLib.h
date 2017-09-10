@@ -30,6 +30,11 @@ namespace ZenLoad
          */
         const oCMsgConversationData& getMessageByName(const std::string& name);
 
+        /**
+         * @return true if the message was found
+         */
+        bool messageExists(const std::string& name) const;
+
         const zCCSLibData& getData(){ return m_Data; }
     private:
 
