@@ -136,3 +136,10 @@ const oCMsgConversationData& zCCSLib::getMessageByName(const std::string& name)
     return m_Data.blocks[idx].command;
 }
 
+bool zCCSLib::messageExists(const std::string& name) const
+{
+    auto nameUppered = name;
+    std::transform(nameUppered.begin(), nameUppered.end(), nameUppered.begin(), ::toupper);
+    return m_MessagesByName.find(nameUppered) != m_MessagesByName.end();
+}
+

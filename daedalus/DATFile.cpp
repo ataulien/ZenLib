@@ -490,6 +490,9 @@ void DATFile::iterateSymbolsOfClass(const std::string& className, std::function<
         if(s.parent == -1 || s.properties.elemProps.type != EParType_Instance)
             continue;
 
+        if ((s.properties.elemProps.flags & Daedalus::EParFlag::EParFlag_Const) == 0)
+            continue; // filters out variables of type C_NPC or C_ITEM
+
         PARSymbol& p = getSymbolByIndex(s.parent);
         uint32_t pBase = s.parent;
 
