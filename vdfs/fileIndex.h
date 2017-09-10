@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <vector>
 #include <set>
+#include <map>
 
 namespace VDFS
 {
@@ -36,5 +37,19 @@ namespace VDFS
 		 * @return Whether a file with the given name exists
 		 */
          bool hasFile(const std::string& name) const;
+
+	private:
+
+		/**
+		 * Updates the cache used by findCaseSensitiveNameOf
+		 */
+		void updateUpperedFilenamesMap();
+
+		/**
+		 * @return Case-sensitive version of the given case-insensitive filename. Empty string if not found.
+		 */
+		std::string findCaseSensitiveNameOf(const std::string& caseInsensitiveName) const;
+
+		std::map<std::string, std::string> m_FilenamesByUpperedFileNames;
 	};
 }
