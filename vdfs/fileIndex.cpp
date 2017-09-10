@@ -31,6 +31,9 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
         LogInfo() << "Couldn't load VDF-Archive " << vdf << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         return false;
     }
+
+    updateUpperedFilenamesMap();
+
 	return true;
 }
 
@@ -39,12 +42,12 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
 */
 bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data) const
 {
-    std::string filePath(file);
-    bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
+    std::string caseSensitivePath = findCaseSensitiveNameOf(file);
+    bool exists = caseSensitivePath != "";
 
     if (!exists) return false;
 
-    PHYSFS_File *handle = PHYSFS_openRead(filePath.c_str());
+    PHYSFS_File *handle = PHYSFS_openRead(caseSensitivePath.c_str());
     if (!handle)
     {
         LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
@@ -65,9 +68,7 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
 
 bool FileIndex::hasFile(const std::string& name) const
 {
-    std::string filePath(name);
-    bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
-    return exists;
+    return findCaseSensitiveNameOf(name) != "";
 }
 
 std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
@@ -85,4 +86,31 @@ std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
         vec.push_back(*i);
     PHYSFS_freeList(files);
     return vec;
+}
+
+void FileIndex::updateUpperedFilenamesMap()
+{
+    std::vector<std::string> files = getKnownFiles();
+
+    m_FilenamesByUpperedFileNames.clear();
+    for(const std::string& file : files)
+    {
+        std::string uppered = file;
+        std::transform(uppered.begin(), uppered.end(), uppered.begin(), ::toupper);
+
+        m_FilenamesByUpperedFileNames[uppered] = file;
+    }
+}
+
+std::string FileIndex::findCaseSensitiveNameOf(const std::string& caseInsensitiveName) const
+{
+    std::string uppered = caseInsensitiveName;
+    std::transform(caseInsensitiveName.begin(), caseInsensitiveName.end(), uppered.begin(), ::toupper);
+
+    auto it = m_FilenamesByUpperedFileNames.find(uppered);
+
+    if(it == m_FilenamesByUpperedFileNames.end())
+        return "";
+
+    return it->second;
 }
