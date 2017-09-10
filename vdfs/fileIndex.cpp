@@ -3,6 +3,7 @@
 #include <locale>
 #include <algorithm>
 #include <physfs.h>
+#include "../lib/physfs/extras/ignorecase.h"
 
 using namespace VDFS;
 
@@ -27,7 +28,7 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
 {
     if (!PHYSFS_mount(vdf.c_str(), mountPoint.c_str(), 1))
     {
-        LogInfo() << "Couldn't load VDF-Archive " << vdf << ": " << PHYSFS_getLastError();
+        LogInfo() << "Couldn't load VDF-Archive " << vdf << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         return false;
     }
 	return true;
@@ -38,20 +39,23 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
 */
 bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data) const
 {
-    if (!PHYSFS_exists(file.c_str())) return false;
+    std::string filePath(file);
+    bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
 
-    PHYSFS_File *handle = PHYSFS_openRead(file.c_str());
+    if (!exists) return false;
+
+    PHYSFS_File *handle = PHYSFS_openRead(filePath.c_str());
     if (!handle)
     {
-        LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getLastError();
+        LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         return false;
     }
 
     auto length = PHYSFS_fileLength(handle);
     data.resize(length);
-    if (PHYSFS_read(handle, data.data(), 1, length) < length)
+    if (PHYSFS_readBytes(handle, data.data(), length) < length)
     {
-        LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getLastError();
+        LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         PHYSFS_close(handle);
         return false;
     }
@@ -61,14 +65,22 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
 
 bool FileIndex::hasFile(const std::string& name) const
 {
-    return PHYSFS_exists(name.c_str());
+    std::string filePath(name);
+    bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
+    return exists;
 }
 
 std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
 {
-    char **files = PHYSFS_enumerateFiles(path.c_str());
-    char **i;
+    std::string filePath(path);
     std::vector<std::string> vec;
+    bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
+    if (!exists) {
+        return vec;
+    }
+
+    char **files = PHYSFS_enumerateFiles(filePath.c_str());
+    char **i;
     for (i = files; *i != NULL; i++)
         vec.push_back(*i);
     PHYSFS_freeList(files);
