@@ -648,6 +648,60 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseAniAlias()
     if (res != Success)
         return Error;
 
+    if (m_ArgCount < 8)
+    {
+        LogError() << "invalid number of arguments for aniAlias at line " << m_Line;
+        return Error;
+    }
+
+    m_Alias.m_Name = m_Args[0];
+
+    std::transform(m_Alias.m_Name.begin(), m_Alias.m_Name.end(), m_Alias.m_Name.begin(), ::toupper);
+
+    m_Alias.m_Next = m_Args[2];
+    std::transform(m_Alias.m_Next.begin(), m_Alias.m_Next.end(), m_Alias.m_Next.begin(), ::toupper);
+
+    m_Alias.m_Alias = m_Args[6];
+    std::transform(m_Alias.m_Alias.begin(), m_Alias.m_Alias.end(), m_Alias.m_Alias.begin(), ::toupper);
+
+    m_Alias.m_Dir = (!m_Args[7].empty() && m_Args[7][0] == 'R') ? MSB_BACKWARD : MSB_FORWARD;
+
+    std::string& flags = m_Args[5];
+
+    m_Alias.m_Flags = 0;
+    for(size_t i=0;i<flags.size();i++)
+    {
+        switch(flags[i])
+        {
+	case 'M':
+	    m_Alias.m_Flags |= EModelScriptAniFlags::MSB_MOVE_MODEL;
+	    break;
+
+	case 'R':
+	    m_Alias.m_Flags |= EModelScriptAniFlags::MSB_ROTATE_MODEL;
+	    break;
+
+	case 'E':
+	    m_Alias.m_Flags |= EModelScriptAniFlags::MSB_QUEUE_ANI;
+	    break;
+
+	case 'F':
+	    m_Alias.m_Flags |= EModelScriptAniFlags::MSB_FLY;
+	    break;
+
+	case 'I':
+	    m_Alias.m_Flags |= EModelScriptAniFlags::MSB_IDLE;
+	    break;
+
+	case '.':
+	    // This is used as a placeholder
+	    break;
+
+	default:
+	    LogWarn() << "Anim: Unknown anialias-flag: " << flags[i];
+        }
+    }
+
     return parseAniEvents();
 }
 
