@@ -268,9 +268,6 @@ namespace Daedalus
             RegisteredObjects& getRegisteredObjects()
             { return m_RegisteredObjects; }
 
-            std::map<std::string, LogTopic>& getPlayerLog()
-            { return m_PlayerLog; };
-
             const std::list<ItemHandle>& getInventoryOf(NpcHandle npc)
             { return m_NpcInventories[npc]; }
 
@@ -298,11 +295,6 @@ namespace Daedalus
              * Daedalus-VM this is running on
              */
             Daedalus::DaedalusVM &m_VM;
-
-            /**
-             * @brief The players log. Map of Entries by Topics
-             */
-            std::map<std::string, LogTopic> m_PlayerLog;
 
             /**
              * Inventories by npc handle

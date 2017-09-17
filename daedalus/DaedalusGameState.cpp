@@ -100,40 +100,6 @@ void DaedalusGameState::registerExternals()
         else
             vm.setReturn(0);
     });
-
-    m_VM.registerExternalFunction("log_createtopic", [=](Daedalus::DaedalusVM& vm){
-        int32_t section = vm.popDataValue();
-        std::string name = vm.popString();
-        m_PlayerLog[name].section = static_cast<LogTopic::ESection>(section);
-
-        if(m_GameExternals.log_createtopic)
-            m_GameExternals.log_createtopic(name);
-    });
-
-    m_VM.registerExternalFunction("log_settopicstatus", [=](Daedalus::DaedalusVM& vm){
-        int32_t status = vm.popDataValue();
-        std::string name = vm.popString();
-
-        m_PlayerLog[name].status = static_cast<LogTopic::ELogStatus>(status);
-
-        if(m_GameExternals.log_settopicstatus)
-            m_GameExternals.log_settopicstatus(name);
-    });
-
-    m_VM.registerExternalFunction("log_addentry", [=](Daedalus::DaedalusVM& vm){
-        std::string entry = vm.popString();
-        std::string topic = vm.popString();
-
-        LogInfo() << "";
-        LogInfo() << " ########### New Log Entry: " << topic << " ########### ";
-        LogInfo() << entry;
-        LogInfo() << "";
-
-        m_PlayerLog[topic].entries.push_back(entry);
-
-        if(m_GameExternals.log_addentry)
-            m_GameExternals.log_addentry(topic, entry);
-    });
 }
 
 
