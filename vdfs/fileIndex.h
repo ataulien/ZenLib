@@ -24,6 +24,18 @@ namespace VDFS
 		bool loadVDF(const std::string& vdf, uint32_t priority = 0, const std::string& mountPoint = "/");
 
 		/**
+		 * Mounts the given folder-structure into the file-index
+		 * @param path folder to mount
+		 * @return success
+		 */
+		bool mountFolder(const std::string& path, const std::string& mountPoint = "/");
+
+        /**
+         * Must be called after you have mounted/loaded all files. Otherwise files won't be openable.
+         */
+        void finalizeLoad();
+
+		/**
 		 * @brief Fills a vector with the data of the given file
 		 */
 		bool getFileData(const std::string& file, std::vector<uint8_t>& data) const;

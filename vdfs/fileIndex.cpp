@@ -32,9 +32,18 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
         return false;
     }
 
-    updateUpperedFilenamesMap();
-
 	return true;
+}
+
+bool FileIndex::mountFolder(const std::string& path, const std::string& mountPoint)
+{
+    if(!PHYSFS_mount(path.c_str(), mountPoint.c_str(), 1))
+    {
+        LogInfo() << "Couldn't mount directory " << path << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        return false;
+    }
+
+    return true;
 }
 
 /**
@@ -113,4 +122,10 @@ std::string FileIndex::findCaseSensitiveNameOf(const std::string& caseInsensitiv
         return "";
 
     return it->second;
+}
+
+void FileIndex::finalizeLoad()
+{
+    // Must be called here so opening files will actually work
+    updateUpperedFilenamesMap();
 }
