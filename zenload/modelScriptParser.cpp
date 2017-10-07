@@ -135,7 +135,7 @@ void ModelScriptBinParser::readSfx()
     float range = m_Zen.readBinaryFloat();
     float emptySlot = m_Zen.readBinaryFloat();
 
-    m_Sfx.back().m_Range = range;
+    m_Sfx.back().m_Range = range / 100.0f; // Convert to meters
     m_Sfx.back().m_EmptySlot = emptySlot > 0.0f; // They encoded this as float for some reason...
 }
 
