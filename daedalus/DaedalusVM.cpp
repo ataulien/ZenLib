@@ -639,7 +639,10 @@ int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx, bool clearDataStack)
         if(!isStackEmpty())
             ret = popDataValue(); // TODO handle vars?
         else
-            LogWarn() << "DaedalusVM: function " << functionSymbol.name << " forgot to push a return value";
+        {
+            // too many warnings for now. Dialog conditions omit default value (0)
+            //LogWarn() << "DaedalusVM: function " << functionSymbol.name << " forgot to push a return value";
+        }
     }
 
     if (!m_Stack.empty())
