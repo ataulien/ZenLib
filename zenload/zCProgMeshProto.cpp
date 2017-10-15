@@ -142,9 +142,15 @@ void zCProgMeshProto::readObjectData(ZenParser& parser)
 
 				parser.setSeek(p2.getSeek() + parser.getSeek());
 
-				// Read whether we want to have alphatesting
-				m_IsUsingAlphaTest = parser.readBinaryByte() != 0;
-				
+				if(version == zCPROGMESH_FILE_VERS_G2)
+				{
+					// Read whether we want to have alphatesting
+					m_IsUsingAlphaTest = parser.readBinaryByte() != 0;
+				}else
+				{
+					m_IsUsingAlphaTest = false;
+				}
+
 				// Read boundingbox
 				ZMath::float3 min, max;
 				parser.readStructure(min);

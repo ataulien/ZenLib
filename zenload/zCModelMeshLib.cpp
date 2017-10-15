@@ -250,6 +250,9 @@ void zCModelMeshLib::packMesh(PackedSkeletalMesh& mesh, float scale) const
 		m.packMesh(mesh, scale);
 	}
 
+	mesh.bbox[0] = m_BBox[0];
+	mesh.bbox[0] = m_BBox[1];
+
 	// TODO: Implement node-attachments!
 	/*for(const auto& m : m_NodeAttachments)
 	{

@@ -604,6 +604,7 @@ namespace ZenLoad
 			std::vector<uint32_t> indices;		
 		};
 
+		ZMath::float3 bbox[2];
 		std::vector<SkeletalVertex> vertices;
 		std::vector<SubMesh> subMeshes;
 	};
