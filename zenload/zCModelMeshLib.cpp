@@ -3,6 +3,7 @@
 #include "utils/logger.h"
 #include "zTypes.h"
 #include <string>
+#include <cfloat>
 #include "vdfs/fileIndex.h"
 #include "zCMeshSoftSkin.h"
 #include "parserImpl.h"
@@ -250,8 +251,34 @@ void zCModelMeshLib::packMesh(PackedSkeletalMesh& mesh, float scale) const
 		m.packMesh(mesh, scale);
 	}
 
-	mesh.bbox[0] = m_BBox[0];
-	mesh.bbox[0] = m_BBox[1];
+	mesh.bbox[0] = { FLT_MAX, FLT_MAX, FLT_MAX};
+	mesh.bbox[1] = { FLT_MIN, FLT_MIN, FLT_MIN};
+
+	// Choose the biggest BBox possible (From model hierarchy or soft-meshes)
+	for(const auto& m : m_Meshes)
+	{
+		ZMath::float3 min, max;
+		m.getAABBTotal(min, max);
+
+		min *= scale;
+		max *= scale;
+
+		mesh.bbox[0].x = std::min(mesh.bbox[0].x, min.x);
+		mesh.bbox[0].y = std::min(mesh.bbox[0].y, min.y);
+		mesh.bbox[0].z = std::min(mesh.bbox[0].z, min.z);
+
+		mesh.bbox[1].x = std::max(mesh.bbox[1].x, max.x);
+		mesh.bbox[1].y = std::max(mesh.bbox[1].y, max.y);
+		mesh.bbox[1].z = std::max(mesh.bbox[1].z, max.z);
+	}
+
+	mesh.bbox[0].x = std::min(mesh.bbox[0].x, m_BBox[0].x);
+	mesh.bbox[0].y = std::min(mesh.bbox[0].y, m_BBox[0].y);
+	mesh.bbox[0].z = std::min(mesh.bbox[0].z, m_BBox[0].z);
+
+	mesh.bbox[1].x = std::max(mesh.bbox[1].x, m_BBox[1].x);
+	mesh.bbox[1].y = std::max(mesh.bbox[1].y, m_BBox[1].y);
+	mesh.bbox[1].z = std::max(mesh.bbox[1].z, m_BBox[1].z);
 
 	// TODO: Implement node-attachments!
 	/*for(const auto& m : m_NodeAttachments)

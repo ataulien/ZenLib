@@ -3,6 +3,7 @@
 #include "utils/logger.h"
 #include "zTypes.h"
 #include <string>
+#include <cfloat>
 #include "vdfs/fileIndex.h"
 #include "zCProgMeshProto.h"
 #include "utils/alignment.h"
@@ -12,30 +13,58 @@ using namespace ZenLoad;
 static const uint16_t MSID_MESHSOFTSKIN = 0xE100;
 static const uint16_t MSID_MESHSOFTSKIN_END = 0xE110;
 
-struct oBBox3d
+void oBBox3d::load(ZenParser& parser)
 {
-	ZMath::float3 center;
-	ZMath::float3 axis[3];
-	ZMath::float3 extends;
+	parser.readBinaryRaw(&center, sizeof(center));
 
-	std::vector<oBBox3d> children;
+	parser.readBinaryRaw(&axis, sizeof(axis));
+	parser.readBinaryRaw(&extends, sizeof(extends));
 
-	void load(ZenParser& parser)
+	uint16_t numChildren = parser.readBinaryWord();
+
+	for(uint16_t i = 0; i < numChildren; i++)
 	{
-		parser.readBinaryRaw(&center, sizeof(center));
-
-		parser.readBinaryRaw(&axis, sizeof(axis));
-		parser.readBinaryRaw(&extends, sizeof(extends));
-
-		uint16_t numChildren = parser.readBinaryWord();
-
-		for(uint16_t i = 0; i < numChildren; i++)
-		{
-			children.emplace_back();
-			children.back().load(parser);
-		}
+		children.emplace_back();
+		children.back().load(parser);
 	}
-};
+}
+
+void oBBox3d::getAABB(ZMath::float3& min, ZMath::float3& max) const
+{
+	const float sign[8][3] =	{
+			-1, -1, -1,
+			-1, -1, +1,
+			-1, +1, -1,
+			-1, +1, +1,
+			+1, -1, -1,
+			+1, -1, +1,
+			+1, +1, -1,
+			+1, +1, +1
+	};
+
+	min = { FLT_MAX, FLT_MAX, FLT_MAX};
+	max = { FLT_MIN, FLT_MIN, FLT_MIN};
+
+	for (int i = 0; i < 8; i++)
+	{
+		ZMath::float3 point = center;
+		const ZMath::float3 axis0 = axis[0] * extends.x * sign[i][0];
+		const ZMath::float3 axis1 = axis[1] * extends.y * sign[i][1];
+		const ZMath::float3 axis2 = axis[2] * extends.z * sign[i][2];
+
+		point.x += axis0.x + axis1.x + axis2.x;
+		point.y += axis0.y + axis1.y + axis2.y;
+		point.z += axis0.z + axis1.z + axis2.z;
+
+		min.x = std::min(min.x, point.x);
+		min.y = std::min(min.y, point.y);
+		min.z = std::min(min.z, point.z);
+
+		max.x = std::max(max.x, point.x);
+		max.y = std::max(max.y, point.y);
+		max.z = std::max(max.z, point.z);
+	}
+}
 
 /**
 * @brief Reads the mesh-object from the given binary stream
@@ -85,10 +114,11 @@ void zCMeshSoftSkin::readObjectData(ZenParser& parser)
 
 			for(uint16_t i = 0; i < numNodes; i++)
 			{
-				oBBox3d obbox3d;
-				obbox3d.load(parser);
+				m_BBoxesByNodes.emplace_back();
+				m_BBoxesByNodes.back().load(parser);
 			}
-	
+
+			updateBboxTotal();
 			// Chunksize seems wrong, can't skip here!
 			//parser.setSeek(chunkEnd); // Skip chunk
 		}
@@ -193,4 +223,33 @@ void zCMeshSoftSkin::packMesh(PackedSkeletalMesh& mesh, float scale) const
 			mesh.subMeshes.back().indices.push_back(indices[j]);
 		}
 	}
+
+	mesh.bbox[0] = m_BBoxTotal[0] * scale;
+	mesh.bbox[1] = m_BBoxTotal[1] * scale;
+}
+
+void zCMeshSoftSkin::updateBboxTotal()
+{
+	m_BBoxTotal[0] = { FLT_MAX, FLT_MAX, FLT_MAX};
+	m_BBoxTotal[1] = { FLT_MIN, FLT_MIN, FLT_MIN};
+
+	for(const oBBox3d& bb : m_BBoxesByNodes)
+	{
+		ZMath::float3 min, max;
+		bb.getAABB(min, max);
+
+		m_BBoxTotal[0].x = std::min(m_BBoxTotal[0].x, min.x);
+		m_BBoxTotal[0].y = std::min(m_BBoxTotal[0].y, min.y);
+		m_BBoxTotal[0].z = std::min(m_BBoxTotal[0].z, min.z);
+
+		m_BBoxTotal[1].x = std::max(m_BBoxTotal[1].x, max.x);
+		m_BBoxTotal[1].y = std::max(m_BBoxTotal[1].y, max.y);
+		m_BBoxTotal[1].z = std::max(m_BBoxTotal[1].z, max.z);
+	}
+}
+
+void zCMeshSoftSkin::getAABBTotal(ZMath::float3& min, ZMath::float3& max) const
+{
+	min = m_BBoxTotal[0];
+	max = m_BBoxTotal[1];
 }

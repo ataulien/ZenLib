@@ -11,6 +11,18 @@ namespace VDFS
 
 namespace ZenLoad
 {
+	struct oBBox3d
+	{
+		ZMath::float3 center;
+		ZMath::float3 axis[3];
+		ZMath::float3 extends;
+
+		std::vector<oBBox3d> children;
+
+		void getAABB(ZMath::float3& min, ZMath::float3& max) const;
+		void load(ZenParser& parser);
+	};
+
 	class ZenParser;
 	class zCMeshSoftSkin
 	{
@@ -33,7 +45,16 @@ namespace ZenLoad
 		 * @brief Creates packed submesh-data
 		 */
 		void packMesh(PackedSkeletalMesh& mesh, float scale = 1.0f) const;
+
+		/**
+		 * @param min Output of min-part of the AABB surrounding this mesh
+		 * @param max Output of max-part of the AABB surrounding this mesh
+		 */
+		void getAABBTotal(ZMath::float3& min, ZMath::float3& max) const;
 	private:
+
+		void updateBboxTotal();
+
 		/**
 		 * @brief Internal zCProgMeshProto of this soft skin. The soft-skin only displaces the vertices found in the ProgMesh.
 		 */
@@ -45,5 +66,7 @@ namespace ZenLoad
 		 *		  numWeights* zTWeightEntry: weights
 		 */
 		std::vector<uint8_t> m_VertexWeightStream;
+		std::vector<oBBox3d> m_BBoxesByNodes;
+		ZMath::float3 m_BBoxTotal[2];
 	};
 }
