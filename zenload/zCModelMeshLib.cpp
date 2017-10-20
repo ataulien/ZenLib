@@ -251,8 +251,8 @@ void zCModelMeshLib::packMesh(PackedSkeletalMesh& mesh, float scale) const
 		m.packMesh(mesh, scale);
 	}
 
-	mesh.bbox[0] = { FLT_MAX, FLT_MAX, FLT_MAX};
-	mesh.bbox[1] = { FLT_MIN, FLT_MIN, FLT_MIN};
+	mesh.bbox[0] = {  FLT_MAX,  FLT_MAX,  FLT_MAX};
+	mesh.bbox[1] = { -FLT_MAX, -FLT_MAX, -FLT_MAX};
 
 	// Choose the biggest BBox possible (From model hierarchy or soft-meshes)
 	for(const auto& m : m_Meshes)

@@ -43,7 +43,7 @@ void oBBox3d::getAABB(ZMath::float3& min, ZMath::float3& max) const
 	};
 
 	min = { FLT_MAX, FLT_MAX, FLT_MAX};
-	max = { FLT_MIN, FLT_MIN, FLT_MIN};
+	max = { -FLT_MAX, -FLT_MAX, -FLT_MAX};
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -230,8 +230,8 @@ void zCMeshSoftSkin::packMesh(PackedSkeletalMesh& mesh, float scale) const
 
 void zCMeshSoftSkin::updateBboxTotal()
 {
-	m_BBoxTotal[0] = { FLT_MAX, FLT_MAX, FLT_MAX};
-	m_BBoxTotal[1] = { FLT_MIN, FLT_MIN, FLT_MIN};
+	m_BBoxTotal[0] = {  FLT_MAX,  FLT_MAX,  FLT_MAX};
+	m_BBoxTotal[1] = { -FLT_MAX, -FLT_MAX, -FLT_MAX};
 
 	for(const oBBox3d& bb : m_BBoxesByNodes)
 	{
