@@ -2,6 +2,7 @@
 #include "zenParser.h"
 #include "utils/logger.h"
 #include "zTypes.h"
+#include <algorithm>
 #include <string>
 #include <cfloat>
 #include "vdfs/fileIndex.h"
