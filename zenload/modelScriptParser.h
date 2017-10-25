@@ -84,6 +84,8 @@ public:
     std::vector<zCModelScriptEventSfx>     &sfxGround() { return m_SfxGround; }
     std::vector<zCModelScriptEventTag>          &tag() { return m_Tag; }
 
+    std::vector<zCModelScriptEventPfx> &pfx() {return m_Pfx; }
+
     /** Reads the next chunk.
      *
      * @return The chunk type or CHUNK_ERROR / CHUNK_EOF.
@@ -97,6 +99,8 @@ protected:
 
     zCModelScriptAni                m_Ani;
     zCModelScriptAniAlias           m_Alias;
+    std::vector<zCModelScriptEventPfx>          m_Pfx;
+    //std::vector<zCModelScriptEventPfx>          m_Pfx;
     std::vector<zCModelScriptEventSfx>           m_Sfx;
     std::vector<zCModelScriptEventSfx>           m_SfxGround;
     std::vector<zCModelScriptEventTag>                m_Tag;
@@ -117,6 +121,7 @@ private:
     void                            readAni();
     void                            readAlias();
     void                            readSfx();
+    void                            readPfx();
 };
 
 /** Streaming parser for .MDS files.

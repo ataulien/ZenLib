@@ -55,6 +55,10 @@ ModelScriptBinParser::EChunkType ModelScriptBinParser::parse()
             readSfx();
             m_Zen.setSeek(chunk_end);
             return CHUNK_EVENT_SFX_GRND;
+        case CHUNK_EVENT_PFX:
+            readPfx();
+            m_Zen.setSeek(chunk_end);
+            return CHUNK_EVENT_PFX;
         default:
             m_Zen.setSeek(chunk_end);
             return parse(); // skip unknown chunk
@@ -138,6 +142,17 @@ void ModelScriptBinParser::readSfx()
     m_Sfx.back().m_Range = range / 100.0f; // Convert to meters
     m_Sfx.back().m_EmptySlot = emptySlot > 0.0f; // They encoded this as float for some reason...
 }
+void ModelScriptBinParser::readPfx()
+{
+    //gets called
+    m_Pfx.emplace_back();
+
+    m_Pfx.back().m_Frame = m_Zen.readBinaryDWord();
+    m_Pfx.back().m_Num = m_Zen.readBinaryDWord();
+    m_Pfx.back().m_Name = m_Zen.readLine(true);
+    m_Pfx.back().m_Pos = m_Zen.readLine(true);
+}
+
 
 ModelScriptTextParser::ModelScriptTextParser(ZenParser &zen)
     : ModelScriptParser(zen),
@@ -488,7 +503,7 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseAniEvents()
     Result res = parseObjectStart();
     if (res != Success)
         return Error;
-
+    LogInfo() << "Ani Events";
     while (true)
     {
         // Need to check this first, to fix parsing of empty { } blocks
@@ -507,6 +522,7 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseAniEvents()
         } else
         if (m_Token.text == "*EVENTPFX")
         {
+            //gets never called...
             res = parsePfxEvent();
             if (res != Success)
                 break;
@@ -728,10 +744,18 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseSwapMeshEvent()
 ModelScriptTextParser::Result ModelScriptTextParser::parsePfxEvent()
 {
     Result res = parseArguments();
-    if (res != Success)
+    //FIXME 2? Check
+    if (res != Success || m_Args.size() < 2 || m_Args.size() > 5)
         return Error;
 
     // TODO: assign
+    m_Pfx.emplace_back();
+    m_Pfx.back().m_Frame = (uint32_t)std::stoi(m_Args[0]);
+    m_Pfx.back().m_Num= (uint32_t)std::stoi(m_Args[1]);
+    m_Pfx.back().m_Name = m_Args[2];
+    m_Pfx.back().m_Pos = m_Args[3];
+
+    //FIXME attach
 
     return Success;
 }
