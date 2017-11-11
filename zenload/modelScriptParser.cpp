@@ -59,6 +59,10 @@ ModelScriptBinParser::EChunkType ModelScriptBinParser::parse()
             readPfx();
             m_Zen.setSeek(chunk_end);
             return CHUNK_EVENT_PFX;
+        case CHUNK_EVENT_PFX_STOP:
+            readPfxStop();
+            m_Zen.setSeek(chunk_end);
+            return CHUNK_EVENT_PFX_STOP;
         default:
             m_Zen.setSeek(chunk_end);
             return parse(); // skip unknown chunk
@@ -144,13 +148,20 @@ void ModelScriptBinParser::readSfx()
 }
 void ModelScriptBinParser::readPfx()
 {
-    //gets called
     m_Pfx.emplace_back();
 
     m_Pfx.back().m_Frame = m_Zen.readBinaryDWord();
     m_Pfx.back().m_Num = m_Zen.readBinaryDWord();
     m_Pfx.back().m_Name = m_Zen.readLine(true);
     m_Pfx.back().m_Pos = m_Zen.readLine(true);
+    m_Pfx.back().m_isAttached = m_Zen.readLine(true);
+}
+
+void ModelScriptBinParser::readPfxStop()
+{
+    m_PfxStop.emplace_back();
+    m_PfxStop.back().m_Frame = m_Zen.readBinaryDWord();
+    m_PfxStop.back().m_Num = m_Zen.readBinaryDWord();
 }
 
 
@@ -744,7 +755,6 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseSwapMeshEvent()
 ModelScriptTextParser::Result ModelScriptTextParser::parsePfxEvent()
 {
     Result res = parseArguments();
-    //FIXME 2? Check
     if (res != Success || m_Args.size() < 2 || m_Args.size() > 5)
         return Error;
 
@@ -754,19 +764,20 @@ ModelScriptTextParser::Result ModelScriptTextParser::parsePfxEvent()
     m_Pfx.back().m_Num= (uint32_t)std::stoi(m_Args[1]);
     m_Pfx.back().m_Name = m_Args[2];
     m_Pfx.back().m_Pos = m_Args[3];
-
-    //FIXME attach
-
+    if(m_Args.size() > 4)
+        m_Pfx.back().m_isAttached = m_Args[4];
     return Success;
 }
 
 ModelScriptTextParser::Result ModelScriptTextParser::parsePfxStopEvent()
 {
     Result res = parseArguments();
-    if (res != Success)
+    if (res != Success || m_Args.size() != 2)
         return Error;
 
-    // TODO: assign
+    m_PfxStop.emplace_back();
+    m_PfxStop.back().m_Frame = (uint32_t)std::stoi(m_Args[0]);
+    m_PfxStop.back().m_Num = (uint32_t)std::stoi(m_Args[1]);
 
     return Success;
 }
