@@ -151,10 +151,12 @@ void ModelScriptBinParser::readPfx()
     m_Pfx.emplace_back();
 
     m_Pfx.back().m_Frame = m_Zen.readBinaryDWord();
+
     m_Pfx.back().m_Num = m_Zen.readBinaryDWord();
     m_Pfx.back().m_Name = m_Zen.readLine(true);
     m_Pfx.back().m_Pos = m_Zen.readLine(true);
-    m_Pfx.back().m_isAttached = m_Zen.readLine(true);
+    //Like EmptySlot in readSfx encoded in float. No " " around value might be a hint that no string is used
+    m_Pfx.back().m_isAttached = m_Zen.readBinaryFloat() > 0.0f;
 }
 
 void ModelScriptBinParser::readPfxStop()
@@ -755,17 +757,28 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseSwapMeshEvent()
 ModelScriptTextParser::Result ModelScriptTextParser::parsePfxEvent()
 {
     Result res = parseArguments();
-    if (res != Success || m_Args.size() < 2 || m_Args.size() > 5)
+    if (res != Success || m_Args.size() < 3 || m_Args.size() > 5)
         return Error;
 
-    // TODO: assign
     m_Pfx.emplace_back();
+    //Base case: no node name and no attach
     m_Pfx.back().m_Frame = (uint32_t)std::stoi(m_Args[0]);
     m_Pfx.back().m_Num= (uint32_t)std::stoi(m_Args[1]);
     m_Pfx.back().m_Name = m_Args[2];
-    m_Pfx.back().m_Pos = m_Args[3];
-    if(m_Args.size() > 4)
-        m_Pfx.back().m_isAttached = m_Args[4];
+
+    switch (m_Args.size()){
+        //No attach
+        case 4:
+            m_Pfx.back().m_Pos = m_Args[3];
+            break;
+        case 5:
+            m_Pfx.back().m_Pos = m_Args[3];
+            if(m_Args[4] == "ATTACH")
+                //FIXME attach is encoded as float in other parsing function. Is this different here?
+                m_Pfx.back().m_isAttached = true;
+            break;
+
+    }
     return Success;
 }
 

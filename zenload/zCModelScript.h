@@ -126,7 +126,7 @@ namespace ZenLoad
         int32_t m_Num;
         std::string m_Name;
         std::string m_Pos;
-        std::string m_isAttached;
+        bool m_isAttached = false;
 
     };
     struct zCModelScriptEventPfxStop
