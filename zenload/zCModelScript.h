@@ -119,4 +119,20 @@ namespace ZenLoad
          */
         bool m_EmptySlot = false;
     };
+
+    struct zCModelScriptEventPfx
+    {
+        int32_t m_Frame;
+        int32_t m_Num;
+        std::string m_Name;
+        std::string m_Pos;
+        bool m_isAttached = false;
+
+    };
+    struct zCModelScriptEventPfxStop
+    {
+        int32_t m_Frame;
+        int32_t m_Num;
+
+    };
 }
