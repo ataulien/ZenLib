@@ -516,7 +516,6 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseAniEvents()
     Result res = parseObjectStart();
     if (res != Success)
         return Error;
-    LogInfo() << "Ani Events";
     while (true)
     {
         // Need to check this first, to fix parsing of empty { } blocks

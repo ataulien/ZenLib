@@ -43,8 +43,8 @@ namespace ZenLoad
         uint32_t m_Flags = 0;
         std::string m_Asc;
         EModelScriptAniDir m_Dir = MSB_FORWARD;
-        uint32_t m_FirstFrame = 0;
-        uint32_t m_LastFrame = 0;
+        int32_t m_FirstFrame = 0;
+        int32_t m_LastFrame = 0;
         float m_MaxFps = 0.0f;
         float m_Speed = 0.0f;
         float m_ColVolScale = 1.0f;
