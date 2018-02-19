@@ -4,6 +4,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <array>
 
 namespace ZenLoad
 {
@@ -50,9 +51,9 @@ namespace ZenLoad
 		ZMath::float3 Normal;
 		ZMath::float2 TexCoord;
 		uint32_t Color;
-		ZMath::float3 LocalPositions[4];
-		unsigned char BoneIndices[4];
-		float Weights[4];
+        std::array<ZMath::float3, 4> LocalPositions;
+        std::array<uint8_t, 4> BoneIndices;
+        std::array<float, 4> Weights;
 	};
 	
 	struct zMAT3
