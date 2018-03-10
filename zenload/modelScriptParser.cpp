@@ -771,6 +771,8 @@ ModelScriptTextParser::Result ModelScriptTextParser::parsePfxEvent()
 	if(isStringNumber(m_Args[currentArgIndex])){
 		m_Pfx.back().m_Num= (uint32_t)std::stoi(m_Args[currentArgIndex]);
 		++currentArgIndex;
+	}else{
+		m_Pfx.back().m_Num = 0;
 	}
     m_Pfx.back().m_Name = m_Args[currentArgIndex];
 	++currentArgIndex;
