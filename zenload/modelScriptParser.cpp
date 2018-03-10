@@ -753,6 +753,9 @@ ModelScriptTextParser::Result ModelScriptTextParser::parseSwapMeshEvent()
     return Success;
 }
 
+inline bool isStringNumber(const std::string &s){
+	return s.find_first_not_of( "0123456789" ) == std::string::npos;
+}
 ModelScriptTextParser::Result ModelScriptTextParser::parsePfxEvent()
 {
     Result res = parseArguments();
@@ -760,22 +763,39 @@ ModelScriptTextParser::Result ModelScriptTextParser::parsePfxEvent()
         return Error;
 
     m_Pfx.emplace_back();
+	unsigned int currentArgIndex = 0;
     //Base case: no node name and no attach
-    m_Pfx.back().m_Frame = (uint32_t)std::stoi(m_Args[0]);
-    m_Pfx.back().m_Num= (uint32_t)std::stoi(m_Args[1]);
-    m_Pfx.back().m_Name = m_Args[2];
+    m_Pfx.back().m_Frame = (uint32_t)std::stoi(m_Args[currentArgIndex]);
+	++currentArgIndex;
+	//If pfx event has no handle number, no pfx end event exists for it
+	if(isStringNumber(m_Args[currentArgIndex])){
+		m_Pfx.back().m_Num= (uint32_t)std::stoi(m_Args[currentArgIndex]);
+		++currentArgIndex;
+	}else{
+		m_Pfx.back().m_Num = 0;
+	}
+    m_Pfx.back().m_Name = m_Args[currentArgIndex];
+	++currentArgIndex;
 
-    switch (m_Args.size()){
+    switch (m_Args.size())
+	{
         //No attach
         case 4:
-            m_Pfx.back().m_Pos = m_Args[3];
+            m_Pfx.back().m_Pos = m_Args[currentArgIndex];
             break;
         case 5:
-            m_Pfx.back().m_Pos = m_Args[3];
-            if(m_Args[4] == "ATTACH")
-                //FIXME attach is encoded as float in other parsing function. Is this different here?
-                m_Pfx.back().m_isAttached = true;
+            m_Pfx.back().m_Pos = m_Args[currentArgIndex];
+            if(m_Args[currentArgIndex] == "ATTACH")
+			{
+				//FIXME attach is encoded as float in other parsing function. Is this different here?
+				m_Pfx.back().m_isAttached = true;
+			}else
+			{
+				LogWarn() << "Unknown string at the end of PFX Start Event " << m_Args[currentArgIndex];
+			}
             break;
+		default:
+			LogWarn() << "Parsed malformed PFX Start Event";
 
     }
     return Success;
