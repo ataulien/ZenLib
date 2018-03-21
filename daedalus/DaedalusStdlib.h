@@ -458,6 +458,7 @@ namespace Daedalus
 
             enum Flags
             {
+                ITEM_DAG      = 1 << 13,        //  Dagger
                 ITEM_SWD	  = 1 << 14,		//	Waffe wird wie ein Schwert behandelt
                 ITEM_AXE	  = 1 << 15,		//	Waffe wird wie eine Axt behandelt
                 ITEM_2HD_SWD  = 1 << 16,		//	Waffe wird wie ein Zweihänder behandelt
@@ -466,6 +467,8 @@ namespace Daedalus
                 ITEM_CROSSBOW = 1 << 20,		//	Waffe wird wie eine Armbrust behandelt
                 ITEM_AMULET	  = 1 << 22,
                 ITEM_RING	  = 1 << 11,
+                ITEM_BELT     = 1 << 24,
+                ITEM_MISSION  = 1 << 12,
             };
 
             C_Item()
