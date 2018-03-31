@@ -14,6 +14,8 @@ endif()
 
 # 3rd-party dependencies
 add_subdirectory(lib/libsquish)
+
+set(PHYSFS_BUILD_TEST OFF CACHE STRING "" FORCE)
 add_subdirectory(lib/physfs)
 
 include_directories(lib/glm/glm)
