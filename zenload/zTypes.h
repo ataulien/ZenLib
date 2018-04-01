@@ -156,6 +156,7 @@ namespace ZenLoad
             VT_oCMobInter,
             VT_oCMobContainer,
             VT_zCVobLight,
+            VT_zCVobSound,
             VT_oCZoneMusic
         };
 
