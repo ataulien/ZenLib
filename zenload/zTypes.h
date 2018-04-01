@@ -156,6 +156,7 @@ namespace ZenLoad
             VT_oCMobInter,
             VT_oCMobContainer,
             VT_zCVobLight,
+            VT_oCZoneMusic
         };
 
         EVobType vobType;
@@ -253,6 +254,16 @@ namespace ZenLoad
 			float sndRadius;
 			std::string sndName;
 		}zCVobSound;
+
+		struct
+		{
+			bool enabled;
+			uint32_t priority;
+			bool ellipsoid;
+			float reverbLevel;
+			float volumeLevel;
+			bool loop;
+		}oCZoneMusic;
 
 		std::vector<zCVobData> childVobs;
 	};
