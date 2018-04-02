@@ -24,6 +24,7 @@ namespace Daedalus
         constexpr int MAX_NUM_MENUITEM = MAX_NUM_MISC;
         constexpr int MAX_NUM_SFX = 4096; // G2 has 1700
         constexpr int MAX_NUM_PFX = 1024;
+        constexpr int MAX_NUM_MUSICTHEME = 512;
         
         template <class T>
         constexpr size_t MAX_NUM();
@@ -38,6 +39,7 @@ namespace Daedalus
         template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Menu_Item>() { return MAX_NUM_MENUITEM; }
         template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_SFX>() { return MAX_NUM_SFX; }
         template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_ParticleFX>() { return MAX_NUM_PFX; }
+        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_MusicTheme>() { return MAX_NUM_MUSICTHEME; }
 
         template <typename C_Class>
         using CHandle = typename ZMemory::StaticReferencedAllocator<C_Class, MAX_NUM<C_Class>()>::Handle;
@@ -52,6 +54,7 @@ namespace Daedalus
         typedef CHandle<Daedalus::GEngineClasses::C_Menu_Item> MenuItemHandle;
         typedef CHandle<Daedalus::GEngineClasses::C_SFX> SfxHandle;
         typedef CHandle<Daedalus::GEngineClasses::C_ParticleFX> PfxHandle;
+        typedef CHandle<Daedalus::GEngineClasses::C_MusicTheme> MusicThemeHandle;
 
         struct LogTopic
         {
@@ -92,6 +95,7 @@ namespace Daedalus
             CAllocator<GEngineClasses::C_Menu_Item> menuItems;
             CAllocator<GEngineClasses::C_SFX> sfx;
             CAllocator<GEngineClasses::C_ParticleFX> pfx;
+            CAllocator<GEngineClasses::C_MusicTheme> musicThemes;
 
             /**
              * generic getter for the Engine containers NPCs, items, ...
@@ -124,6 +128,8 @@ namespace Daedalus
         RegisteredObjects::get<GEngineClasses::C_SFX, MAX_NUM<GEngineClasses::C_SFX>()>() { return sfx; };
         template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_ParticleFX>&
         RegisteredObjects::get<GEngineClasses::C_ParticleFX, MAX_NUM<GEngineClasses::C_ParticleFX>()>() { return pfx; };
+        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_MusicTheme>&
+        RegisteredObjects::get<GEngineClasses::C_MusicTheme, MAX_NUM<GEngineClasses::C_MusicTheme>()>() { return musicThemes; };
 
         /**
 		 * Class holding the current engine-side gamestate of a daedalus-VM
@@ -210,6 +216,9 @@ namespace Daedalus
             SfxHandle insertSFX(size_t instance);
             SfxHandle insertSFX(const std::string& instance);
 
+            MusicThemeHandle insertMusicTheme(size_t instance);
+            MusicThemeHandle insertMusicTheme(const std::string& instance);
+
             /**
              * Creates scripting relevant objects
              */
@@ -225,6 +234,7 @@ namespace Daedalus
             MenuItemHandle createMenuItem();
             SfxHandle createSfx();
             PfxHandle createPfx();
+            MusicThemeHandle createMusicTheme();
 
             /**
              * Accessors
@@ -262,6 +272,9 @@ namespace Daedalus
 
             Daedalus::GEngineClasses::C_ParticleFX& getPfx(PfxHandle h)
             { return get<Daedalus::GEngineClasses::C_ParticleFX>(h); };
+
+            Daedalus::GEngineClasses::C_MusicTheme& getMusicTheme(MusicThemeHandle h)
+            { return get<Daedalus::GEngineClasses::C_MusicTheme>(h); };
 
             Daedalus::GEngineClasses::Instance *getByClass(ZMemory::BigHandle h, EInstanceClass instClass);
 

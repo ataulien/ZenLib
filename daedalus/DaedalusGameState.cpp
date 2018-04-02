@@ -140,6 +140,9 @@ Daedalus::GEngineClasses::Instance* DaedalusGameState::getByClass(ZMemory::BigHa
         case IC_Pfx:
             return &getPfx(ZMemory::handleCast<PfxHandle>(h));
 
+        case IC_MusicTheme:
+            return &getMusicTheme(ZMemory::handleCast<MusicThemeHandle>(h));
+
         default:
             return nullptr;
 
@@ -208,6 +211,11 @@ FocusHandle DaedalusGameState::createMenu()
 FocusHandle DaedalusGameState::createMenuItem()
 {
     return create<GEngineClasses::C_Menu_Item>();
+}
+
+MusicThemeHandle DaedalusGameState::createMusicTheme()
+{
+    return create<GEngineClasses::C_MusicTheme>();
 }
 
 
@@ -363,6 +371,23 @@ SfxHandle DaedalusGameState::insertSFX(size_t instance)
 SfxHandle DaedalusGameState::insertSFX(const std::string &instance)
 {
     return insertSFX(m_VM.getDATFile().getSymbolIndexByName(instance));
+}
+
+MusicThemeHandle DaedalusGameState::insertMusicTheme(size_t instance)
+{
+    // Get memory for the item
+    MusicThemeHandle h = createMusicTheme();
+    GEngineClasses::C_MusicTheme& mt = getMusicTheme(h);
+
+    // Run the script-constructor
+    m_VM.initializeInstance(ZMemory::toBigHandle(h), static_cast<size_t>(instance), IC_MusicTheme);
+
+    return h;
+}
+
+MusicThemeHandle DaedalusGameState::insertMusicTheme(const std::string &instance)
+{
+    return insertMusicTheme(m_VM.getDATFile().getSymbolIndexByName(instance));
 }
 
 void DaedalusGameState::removeItem(ItemHandle item)

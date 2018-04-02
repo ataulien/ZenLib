@@ -348,6 +348,7 @@ namespace Daedalus
     template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_Menu_Item>() { return IC_MenuItem; };
     template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_SFX>() { return IC_Sfx; };
     template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_ParticleFX>() { return IC_Pfx; };
+    template <> EInstanceClass enumFromClass<Daedalus::GEngineClasses::C_MusicTheme>() { return IC_MusicTheme; };
 }
 
 PARSymbol& DATFile::getSymbolByName(const std::string& symName)
