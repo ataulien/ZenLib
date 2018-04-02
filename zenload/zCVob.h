@@ -52,7 +52,7 @@ namespace ZenLoad
 		static void readObjectData(zCVobData& info, ZenParser& parser, WorldVersion version, const ZenParser::ChunkHeader& header)
 		{
 			info.objectClass = "zCVob";
-            info.vobType = zCVobData::VT_zCVob;
+			info.vobType = zCVobData::VT_zCVob;
 
 			info.rotationMatrix = ZMath::Matrix::CreateIdentity();
 
@@ -164,8 +164,8 @@ namespace ZenLoad
 										 Prop("cdStatic", info.cdStatic),
 										 Prop("cdDyn", info.cdDyn),
 										 Prop("staticVob", info.staticVob),
-                                         Prop("dynShadow", info.dynamicShadow),
-                                         Prop("visualAniMode", info.visualAniMode)); // TODO: References!
+										 Prop("dynShadow", info.dynamicShadow),
+										 Prop("visualAniMode", info.visualAniMode)); // TODO: References!
 				}
 
 				// Skip visual-chunk
@@ -191,13 +191,13 @@ namespace ZenLoad
 			// Check subclasses
 			if(header.classname == "oCItem:zCVob")
 			{
-                info.vobType = zCVobData::VT_oCItem;
+				info.vobType = zCVobData::VT_oCItem;
 				parser.getImpl()->readEntry("itemInstance", &info.oCItem.instanceName);
 			}
 
 			if(header.classname.find("oCMOB:") != std::string::npos)
 			{
-                info.vobType = zCVobData::VT_oCMOB;
+				info.vobType = zCVobData::VT_oCMOB;
 
 				parser.getImpl()->readEntry("focusName", &info.oCMOB.focusName);
 				parser.getImpl()->readEntry("hitpoints", &info.oCMOB.hitpoints);
@@ -214,7 +214,7 @@ namespace ZenLoad
 
 			if(header.classname.find("oCMobInter:") != std::string::npos)
 			{
-                info.vobType = zCVobData::VT_oCMobInter;
+				info.vobType = zCVobData::VT_oCMobInter;
 
 				/*if(version == WorldVersion::VERSION_G1_08k)
 				{
@@ -232,14 +232,14 @@ namespace ZenLoad
 
 				if(header.classname.find("oCMobContainer:") != std::string::npos)
 				{
-                    parser.getImpl()->readEntry("locked", &info.oCMobContainer.locked);
+					parser.getImpl()->readEntry("locked", &info.oCMobContainer.locked);
 					parser.getImpl()->readEntry("keyInstance", &info.oCMobContainer.keyInstance);
 					parser.getImpl()->readEntry("pickLockStr", &info.oCMobContainer.pickLockStr);
 					parser.getImpl()->readEntry("contains", &info.oCMobContainer.contains);
 				}
 			}else if(header.classname.find("zCVobLight:") != std::string::npos)
 			{
-                info.vobType = zCVobData::VT_zCVobLight;
+				info.vobType = zCVobData::VT_zCVobLight;
 
 				parser.getImpl()->readEntry("lightPresetInUse", &info.zCVobLight.lightPresetInUse);
 				parser.getImpl()->readEntry("lightType", &info.zCVobLight.lightType);
@@ -252,6 +252,8 @@ namespace ZenLoad
 
 			}else if(header.classname.find("zCVobSound:") != std::string::npos)
 			{
+				info.vobType = zCVobData::VT_zCVobSound;
+
 				parser.getImpl()->readEntry("sndVolume", &info.zCVobSound.sndVolume);
 				parser.getImpl()->readEntry("sndMode", (uint32_t*)&info.zCVobSound.sndType);
 				parser.getImpl()->readEntry("sndRandDelay", &info.zCVobSound.sndRandDelay);
@@ -263,6 +265,16 @@ namespace ZenLoad
 				parser.getImpl()->readEntry("sndVolType", (uint32_t*)&info.zCVobSound.sndVolType);
 				parser.getImpl()->readEntry("sndRadius", &info.zCVobSound.sndRadius);
 				parser.getImpl()->readEntry("sndName", &info.zCVobSound.sndName);
+			}else if(header.classname.find("oCZoneMusic:") != std::string::npos)
+			{
+				info.vobType = zCVobData::VT_oCZoneMusic;
+
+				parser.getImpl()->readEntry("enabled", &info.oCZoneMusic.enabled);
+				parser.getImpl()->readEntry("priority", &info.oCZoneMusic.priority);
+				parser.getImpl()->readEntry("ellipsoid", &info.oCZoneMusic.ellipsoid);
+				parser.getImpl()->readEntry("reverbLevel", &info.oCZoneMusic.reverbLevel);
+				parser.getImpl()->readEntry("volumeLevel", &info.oCZoneMusic.volumeLevel);
+				parser.getImpl()->readEntry("loop", &info.oCZoneMusic.loop);
 			}
 
 			parser.skipChunk();
