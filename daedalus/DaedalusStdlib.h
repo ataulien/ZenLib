@@ -47,6 +47,25 @@ namespace Daedalus
         const int PROT_FALL = DAM_INDEX_FALL;
         const int PROT_INDEX_MAX = DAM_INDEX_MAX;
 
+        // Music transition types
+        enum ETransitionType
+        {
+            TRANSITION_TYPE_NONE = 1,
+            TRANSITION_TYPE_GROOVE = 2,
+            TRANSITION_TYPE_FILL = 3,
+            TRANSITION_TYPE_BREAK = 4,
+            TRANSITION_TYPE_INTRO = 5,
+            TRANSITION_TYPE_END = 6,
+            TRANSITION_TYPE_ENDANDINTRO = 7
+        };
+
+        enum ESubTransitionType
+        {
+            TRANSITION_SUB_TYPE_IMMEDIATE = 1,
+            TRANSITION_SUB_TYPE_BEAT = 2,
+            TRANSITION_SUB_TYPE_MEASURE = 3
+        };
+
         namespace MenuConstants
         {
             const int MAX_USERSTRINGS = 10;
@@ -683,6 +702,17 @@ namespace Daedalus
             int32_t         loopEndOffset = 0;
             float           reverbLevel = 0.0f;
             std::string     pfxName;
+        };
+
+        struct C_MusicTheme : Instance
+        {
+            std::string    file;
+            float          vol;
+            int32_t        loop;
+            float          reverbMix;
+            float          reverbTime;
+            int32_t        transType;
+            int32_t        transSubType;
         };
     }
 

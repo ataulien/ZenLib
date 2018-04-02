@@ -68,6 +68,7 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
     GEngineClasses::C_Menu_Item menuItem;
     GEngineClasses::C_SFX sfx;
     GEngineClasses::C_ParticleFX pfx;
+    GEngineClasses::C_MusicTheme musicTheme;
     auto& datFile = vm.getDATFile();
 
     // the vm of the GOTHIC.DAT does not contain C_Menu and MENU.DAT's vm does not contain C_NPC
@@ -348,6 +349,16 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER_IF_EXISTS("C_ParticleFX", pfx, useEmittersFOR);
         REGISTER_IF_EXISTS("C_ParticleFX", pfx, timeStartEnd_S);
         REGISTER_IF_EXISTS("C_ParticleFX", pfx, m_bIsAmbientPFX);
+    }
+
+    if (classExists("C_MUSICTHEME")) {
+        REGISTER("C_MUSICTHEME", musicTheme, file);
+        REGISTER("C_MUSICTHEME", musicTheme, vol);
+        REGISTER("C_MUSICTHEME", musicTheme, loop);
+        REGISTER("C_MUSICTHEME", musicTheme, reverbMix);
+        REGISTER("C_MUSICTHEME", musicTheme, reverbTime);
+        REGISTER("C_MUSICTHEME", musicTheme, transType);
+        REGISTER("C_MUSICTHEME", musicTheme, transSubType);
     }
 }
 

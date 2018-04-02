@@ -19,9 +19,10 @@ namespace Daedalus
 		IC_ItemReact,
 		IC_Focus,
 		IC_Menu,
-        IC_MenuItem,
+		IC_MenuItem,
 		IC_Sfx,
-		IC_Pfx
+		IC_Pfx,
+		IC_MusicTheme
 	};
 
 	template <class C_Class>
