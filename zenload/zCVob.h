@@ -265,8 +265,17 @@ namespace ZenLoad
 				parser.getImpl()->readEntry("sndVolType", (uint32_t*)&info.zCVobSound.sndVolType);
 				parser.getImpl()->readEntry("sndRadius", &info.zCVobSound.sndRadius);
 				parser.getImpl()->readEntry("sndName", &info.zCVobSound.sndName);
-			}else if(header.classname.find("oCZoneMusic:") != std::string::npos)
+			}else if(header.classname.find("oCZoneMusicDefault:") != std::string::npos)
 			{
+				info.vobType = zCVobData::VT_oCZoneMusicDefault;
+
+				parser.getImpl()->readEntry("enabled", &info.oCZoneMusic.enabled);
+				parser.getImpl()->readEntry("priority", &info.oCZoneMusic.priority);
+				parser.getImpl()->readEntry("ellipsoid", &info.oCZoneMusic.ellipsoid);
+				parser.getImpl()->readEntry("reverbLevel", &info.oCZoneMusic.reverbLevel);
+				parser.getImpl()->readEntry("volumeLevel", &info.oCZoneMusic.volumeLevel);
+				parser.getImpl()->readEntry("loop", &info.oCZoneMusic.loop);
+			} else if (header.classname.find("oCZoneMusic:") != std::string::npos) {
 				info.vobType = zCVobData::VT_oCZoneMusic;
 
 				parser.getImpl()->readEntry("enabled", &info.oCZoneMusic.enabled);
