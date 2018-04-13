@@ -157,7 +157,8 @@ namespace ZenLoad
             VT_oCMobContainer,
             VT_zCVobLight,
             VT_zCVobSound,
-            VT_oCZoneMusic
+            VT_oCZoneMusic,
+            VT_oCZoneMusicDefault,
         };
 
         EVobType vobType;
