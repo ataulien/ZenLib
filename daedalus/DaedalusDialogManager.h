@@ -11,6 +11,11 @@ namespace ZenLoad
     struct oCMsgConversationData;
 }
 
+namespace VDFS
+{
+    class FileIndex;
+}
+
 namespace Daedalus
 {
     class DaedalusVM;
@@ -25,6 +30,10 @@ namespace Daedalus
                                   const std::string &ou_bin,
                                   std::map<size_t, std::set<size_t>>& knownInfos);
 
+            DaedalusDialogManager(Daedalus::DaedalusVM& vm,
+                                  const std::string& ou_bin,
+                                  const VDFS::FileIndex& vdfsFileIndex,
+                                  std::map<size_t, std::set<size_t>>& knownInfos);
             /**
 			 * Sets the given info-instance as "known" to the given NPC-Instance
 			 */

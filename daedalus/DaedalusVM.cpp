@@ -16,35 +16,40 @@ const int NUM_FAKE_STRING_SYMBOLS = 5;
 using namespace ZenLoad;
 using namespace Daedalus;
 
-DaedalusVM::DaedalusVM(const std::string& file, const std::string& main, bool registerZenLibExternals)
+DaedalusVM::DaedalusVM(const std::string& file,  bool registerZenLibExternals)
     : m_GameState(*this)
 {
     m_PC = 0;
     m_DATFile = Daedalus::DATFile(file);
 
-    // See if we find a "main"-function
-    if(m_DATFile.hasSymbolName(main))
-    {
-        const PARSymbol& s = m_DATFile.getSymbolByName(main);
+    initializeFromLoadedDAT(registerZenLibExternals);
+}
 
-        LogInfo() << "Found main-function at Address: " << s.address;
-        m_PC = s.address;
+DaedalusVM::DaedalusVM(const uint8_t* pDATFileData, size_t numBytes,  bool registerZenLibExternals)
+  : m_GameState(*this)
+{
+  m_PC = 0;
+  m_DATFile = Daedalus::DATFile(pDATFileData, numBytes);
+
+  initializeFromLoadedDAT(registerZenLibExternals);
+}
+
+void DaedalusVM::initializeFromLoadedDAT(bool registerZenLibExternals)
+{
+  // Make fake-strings
+  for(size_t i=0;i<NUM_FAKE_STRING_SYMBOLS;i++)
+    {
+      auto symIndex = m_DATFile.addSymbol();
+      // make sure there is enough space for 1 string
+      m_DATFile.getSymbolByIndex(symIndex).strData.resize(1);
+      m_FakeStringSymbols.push(symIndex);
     }
 
-    // Make fake-strings
-    for(size_t i=0;i<NUM_FAKE_STRING_SYMBOLS;i++)
-    {
-        auto symIndex = m_DATFile.addSymbol();
-        // make sure there is enough space for 1 string
-        m_DATFile.getSymbolByIndex(symIndex).strData.resize(1);
-        m_FakeStringSymbols.push(symIndex);
-    }
+  // REGoth: don't register ZenLib externals
+  if (registerZenLibExternals)
+    m_GameState.registerExternals();
 
-    // REGoth: don't register ZenLib externals
-    if (registerZenLibExternals)
-        m_GameState.registerExternals();
-
-    m_CurrentInstanceHandle.invalidate();
+  m_CurrentInstanceHandle.invalidate();
 }
 
 bool DaedalusVM::doStack(bool verbose)

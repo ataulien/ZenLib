@@ -76,6 +76,14 @@ DATFile::DATFile(const std::string& file, bool verbose) :
     parseFile();
 }
 
+
+DATFile::DATFile(const uint8_t* pData, size_t numBytes, bool verbose) :
+  m_Parser(pData, numBytes),
+  m_Verbose(verbose)
+{
+  parseFile();
+}
+
 void DATFile::parseFile()
 {
     uint8_t version = m_Parser.readBinaryByte();

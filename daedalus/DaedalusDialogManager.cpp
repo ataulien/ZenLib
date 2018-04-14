@@ -10,6 +10,17 @@ using namespace ZenLoad;
 
 DaedalusDialogManager::DaedalusDialogManager(Daedalus::DaedalusVM& vm,
                                              const std::string& ou_bin,
+                                             const VDFS::FileIndex& vdfsFileIndex,
+                                             std::map<size_t, std::set<size_t>>& knownInfos)
+  : m_VM(vm),
+    m_MessageLib(ou_bin, vdfsFileIndex),
+    m_KnownNpcInfoSymbolsByNpcSymbols(knownInfos)
+{
+  gatherNpcInformation();
+}
+
+DaedalusDialogManager::DaedalusDialogManager(Daedalus::DaedalusVM& vm,
+                                             const std::string& ou_bin,
                                              std::map<size_t, std::set<size_t>>& knownInfos)
     : m_VM(vm),
       m_MessageLib(ou_bin),

@@ -314,6 +314,7 @@ namespace Daedalus
     public:
 		DATFile();
         DATFile(const std::string& file, bool verbose=false);
+        DATFile(const uint8_t* pData, size_t numBytes, bool verbose=false);
 
         void parseFile();
 
