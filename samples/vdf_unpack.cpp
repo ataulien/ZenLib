@@ -32,9 +32,13 @@ int main(int argc, char** argv)
                     << "       <target-path>: Path to unpack the files to" << std::endl;
         return 0;
     }
+
+    
     
     // Create file-index to hold information about the files inside the archives
     VDFS::FileIndex vdf;
+
+    vdf.Init(argv[0]);
     
     // Load the archive specified by the user. 
     // Note: You can call this method again to load more archives and add more files to the index
@@ -44,10 +48,10 @@ int main(int argc, char** argv)
     std::cout << "Loaded " << vdf.getKnownFiles().size() << " files into fileIndex!" << std::endl;
     
     // List all known files
-    for(const VDFS::FileInfo& f : vdf.getKnownFiles())
+    for(auto fname : vdf.getKnownFiles())
     {
         // Print some information about the file
-        std::cout << f.fileName << " (" << f.fileSize << " bytes)" << std::endl;
+        std::cout << fname << std::endl;
         
         // Get the data of the file
         std::vector<uint8_t> data;
@@ -58,10 +62,10 @@ int main(int argc, char** argv)
         //      vdf.getFileData("AddonWorld.zen", data);
         //
         // Filenames are non case sensitive
-        vdf.getFileData(f, data);
+        vdf.getFileData(fname, data);
         
         // Write the file to disk
-        if(!writeFile(f.fileName, argv[2], data))
+        if(!writeFile(fname, argv[2], data))
             std::cout << " - Failed to write file!" << std::endl;
     }
     
