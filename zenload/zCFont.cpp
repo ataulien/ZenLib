@@ -62,7 +62,7 @@ bool zCFont::parseFNTData(const std::vector<uint8_t>& fntData)
             return false;
         }
 
-        std::string name = parser.readLine();
+        std::string name = parser.readLine(false);
 
         uint32_t height = parser.readBinaryDWord();
         uint32_t magic = parser.readBinaryDWord();
