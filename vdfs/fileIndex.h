@@ -50,6 +50,15 @@ namespace VDFS
 		 */
          bool hasFile(const std::string& name) const;
 
+         /**
+         * Get the last modification time of the given VDF-File.
+         * @param name of the VDF-File
+         * @return If successful then the datetime inside the VDF header which represents 
+         * the last modification time of the VDF-File will be returned as seconds since 
+         * the unix epoch 00:00, Jan 1 1970 UTC otherwise -1.
+         */
+         static int64_t getLastModTime(const std::string& name);
+
 	private:
 
 		/**
