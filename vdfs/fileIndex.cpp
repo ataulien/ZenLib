@@ -1,6 +1,8 @@
 #include "fileIndex.h"
 #include "utils/logger.h"
-#include <locale>
+#include <fstream>
+#include <iomanip>
+#include <regex>
 #include <algorithm>
 #include <physfs.h>
 #include "../lib/physfs/extras/ignorecase.h"
@@ -32,12 +34,12 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
         return false;
     }
 
-	return true;
+    return true;
 }
 
 bool FileIndex::mountFolder(const std::string& path, const std::string& mountPoint)
 {
-    if(!PHYSFS_mount(path.c_str(), mountPoint.c_str(), 1))
+    if (!PHYSFS_mount(path.c_str(), mountPoint.c_str(), 1))
     {
         LogInfo() << "Couldn't mount directory " << path << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         return false;
@@ -80,6 +82,50 @@ bool FileIndex::hasFile(const std::string& name) const
     return findCaseSensitiveNameOf(name) != "";
 }
 
+int64_t VDFS::FileIndex::getLastModTime(const std::string& name)
+{
+    int64_t result = -1;
+    std::ifstream infile(name);
+    if (infile.good())
+    {
+        std::string firstLine;
+        std::getline(infile, firstLine);
+        struct std::tm tm;
+        std::smatch match;
+
+        // Regex of the datetime used by G1 and G2 e.g. (Thu, 19 Dec 2002 19:24:42 GMT)
+        std::regex rgxG1G2("\\(.*, ([[:digit:]]*) (.*) ([[:digit:]]*) ([[:digit:]]*):([[:digit:]]*):([[:digit:]]*) GMT\\)");
+
+        // Regex of the datetime used by G1 e.g. 19.06.2001  18:58.06
+        std::regex rgxG1("([[:digit:]]*)\\.([[:digit:]]*)\\.([[:digit:]]*)  ([[:digit:]]*):([[:digit:]]*).([[:digit:]]*)");
+
+        if (std::regex_search(firstLine, match, rgxG1G2))
+        {
+            std::istringstream datetime(match[1].str() + "-" + match[2].str() + "-"
+                + match[3].str() + " " + match[4].str() + ":"
+                + match[5].str() + ":" + match[6].str());
+
+            datetime >> std::get_time(&tm, "%d-%b-%Y %H:%M:%S");
+            if (!datetime.fail())
+                result = std::mktime(&tm);
+        }
+        else if (std::regex_search(firstLine, match, rgxG1))
+        {
+            std::istringstream datetime(match[1].str() + "-" + match[2].str() + "-"
+                + match[3].str() + " " + match[4].str() + ":"
+                + match[5].str() + ":" + match[6].str());
+
+            datetime >> std::get_time(&tm, "%d-%m-%Y %H:%M:%S");
+            if (!datetime.fail())
+                result = std::mktime(&tm);
+        }
+
+        infile.close();
+    }
+
+    return result;
+}
+
 std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
 {
     std::string filePath(path);
@@ -102,7 +148,7 @@ void FileIndex::updateUpperedFilenamesMap()
     std::vector<std::string> files = getKnownFiles();
 
     m_FilenamesByUpperedFileNames.clear();
-    for(const std::string& file : files)
+    for (const std::string& file : files)
     {
         std::string uppered = file;
         std::transform(uppered.begin(), uppered.end(), uppered.begin(), ::toupper);
@@ -118,7 +164,7 @@ std::string FileIndex::findCaseSensitiveNameOf(const std::string& caseInsensitiv
 
     auto it = m_FilenamesByUpperedFileNames.find(uppered);
 
-    if(it == m_FilenamesByUpperedFileNames.end())
+    if (it == m_FilenamesByUpperedFileNames.end())
         return "";
 
     return it->second;
