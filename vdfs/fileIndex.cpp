@@ -34,12 +34,12 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
         return false;
     }
 
-	return true;
+    return true;
 }
 
 bool FileIndex::mountFolder(const std::string& path, const std::string& mountPoint)
 {
-    if(!PHYSFS_mount(path.c_str(), mountPoint.c_str(), 1))
+    if (!PHYSFS_mount(path.c_str(), mountPoint.c_str(), 1))
     {
         LogInfo() << "Couldn't mount directory " << path << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
         return false;
@@ -148,7 +148,7 @@ void FileIndex::updateUpperedFilenamesMap()
     std::vector<std::string> files = getKnownFiles();
 
     m_FilenamesByUpperedFileNames.clear();
-    for(const std::string& file : files)
+    for (const std::string& file : files)
     {
         std::string uppered = file;
         std::transform(uppered.begin(), uppered.end(), uppered.begin(), ::toupper);
@@ -164,7 +164,7 @@ std::string FileIndex::findCaseSensitiveNameOf(const std::string& caseInsensitiv
 
     auto it = m_FilenamesByUpperedFileNames.find(uppered);
 
-    if(it == m_FilenamesByUpperedFileNames.end())
+    if (it == m_FilenamesByUpperedFileNames.end())
         return "";
 
     return it->second;
