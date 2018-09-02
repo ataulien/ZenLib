@@ -29,6 +29,14 @@ void FileIndex::initVDFS(const char *argv0)
 */
 bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::string& mountPoint)
 {
+    assert(!isFinalized());
+
+    if (!isFinalized())
+    {
+        LogWarn() << "Cannot load new VDFS-archives into finalized index!";
+        return false;
+    }
+
     if (!PHYSFS_mount(vdf.c_str(), mountPoint.c_str(), 1))
     {
         LogInfo() << "Couldn't load VDF-Archive " << vdf << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
