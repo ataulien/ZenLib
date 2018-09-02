@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.4)
 project(ZenLib)
+
 include(ExternalProject)
 
 set(ZENLIB_BUILD_EXAMPLES OFF CACHE BOOL "Whether to build the examples")
@@ -28,6 +29,9 @@ add_subdirectory(utils)
 add_subdirectory(vdfs)
 add_subdirectory(zenload)
 add_subdirectory(daedalus)
+
+# Tests
+add_subdirectory(tests)
 
 if(ZENLIB_BUILD_EXAMPLES)
     add_subdirectory(samples)
