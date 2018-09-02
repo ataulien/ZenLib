@@ -10,18 +10,46 @@
 
 using namespace VDFS;
 
+namespace internal {
+
+    // Must be initialized with the 0th argument passed to the executable for PhysFS.
+    std::string argv0;
+
+    // We need to do some poor-mans-refcounting to be able to know when we
+    // need to init and deinit physfs.
+    size_t numAliveIndices = 0;
+}
+
 FileIndex::FileIndex()
 {
+    if(internal::argv0.empty())
+    {
+        LogError() << "VDFS not intialized! Please call 'initVDFS' before using!";
+        exit(-1);
+    }
+
+    if (!PHYSFS_isInit())
+        PHYSFS_init(internal::argv0.c_str());
+
+    internal::numAliveIndices++;
+
+    assert(!internal::argv0.empty());
 }
 
 FileIndex::~FileIndex()
 {
-    if (PHYSFS_isInit()) PHYSFS_deinit();
+    assert(internal::numAliveIndices != 0);
+    internal::numAliveIndices--;
+
+    if (internal::numAliveIndices == 0 && PHYSFS_isInit())
+        PHYSFS_deinit();
 }
 
 void FileIndex::initVDFS(const char *argv0)
 {
-    if (!PHYSFS_isInit()) PHYSFS_init(argv0);
+    assert(internal::argv0.empty());
+
+    internal::argv0 = argv0;
 }
 
 /**
@@ -31,7 +59,7 @@ bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::st
 {
     assert(!isFinalized());
 
-    if (!isFinalized())
+    if (isFinalized())
     {
         LogWarn() << "Cannot load new VDFS-archives into finalized index!";
         return false;
@@ -141,8 +169,6 @@ int64_t VDFS::FileIndex::getLastModTime(const std::string& name)
 
 std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
 {
-    assert(isFinalized());
-
     std::string filePath(path);
     std::vector<std::string> vec;
     bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
