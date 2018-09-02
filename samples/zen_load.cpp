@@ -35,13 +35,17 @@ int main(int argc, char** argv)
         return 0;
     }
 
+    const std::string vdfsArchiveToLoad = argv[1];
+    const std::string zenFileName = argv[2];
+
     // Create file-index to load our vdf-archive
     // See the vdf_unpack for more information
     VDFS::FileIndex vdf;
-    vdf.loadVDF(argv[1]);
+    vdf.loadVDF(vdfsArchiveToLoad);
+    vdf.finalizeLoad();
 
     // Initialize parser with zenfile from vdf
-    ZenLoad::ZenParser parser(argv[2], vdf);
+    ZenLoad::ZenParser parser(zenFileName , vdf);
 
     if (parser.getFileSize() == 0)
     {
@@ -68,7 +72,7 @@ int main(int argc, char** argv)
     parser.getWorldMesh()->packMesh(packedWorldMesh, 0.01f);
 
     // Print some sample-data for vobs which got a visual
-    /*std::cout << "Listing vobs..." << std::endl;
+    std::cout << "Listing vobs..." << std::endl;
     listVobInformation(world.rootVobs);
 
     std::cout << "Listing waypoints..." << std::endl;
@@ -76,11 +80,9 @@ int main(int argc, char** argv)
     {
         std::cout << "Waypoint [" << v.wpName << "] at " << v.position.toString() << std::endl;
     }
-    */
 
-    std::cout << "Exporting obj..." << std::endl;
-
-    Utils::exportPackedMeshToObj(packedWorldMesh, (argv[2] + std::string(".OBJ")));
+    // std::cout << "Exporting obj..." << std::endl;
+    // Utils::exportPackedMeshToObj(packedWorldMesh, (zenFileName + std::string(".OBJ")));
 
     return 0;
 }
