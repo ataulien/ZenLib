@@ -16,7 +16,7 @@ namespace VDFS
         /*
         * @brief Initializes the VDFS
         */
-        void Init(const char *argv0);
+        static void initVDFS(const char *argv0);
 
         /**
         * @brief Loads a VDF-File and initializes everything
@@ -60,6 +60,11 @@ namespace VDFS
         static int64_t getLastModTime(const std::string& name);
 
     private:
+
+        /**
+         * @return Whether this fileindex has been finalized
+         */
+        bool isFinalized() const;
 
         /**
         * Updates the cache used by findCaseSensitiveNameOf

@@ -5,6 +5,7 @@
 #include <regex>
 #include <algorithm>
 #include <physfs.h>
+#include <assert.h>
 #include "../lib/physfs/extras/ignorecase.h"
 
 using namespace VDFS;
@@ -18,7 +19,7 @@ FileIndex::~FileIndex()
     if (PHYSFS_isInit()) PHYSFS_deinit();
 }
 
-void FileIndex::Init(const char *argv0)
+void FileIndex::initVDFS(const char *argv0)
 {
     if (!PHYSFS_isInit()) PHYSFS_init(argv0);
 }
@@ -53,6 +54,8 @@ bool FileIndex::mountFolder(const std::string& path, const std::string& mountPoi
 */
 bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data) const
 {
+    assert(isFinalized());
+
     std::string caseSensitivePath = findCaseSensitiveNameOf(file);
     bool exists = caseSensitivePath != "";
 
@@ -79,6 +82,8 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
 
 bool FileIndex::hasFile(const std::string& name) const
 {
+    assert(isFinalized());
+
     return findCaseSensitiveNameOf(name) != "";
 }
 
@@ -128,6 +133,8 @@ int64_t VDFS::FileIndex::getLastModTime(const std::string& name)
 
 std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
 {
+    assert(isFinalized());
+
     std::string filePath(path);
     std::vector<std::string> vec;
     bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
@@ -159,6 +166,8 @@ void FileIndex::updateUpperedFilenamesMap()
 
 std::string FileIndex::findCaseSensitiveNameOf(const std::string& caseInsensitiveName) const
 {
+    assert(isFinalized());
+
     std::string uppered = caseInsensitiveName;
     std::transform(caseInsensitiveName.begin(), caseInsensitiveName.end(), uppered.begin(), ::toupper);
 
@@ -174,4 +183,9 @@ void FileIndex::finalizeLoad()
 {
     // Must be called here so opening files will actually work
     updateUpperedFilenamesMap();
+}
+
+bool FileIndex::isFinalized() const
+{
+    return !m_FilenamesByUpperedFileNames.empty();
 }
