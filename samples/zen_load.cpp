@@ -16,10 +16,10 @@ void listVobInformation(const std::vector<ZenLoad::zCVobData>& vobs)
             // More information about what a vob stores can be found in the zTypes.h-File
             std::cout << "Vob at " << v.position.toString() << ", Visual: " << v.visual << std::endl;
         }
-        
+
         // List the information about the children as well
         listVobInformation(v.childVobs);
-    }   
+    }
 }
 
 /**
@@ -33,41 +33,41 @@ int main(int argc, char** argv)
                     << "       <vdf-archive>: Path to the vdf-archive to load" << std::endl
                     << "       <zen-name>: Name of the .ZEN-File inside the given vdf-archive (name only, no folders)" << std::endl;
         return 0;
-    } 
-    
+    }
+
     // Create file-index to load our vdf-archive
     // See the vdf_unpack for more information
     VDFS::FileIndex vdf;
     vdf.loadVDF(argv[1]);
-    
 
-	// Initialize parser with zenfile from vdf
-	ZenLoad::ZenParser parser(argv[2], vdf);
 
-	if(parser.getFileSize() == 0)
-	{
-		std::cout << "Error: ZEN-File either not found or empty!" << std::endl;
-		return 0;
-	}
+  // Initialize parser with zenfile from vdf
+  ZenLoad::ZenParser parser(argv[2], vdf);
 
-	// Since this is a usual level-zen, read the file header
-	// You will most likely allways need to do that
-	parser.readHeader();
+  if(parser.getFileSize() == 0)
+  {
+    std::cout << "Error: ZEN-File either not found or empty!" << std::endl;
+    return 0;
+  }
 
-	// Do something with the header, if you want.
-	std::cout << "Author: " << parser.getZenHeader().user << std::endl
-		<< "Date: " << parser.getZenHeader().date << std::endl
-		<< "Object-count (optional): " << parser.getZenHeader().objectCount << std::endl;
+  // Since this is a usual level-zen, read the file header
+  // You will most likely allways need to do that
+  parser.readHeader();
 
-	// Read the rest of the ZEN-file
-	ZenLoad::oCWorldData world;
-	parser.readWorld(world);
+  // Do something with the header, if you want.
+  std::cout << "Author: " << parser.getZenHeader().user << std::endl
+    << "Date: " << parser.getZenHeader().date << std::endl
+    << "Object-count (optional): " << parser.getZenHeader().objectCount << std::endl;
 
-	std::cout << "Done reading ZEN!" << std::endl;
-	
+  // Read the rest of the ZEN-file
+  ZenLoad::oCWorldData world;
+  parser.readWorld(world);
+
+  std::cout << "Done reading ZEN!" << std::endl;
+
     ZenLoad::PackedMesh packedWorldMesh;
     parser.getWorldMesh()->packMesh(packedWorldMesh, 0.01f);
-	
+
     // Print some sample-data for vobs which got a visual
     /*std::cout << "Listing vobs..." << std::endl;
     listVobInformation(world.rootVobs);
@@ -78,9 +78,9 @@ int main(int argc, char** argv)
         std::cout << "Waypoint [" << v.wpName << "] at " << v.position.toString() << std::endl;
     }
     */
-    
+
     std::cout << "Exporting obj..." << std::endl;
-    
+
     Utils::exportPackedMeshToObj(packedWorldMesh, (argv[2] + std::string(".OBJ")));
 
     return 0;
