@@ -24,10 +24,6 @@
 *.out
 *.app
 
-#vdf
-*.vdf
-*.mod
-
 #build dir
 build/
 winbuild/
