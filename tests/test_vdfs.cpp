@@ -3,8 +3,28 @@
 #include <assert.h>
 #include <set>
 #include <gtest/gtest.h>
+#include <stdio.h>
 
-const char* TEST_ARCHIVE = "files/Meshes.vdf";
+const char* TEST_ARCHIVE = "files/test.vdf";
+
+bool readFile(const std::string& fileName, std::vector<uint8_t>& data)
+{
+    FILE* f = fopen(fileName.c_str(), "rb");
+
+    if(!f)
+        return false;
+
+    fseek(f, 0, SEEK_END);
+    size_t size = ftell(f);
+    fseek(f, 0, SEEK_SET);
+
+    data.resize(size);
+    fread(&data[0], size, 1, f);
+
+    fclose(f);
+
+    return true;
+}
 
 int main(int argc, char** argv)
 {
@@ -24,26 +44,17 @@ TEST(VDFS, LoadAny) {
     EXPECT_NE(idx.getKnownFiles().size(), 0);
 }
 
-TEST(VDFS, LoadCameraMRM) {
+TEST(VDFS, LoadTestTxt) {
     VDFS::FileIndex idx;
     ASSERT_TRUE(idx.loadVDF(TEST_ARCHIVE));
     idx.finalizeLoad();
 
-    std::vector<uint8_t> data;
-    ASSERT_TRUE(idx.getFileData("CAMERA.MRM", data));
+    std::vector<uint8_t> data_from_archive;
+    std::vector<uint8_t> data_from_file;
+    ASSERT_TRUE(idx.getFileData("test.txt", data_from_archive));
+    ASSERT_TRUE(readFile("files/test.txt", data_from_file));
 
-    // Make sure this is the exact file we want
-    ASSERT_EQ(data.size(), 8758);
-
-    uint32_t actualChecksum = 0;
-    for(auto b : data)
-    {
-        actualChecksum += b;
-    }
-
-    const uint32_t expectedChecksum = 410570;
-
-    ASSERT_EQ(expectedChecksum, actualChecksum);
+    ASSERT_EQ(data_from_archive, data_from_file);
 }
 
 TEST(VDFS, FileNames)
@@ -52,12 +63,12 @@ TEST(VDFS, FileNames)
     ASSERT_TRUE(idx.loadVDF(TEST_ARCHIVE));
     idx.finalizeLoad();
 
-    ASSERT_TRUE(idx.hasFile("CAMERA.MRM"));
-    ASSERT_TRUE(idx.hasFile("Camera.MRM"));
-    ASSERT_TRUE(idx.hasFile("CAMERA.Mrm"));
-    ASSERT_TRUE(idx.hasFile("camera.MRM"));
-    ASSERT_TRUE(idx.hasFile("cAMERA.MRM"));
-    ASSERT_TRUE(idx.hasFile("camera.mRM"));
-    ASSERT_TRUE(idx.hasFile("cameRa.mRM"));
+    ASSERT_TRUE(idx.hasFile("TEST.TXT"));
+    ASSERT_TRUE(idx.hasFile("Test.TXT"));
+    ASSERT_TRUE(idx.hasFile("TEST.Txt"));
+    ASSERT_TRUE(idx.hasFile("test.TXT"));
+    ASSERT_TRUE(idx.hasFile("tEST.TXT"));
+    ASSERT_TRUE(idx.hasFile("test.tXT"));
+    ASSERT_TRUE(idx.hasFile("teSt.tXt"));
     ASSERT_FALSE(idx.hasFile("this-isnt-in-here.whatever"));
 }
