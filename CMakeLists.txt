@@ -31,7 +31,9 @@ add_subdirectory(zenload)
 add_subdirectory(daedalus)
 
 # Tests
-add_subdirectory(tests)
+if(ZENLIB_BUILD_TESTS)
+  add_subdirectory(tests)
+endif()
 
 if(ZENLIB_BUILD_EXAMPLES)
     add_subdirectory(samples)

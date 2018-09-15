@@ -34,6 +34,5 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 add_executable(test_vdfs test_vdfs.cpp)
 target_link_libraries(test_vdfs gtest vdfs utils)
 
-include(GoogleTest)
-gtest_discover_Tests(test_vdfs)
-add_test(NAME monolithic COMMAND tests)
+enable_testing()
+add_test(test_vdfs test_vdfs)
