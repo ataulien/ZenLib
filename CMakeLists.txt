@@ -4,6 +4,7 @@ project(ZenLib)
 include(ExternalProject)
 
 set(ZENLIB_BUILD_EXAMPLES OFF CACHE BOOL "Whether to build the examples")
+set(ZENLIB_BUILD_TESTS OFF CACHE BOOL "Whether to build tests")
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -36,5 +37,5 @@ if(ZENLIB_BUILD_TESTS)
 endif()
 
 if(ZENLIB_BUILD_EXAMPLES)
-    add_subdirectory(samples)
+  add_subdirectory(samples)
 endif()
