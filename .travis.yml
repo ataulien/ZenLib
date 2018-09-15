@@ -7,6 +7,7 @@ addons:
         packages:
             - g++-6
             - gcc-6
+            - ninja-build
 
 git:
   submodules: false
@@ -16,5 +17,7 @@ script:
   - git submodule update --init --recursive
   - mkdir -p build
   - cd build
-  - cmake ..
-  - make -j2
+  - cmake -GNinja -DZENLIB_BUILD_EXAMPLES=On -DZENLIB_BUILD_TESTS=On ..
+  - ninja
+  - cd ../tests
+  - ../build/tests/test_vdfs
