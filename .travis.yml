@@ -19,4 +19,4 @@ script:
   - cd build
   - cmake -GNinja -DZENLIB_BUILD_EXAMPLES=On -DZENLIB_BUILD_TESTS=On ..
   - ninja
-  - tests/tests_vdfs
+  - tests/test_vdfs
