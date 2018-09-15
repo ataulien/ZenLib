@@ -32,6 +32,8 @@
 build/
 winbuild/
 cmake-build-*/
+.cquery_cached_index/
+compile_commands.json
 
 #dolphin
 .directory
