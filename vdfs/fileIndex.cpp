@@ -24,8 +24,9 @@ FileIndex::FileIndex()
 {
     if(internal::argv0.empty())
     {
-        LogError() << "VDFS not intialized! Please call 'initVDFS' before using!";
-        exit(-1);
+        auto const error = "VDFS not intialized! Please call 'initVDFS' before using!";
+        LogError() << error;
+        throw std::runtime_error(error);
     }
 
     if (!PHYSFS_isInit())
