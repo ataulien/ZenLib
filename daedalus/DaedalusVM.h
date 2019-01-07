@@ -28,12 +28,6 @@ namespace Daedalus
         PARStackOpCode getCurrentInstruction();
 
         /**
-         * Saves the state of the VM and prepares it for a call to runFunction.
-         * You can push function arguments after this call.
-         */
-        void prepareRunFunction();
-
-        /**
          * Runs a complete function with the arguments given by pushing onto the stack
          * Note: Must be prepared first, using prepareRunFunction.
          * @param symIdx Symbol-index of the function to call
@@ -70,12 +64,6 @@ namespace Daedalus
         void setReturn(const std::string& v);
         void setReturn(float f);
         void setReturnVar(int32_t v);
-
-        /**
-         * Pushes/Pops the whole state (PC and RetStack)
-         */
-        void pushState();
-        void popState();
 
         /**
          * @brief Pops an int from the stack
@@ -216,19 +204,6 @@ namespace Daedalus
          * @brief current state of the game
          */
         GameState::DaedalusGameState m_GameState;
-
-        struct VMState
-        {
-            ZMemory::BigHandle m_CurrentInstanceHandle;
-            EInstanceClass m_CurrentInstanceClass;
-            size_t m_PC;
-
-            std::stack<uint32_t> m_Stack;
-            std::vector<size_t> m_CallStack;
-
-            PARSymbol m_Self;
-        };
-        std::stack<VMState> m_StateStack;
 
         /**
          * Callback for when a symbol-value changed/External got called

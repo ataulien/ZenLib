@@ -514,8 +514,6 @@ void DaedalusVM::setInstance(const std::string& instSymbol, ZMemory::BigHandle h
 
 void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, EInstanceClass classIdx)
 {
-    pushState();
-
     PARSymbol& s = m_DATFile.getSymbolByIndex(symIdx);
 
     // Enter address into instance-symbol
@@ -552,8 +550,6 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
     //m_DATFile.getSymbolByName("SELF").instanceDataClass = oldSelfClass;
     m_CurrentInstanceHandle = currentInstanceHandle;
     m_CurrentInstanceClass = currentInstanceClass;
-
-    popState();
 }
 
 void DaedalusVM::setCurrentInstance(size_t symIdx)
@@ -568,40 +564,6 @@ void* DaedalusVM::getCurrentInstanceDataPtr()
     return m_GameState.getByClass(m_CurrentInstanceHandle, m_CurrentInstanceClass);
 }
 
-void DaedalusVM::pushState()
-{
-    return;
-    VMState s;
-    s.m_CurrentInstanceClass = m_CurrentInstanceClass;
-    s.m_CurrentInstanceHandle = m_CurrentInstanceHandle;
-    s.m_PC = m_PC;
-    s.m_Stack = m_Stack;
-    s.m_Self = m_DATFile.getSymbolByName("self");
-    // s.m_CallStack = m_CallStack;
-
-    m_PC = 0;
-    m_Stack = std::stack<uint32_t>();
-    m_CurrentInstanceHandle.invalidate();
-    m_CallStack.clear();
-
-    m_StateStack.push(s);
-}
-
-void DaedalusVM::popState()
-{
-    return;
-    m_PC = m_StateStack.top().m_PC;
-    m_Stack = m_StateStack.top().m_Stack;
-    // m_CallStack = m_StateStack.top().m_CallStack;
-
-    m_CurrentInstanceHandle = m_StateStack.top().m_CurrentInstanceHandle;
-    m_CurrentInstanceClass= m_StateStack.top().m_CurrentInstanceClass;
-
-    m_DATFile.getSymbolByName("self") = m_StateStack.top().m_Self;
-
-    m_StateStack.pop();
-}
-
 std::vector<std::string> DaedalusVM::getCallStack()
 {
     std::vector<std::string> symbolNames;
@@ -613,12 +575,6 @@ std::vector<std::string> DaedalusVM::getCallStack()
     return symbolNames;
 }
 
-
-void DaedalusVM::prepareRunFunction()
-{
-    // Clean the VM for this run
-    pushState();
-}
 
 int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx, bool clearDataStack)
 {
@@ -655,9 +611,6 @@ int32_t DaedalusVM::runFunctionBySymIndex(size_t symIdx, bool clearDataStack)
         // too many warnings for now. need a Daedalus compiler that pops unused expressions
         // LogWarn() << "DaedalusVM: stack not empty (" + std::to_string(m_Stack.size()) + ") after function " << functionSymbol.name;
     }
-
-    // Restore to previous VM-State
-    popState();
     return ret;
 }
 
