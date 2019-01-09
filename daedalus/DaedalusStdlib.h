@@ -105,10 +105,10 @@ namespace Daedalus
 			Instance()
 			{
 				userPtr = nullptr;
-				instanceSymbol = 0;
+				parSymbolIndex = 0;
 			}
 
-            size_t instanceSymbol;
+            size_t parSymbolIndex;
 
             /**
              * Space for the user to save something. Will not be touched at all by ZenLib.

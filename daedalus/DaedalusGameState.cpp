@@ -230,7 +230,7 @@ ItemHandle DaedalusGameState::createInventoryItem(size_t itemSymbol, NpcHandle n
         GEngineClasses::C_Item& item = getItem(h);
 
         // Just add to the count here
-        if(item.instanceSymbol == itemSymbol)
+        if(item.parSymbolIndex == itemSymbol)
         {
             item.amount += count;
             return h;
@@ -265,7 +265,7 @@ ItemHandle DaedalusGameState::addItemToInventory(ItemHandle item, NpcHandle npc)
         GEngineClasses::C_Item& i = getItem(h);
 
         // Just add to the count here
-        if(i.instanceSymbol == getItem(item).instanceSymbol)
+        if(i.parSymbolIndex == getItem(item).parSymbolIndex)
         {
             i.amount++;
             return h;
@@ -288,7 +288,7 @@ bool DaedalusGameState::removeInventoryItem(size_t itemSymbol, NpcHandle npc, un
         Daedalus::GEngineClasses::C_Item& item = getItem((*it));
 
 
-        if(item.instanceSymbol == itemSymbol)
+        if(item.parSymbolIndex == itemSymbol)
         {
             item.amount -= std::min(item.amount, count); // Handle overflow;
 
@@ -316,7 +316,7 @@ NpcHandle DaedalusGameState::insertNPC(size_t instance, const std::string &waypo
 
     // Setup basic class linkage. This is important here, as otherwise the wld_insertnpc-callback won't be
     // able to work properly
-    npcData.instanceSymbol = instance;
+    npcData.parSymbolIndex = instance;
 
     PARSymbol& s = m_VM.getDATFile().getSymbolByIndex(instance);
     s.instanceDataHandle = ZMemory::toBigHandle(npc);

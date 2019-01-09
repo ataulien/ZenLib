@@ -537,7 +537,7 @@ void DaedalusVM::initializeInstance(ZMemory::BigHandle instance, size_t symIdx, 
 
     // Place the assigning symbol into the instance
     GEngineClasses::Instance* instData = m_GameState.getByClass(instance, classIdx);
-    instData->instanceSymbol = symIdx;
+    instData->parSymbolIndex = symIdx;
 
     // Run script code to initialize the object
     runFunctionBySymIndex(symIdx);
