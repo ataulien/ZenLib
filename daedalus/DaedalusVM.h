@@ -13,8 +13,8 @@ namespace Daedalus
     class DaedalusVM
     {
     public:
-        DaedalusVM(const std::string& file, bool registerZenLibExternals=false);
-        DaedalusVM(const uint8_t* pDATFileData, size_t numBytes,  bool registerZenLibExternals=false);
+        DaedalusVM(const std::string& file);
+        DaedalusVM(const uint8_t* pDATFileData, size_t numBytes);
 
         /**
          * @brief Performs a single instruction on the stack
@@ -142,7 +142,7 @@ namespace Daedalus
         /**
          * Initialize the VM from the currently loaded DAT-File
          */
-        void initializeFromLoadedDAT(bool registerZenLibExternals);
+        void initializeFromLoadedDAT();
 
         /**
          * pushing/popping FunctionInfo to the debug callstack using RAII concept

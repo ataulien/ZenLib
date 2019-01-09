@@ -140,11 +140,6 @@ namespace Daedalus
 
             DaedalusGameState(Daedalus::DaedalusVM &vm);
 
-            /**
-             * @brief registers the games externals
-             */
-            void registerExternals();
-
             struct GameExternals
             {
                 // These will all be executed with the content already created
