@@ -221,7 +221,7 @@ ModelScriptTextParser::Result ModelScriptTextParser::token()
 
         } else
         if (ch == '/'
-            && (!m_Strict || (m_Zen.getSeek() < m_Zen.getFileSize() - 1) && (m_Zen.getData()[m_Zen.getSeek()] == '/'))) // Single / were supported by the original parser as well
+            && (!m_Strict || ((m_Zen.getSeek() < m_Zen.getFileSize() - 1) && (m_Zen.getData()[m_Zen.getSeek()] == '/')))) // Single / were supported by the original parser as well
         {
             while (m_Zen.readBinaryByte() != '\n')
             {

@@ -676,9 +676,6 @@ std::string DaedalusVM::nameFromFunctionInfo(DaedalusVM::CallStackFrame::Functio
             if (functionSymbolIndex != static_cast<size_t>(-1))
                 return getDATFile().getSymbolByIndex(functionSymbolIndex).name;
         }
-        default:
-            LogError() << "Unhandled CallStackFrame::AddressType case in switch";
-            assert(false);
     }
     return "unknown function with address: " + std::to_string(functionInfo.first);
 }

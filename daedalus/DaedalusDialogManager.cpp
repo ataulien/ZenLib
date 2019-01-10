@@ -55,7 +55,7 @@ std::vector<InfoHandle> DaedalusDialogManager::getInfos(NpcHandle hnpc)
     std::vector<InfoHandle> result;
     for (auto& infoHandle : m_NpcInfos){
         Daedalus::GEngineClasses::C_Info& info = m_VM.getGameState().getInfo(infoHandle);
-        if (info.npc == npc.instanceSymbol) {
+        if (static_cast<size_t>(info.npc) == npc.instanceSymbol) {
             result.push_back(infoHandle);
         }
     }

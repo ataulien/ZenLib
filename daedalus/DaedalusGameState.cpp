@@ -44,6 +44,7 @@ void DaedalusGameState::registerExternals()
         NpcHandle hnpc = ZMemory::handleCast<NpcHandle>(m_VM.getDATFile().getSymbolByIndex(npc).instanceDataHandle);
 
         ItemHandle h = createInventoryItem(itemInstance, hnpc);
+        (void)h;
 
         //LogInfo() << "1: " << item.name;
         //LogInfo() << "2. " << npcData.name[0];
