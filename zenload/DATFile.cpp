@@ -380,6 +380,8 @@ PARStackOpCode DATFile::getStackOpCode(size_t pc)
             s.opSize += sizeof(uint8_t);
 
             break;
+        default:
+            break;
     }
 
     return s;
@@ -393,20 +395,22 @@ size_t DATFile::addSymbol()
 
 void DATFile::iterateSymbolsOfClass(const std::string& className, std::function<void(size_t, PARSymbol&)> callback)
 {
+    constexpr auto none = uint32_t{0xFFFFFFFF};
+
     // First, find the parent-symbol
     size_t baseSym = getSymbolIndexByName(className);
 
     for(size_t i = 0; i< m_SymTable.symbols.size(); i++)
     {
         PARSymbol& s = getSymbolByIndex(i);
-        if(s.parent == -1 || s.properties.elemProps.type != EParType_Instance)
+        if(s.parent == none || s.properties.elemProps.type != EParType_Instance)
             continue;
 
         PARSymbol& p = getSymbolByIndex(s.parent);
         uint32_t pBase = s.parent;
 
         // In case this is also just a prototype, go deeper one more level
-        if(p.properties.elemProps.type == EParType_Prototype && p.parent != -1)
+        if(p.properties.elemProps.type == EParType_Prototype && p.parent != none)
         {
             pBase = p.parent;
         }
