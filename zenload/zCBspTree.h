@@ -218,6 +218,7 @@ namespace ZenLoad
                         parser.setSeek(chunkEnd); // Skip chunk
                 }
             }
+            (void)version;
 
             // Now get the list of non-lod polygons to load the worldmesh without them
             std::vector<size_t> nonLodPolys = getNonLodPolygons(info);

@@ -76,6 +76,7 @@ bool ParserImplASCII::readChunkStart(ZenParser::ChunkHeader& header)
 					state = S_REFERENCE;
 					break;
 				}
+                //@fallthrough@
 			case S_REFERENCE:
 				if(arg == "%")
 				{
@@ -91,6 +92,7 @@ bool ParserImplASCII::readChunkStart(ZenParser::ChunkHeader& header)
 				}
 				else
 					createObject = true;
+                //@fallthrough@
 			case S_CLASS_NAME:
 				if(!m_pParser->isNumber(arg))
 				{
@@ -98,6 +100,7 @@ bool ParserImplASCII::readChunkStart(ZenParser::ChunkHeader& header)
 					state = S_CLASS_VERSION;
 					break;
 				}
+                //@fallthrough@
 			case S_CLASS_VERSION:
 				classVersion = std::atoi(arg.c_str());
 				state = S_OBJECT_ID;
@@ -270,6 +273,7 @@ void ParserImplASCII::readEntry(const std::string& _expectedName, void* target, 
 		case ZVT_14: break;
 		case ZVT_15: break;
 		case ZVT_ENUM: *reinterpret_cast<uint8_t*>(target) = std::stoi(value); break;
+		case ZVT_HASH: break;
 	}
 }
 

@@ -96,6 +96,9 @@ void ParserImplBinary::readEntry(const std::string& expectedName, void* target, 
 		case ZVT_BOOL:	
 		case ZVT_BYTE:
 		case ZVT_ENUM: size = sizeof(uint8_t); break;
+
+		default:
+			break;
 	}
 
 	m_pParser->readBinaryRaw(target, size);

@@ -83,6 +83,7 @@ bool ParserImplBinSafe::readChunkStart(ZenParser::ChunkHeader& header)
 					state = S_REFERENCE;
 					break;
 				}
+				//@fallthrough@
 			case S_REFERENCE:
 				if(arg == "%")
 				{
@@ -98,6 +99,7 @@ bool ParserImplBinSafe::readChunkStart(ZenParser::ChunkHeader& header)
 				}
 				else
 					createObject = true;
+				//@fallthrough@
 			case S_CLASS_NAME:
 				if(!m_pParser->isNumber(arg))
 				{
@@ -105,6 +107,7 @@ bool ParserImplBinSafe::readChunkStart(ZenParser::ChunkHeader& header)
 					state = S_CLASS_VERSION;
 					break;
 				}
+				//@fallthrough@
 			case S_CLASS_VERSION:
 				classVersion = std::atoi(arg.c_str());
 				state = S_OBJECT_ID;
