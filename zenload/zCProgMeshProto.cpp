@@ -49,7 +49,9 @@ zCProgMeshProto::zCProgMeshProto(const std::string& fileName, const VDFS::FileIn
 	fileIndex.getFileData(fileName, data);
 
     if(data.empty())
-        return; // TODO: Throw an exception or something
+	{
+		return; // TODO: Throw an exception or something
+	}
     
 	try
 	{

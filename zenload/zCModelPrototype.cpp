@@ -122,6 +122,7 @@ void zCModelPrototype::readObjectData(ZenParser& parser)
     /**
      * Ani enum
      */
+    /*
     auto readAniEnum = [&]() {
 
         while (parser.getSeek() < parser.getFileSize())
@@ -138,15 +139,18 @@ void zCModelPrototype::readObjectData(ZenParser& parser)
 
         }
     };
+    */
 
     /**
      * Register mesh
      */
+    /*
     auto readRegisterMesh = [&](const std::string& line) {
         std::vector<std::string> args = splitDecl(line);
 
         LogInfo() << "Args: " << args;
     };
+    */
 
     /**
      * Ani

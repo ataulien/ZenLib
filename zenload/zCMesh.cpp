@@ -36,7 +36,9 @@ zCMesh::zCMesh(const std::string& fileName, VDFS::FileIndex& fileIndex)
 	fileIndex.getFileData(fileName, data);
 
     if(data.empty())
-        return; // TODO: Throw an exception or something
+	{
+    	return; // TODO: Throw an exception or something
+	}
     
 	try
 	{
@@ -290,7 +292,7 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
                 size_t skipListEntry = 0;
 
 				// Read number of polys
-				int numPolys = parser.readBinaryDWord();
+				auto const numPolys = parser.readBinaryDWord();
 
 				// Read block of data
 				//std::vector<uint8_t> dataBlock;
@@ -319,7 +321,7 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
 				m_Triangles.reserve(numPolys * 2);
 
 				// Iterate throuh every poly
-				for(int i = 0; i < numPolys; i++)
+				for(auto i = size_t{0}; i < numPolys; i++)
 				{
                     // Convert to a generic version
                     polyData2<uint32_t, PolyFlags> p;
@@ -343,7 +345,7 @@ void zCMesh::readObjectData(ZenParser& parser, const std::vector<size_t>& skipPo
                         }
                     }
 
-                    if(skipPolys.empty() || skipPolys[skipListEntry] == i)
+                    if(skipPolys.empty() || (skipPolys[skipListEntry] == i))
                     {
                         // TODO: Store these somewhere else
                         // TODO: lodFlag isn't set to something useful in Gothic 1. Also the portal-flags aren't set? Investigate!
