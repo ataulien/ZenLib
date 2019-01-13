@@ -87,6 +87,11 @@ public:
     std::vector<zCModelScriptEventPfx> &pfx() {return m_Pfx; }
     std::vector<zCModelScriptEventPfxStop> &pfxStop() {return m_PfxStop; }
 
+    /** 
+     * @return All meshes which could be used with these animations
+     */
+    std::vector<std::string> &meshesASC() { return m_MeshesASC; }
+
     /** Reads the next chunk.
      *
      * @return The chunk type or CHUNK_ERROR / CHUNK_EOF.
@@ -105,6 +110,7 @@ protected:
     std::vector<zCModelScriptEventSfx>           m_Sfx;
     std::vector<zCModelScriptEventSfx>           m_SfxGround;
     std::vector<zCModelScriptEventTag>                m_Tag;
+    std::vector<std::string> m_MeshesASC;
 };
 
 /** Streaming parser for .MSB files.
@@ -124,6 +130,8 @@ private:
     void                            readSfx();
     void                            readPfx();
     void                            readPfxStop();
+    void                            readRegisterMesh();
+    void                            readMeshAndTree();
 };
 
 /** Streaming parser for .MDS files.
