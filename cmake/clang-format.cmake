@@ -6,7 +6,7 @@ file(GLOB_RECURSE
 find_program(CLANG_FORMAT "clang-format")
 if(CLANG_FORMAT)
   add_custom_target(
-    clang-format
+    "clang-format-${PROJECT_NAME}"
     COMMAND ${CLANG_FORMAT}
     -i
     -style=file
