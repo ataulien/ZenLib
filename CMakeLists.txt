@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 2.4)
 project(ZenLib)
 include(ExternalProject)
+include(cmake/clang-format.cmake)
 
 set(ZENLIB_BUILD_EXAMPLES OFF CACHE BOOL "Whether to build the examples")
 
