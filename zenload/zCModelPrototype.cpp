@@ -1,12 +1,12 @@
 #include "zCModelPrototype.h"
-#include "zenParser.h"
-#include "utils/logger.h"
-#include "zTypes.h"
-#include <string>
 #include <algorithm>
+#include <string>
+#include "zTypes.h"
+#include "zenParser.h"
 #include <stdlib.h>
-#include "vdfs/fileIndex.h"
 #include "utils/alignment.h"
+#include "utils/logger.h"
+#include "vdfs/fileIndex.h"
 
 using namespace ZenLoad;
 
@@ -53,11 +53,11 @@ std::vector<std::string> splitDecl(const std::string& _line)
     std::vector<std::string> out;
     out.push_back("");
     bool inArg = true;
-    for(auto& c : _line)
+    for (auto& c : _line)
     {
-        if(c == ' ' || c == '\t' || c == '(')
+        if (c == ' ' || c == '\t' || c == '(')
         {
-            if (inArg) // Only add a new section, when the last one was filled
+            if (inArg)  // Only add a new section, when the last one was filled
             {
                 out.push_back("");
                 inArg = false;
@@ -65,14 +65,14 @@ std::vector<std::string> splitDecl(const std::string& _line)
         }
         else
         {
-            if (c != '"' && c != ')') // Don't add quotes and the closing bracket
+            if (c != '"' && c != ')')  // Don't add quotes and the closing bracket
             {
                 out.back() += c;
                 inArg = true;
             }
 
             // Handle empty strings
-            if(c == '"')
+            if (c == '"')
                 inArg = true;
         }
     }
@@ -85,8 +85,8 @@ zCModelPrototype::zCModelPrototype(const std::string& fileName, const VDFS::File
     std::vector<uint8_t> data;
     fileIndex.getFileData(fileName, data);
 
-    if(data.empty())
-        return; // TODO: Throw an exception or something
+    if (data.empty())
+        return;  // TODO: Throw an exception or something
 
     try
     {
@@ -96,7 +96,7 @@ zCModelPrototype::zCModelPrototype(const std::string& fileName, const VDFS::File
 
         readObjectData(parser);
     }
-    catch(std::exception &e)
+    catch (std::exception& e)
     {
         LogError() << e.what();
         return;
@@ -173,19 +173,19 @@ void zCModelPrototype::readObjectData(ZenParser& parser)
         ani.endFrame = atoi(args[(int)EIdxAni::endFrame].c_str());
 
         ani.flags = 0;
-        if(args[(int)EIdxAni::flags].find("m") != std::string::npos)
+        if (args[(int)EIdxAni::flags].find("m") != std::string::npos)
             ani.flags |= Animation::MoveObject;
 
-        if(args[(int)EIdxAni::flags].find("r") != std::string::npos)
+        if (args[(int)EIdxAni::flags].find("r") != std::string::npos)
             ani.flags |= Animation::RotateObject;
 
-        if(args[(int)EIdxAni::flags].find("e") != std::string::npos)
+        if (args[(int)EIdxAni::flags].find("e") != std::string::npos)
             ani.flags |= Animation::WaitEnd;
 
-        if(args[(int)EIdxAni::flags].find("f") != std::string::npos)
+        if (args[(int)EIdxAni::flags].find("f") != std::string::npos)
             ani.flags |= Animation::Fly;
 
-        if(args[(int)EIdxAni::flags].find("i") != std::string::npos)
+        if (args[(int)EIdxAni::flags].find("i") != std::string::npos)
             ani.flags |= Animation::Idle;
 
         m_Animations.push_back(ani);
@@ -195,7 +195,6 @@ void zCModelPrototype::readObjectData(ZenParser& parser)
      * Base node
      */
     auto readModel = [&]() {
-
         while (parser.getSeek() < parser.getFileSize())
         {
             std::string line = parser.readLine(true);
@@ -204,7 +203,7 @@ void zCModelPrototype::readObjectData(ZenParser& parser)
             LogInfo() << "MDS-Line: " << line;
 
             if (line.find("//") != std::string::npos)
-                continue; // Skip comments. These MUST be on their own lines, by definition.
+                continue;  // Skip comments. These MUST be on their own lines, by definition.
             else if (line.find("anienum") != std::string::npos)
                 continue;
             else if (line.find("aniblend") != std::string::npos)
@@ -228,7 +227,7 @@ void zCModelPrototype::readObjectData(ZenParser& parser)
             else if (line.find("{") != std::string::npos)
                 continue;
             else if (line.find("}") != std::string::npos)
-                continue; //break; // There can be only one } per block
+                continue;  //break; // There can be only one } per block
         }
     };
 
@@ -240,7 +239,7 @@ void zCModelPrototype::readObjectData(ZenParser& parser)
         LogInfo() << "MDS-Line: " << line;
 
         if (line.find("//") != std::string::npos)
-            continue; // Skip comments. These MUST be on their own lines, by definition.
+            continue;  // Skip comments. These MUST be on their own lines, by definition.
         else if (line.find("model") != std::string::npos)
             readModel();
     }

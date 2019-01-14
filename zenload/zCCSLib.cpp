@@ -1,11 +1,11 @@
 #include "zCCSLib.h"
-#include "zenParser.h"
-#include "parserImpl.h"
-#include "zenParserPropRead.h"
-#include <vdfs/fileIndex.h>
-#include <utils/logger.h>
-#include <assert.h>
 #include <algorithm>
+#include "parserImpl.h"
+#include "zenParser.h"
+#include "zenParserPropRead.h"
+#include <assert.h>
+#include <utils/logger.h>
+#include <vdfs/fileIndex.h>
 
 using namespace ZenLoad;
 
@@ -14,8 +14,8 @@ zCCSLib::zCCSLib(const std::string& fileName, const VDFS::FileIndex& fileIndex)
     std::vector<uint8_t> data;
     fileIndex.getFileData(fileName, data);
 
-    if(data.empty())
-        return; // TODO: Throw an exception or something
+    if (data.empty())
+        return;  // TODO: Throw an exception or something
 
     try
     {
@@ -25,13 +25,12 @@ zCCSLib::zCCSLib(const std::string& fileName, const VDFS::FileIndex& fileIndex)
 
         readObjectData(parser);
     }
-    catch(std::exception &e)
+    catch (std::exception& e)
     {
         LogError() << e.what();
         return;
     }
 }
-
 
 zCCSLib::zCCSLib(const std::string& file)
 {
@@ -43,13 +42,12 @@ zCCSLib::zCCSLib(const std::string& file)
 
         readObjectData(parser);
     }
-    catch(std::exception &e)
+    catch (std::exception& e)
     {
         LogError() << e.what();
         return;
     }
 }
-
 
 void zCCSLib::readObjectData(ZenParser& parser)
 {
@@ -67,7 +65,7 @@ void zCCSLib::readObjectData(ZenParser& parser)
 
     LogInfo() << "Reading " << numItems << " blocks";
 
-    for(uint32_t i = 0;i<numItems;i++)
+    for (uint32_t i = 0; i < numItems; i++)
     {
         ZenParser::ChunkHeader blockHeader;
         parser.readChunkStart(blockHeader);
@@ -95,14 +93,14 @@ void zCCSLib::readObjectData(ZenParser& parser)
                 ZenParser::ChunkHeader messageHeader;
                 parser.readChunkStart(messageHeader);
 
-				/*parser.getImpl()->readEntry("subtype", &blk.atomicBlockData.command.subType, 1, ZenLoad::ParserImpl::ZVT_ENUM);
+                /*parser.getImpl()->readEntry("subtype", &blk.atomicBlockData.command.subType, 1, ZenLoad::ParserImpl::ZVT_ENUM);
 				parser.getImpl()->readEntry("text", &blk.atomicBlockData.command.text, 0, ZenLoad::ParserImpl::ZVT_STRING);
 				parser.getImpl()->readEntry("name", &blk.atomicBlockData.command.name, 0, ZenLoad::ParserImpl::ZVT_STRING);*/
 
                 ReadObjectProperties(parser, blk.atomicBlockData.properties,
                                      Prop("subType", blk.atomicBlockData.command.subType),
-                                          Prop("text", blk.atomicBlockData.command.text),
-                                          Prop("name", blk.atomicBlockData.command.name));
+                                     Prop("text", blk.atomicBlockData.command.text),
+                                     Prop("name", blk.atomicBlockData.command.name));
 
                 //LogInfo() << "Read message: " << blk.atomicBlockData.command.name;
 
@@ -115,16 +113,15 @@ void zCCSLib::readObjectData(ZenParser& parser)
         }
         //parser.skipChunk();
 
-		parser.readChunkEnd();
+        parser.readChunkEnd();
 
         info.blocks.push_back(blk.atomicBlockData);
 
         auto nameUppered = blk.blockName;
         std::transform(nameUppered.begin(), nameUppered.end(), nameUppered.begin(), ::toupper);
         //LogInfo() << "message = " << blk.blockName;
-        m_MessagesByName[nameUppered] = info.blocks.size()-1;
+        m_MessagesByName[nameUppered] = info.blocks.size() - 1;
     }
-
 }
 
 const oCMsgConversationData& zCCSLib::getMessageByName(const std::string& name)
@@ -142,4 +139,3 @@ bool zCCSLib::messageExists(const std::string& name) const
     std::transform(nameUppered.begin(), nameUppered.end(), nameUppered.begin(), ::toupper);
     return m_MessagesByName.find(nameUppered) != m_MessagesByName.end();
 }
-

@@ -2,8 +2,8 @@
 #include <functional>
 #include <string>
 #include <vector>
-#include "utils/mathlib.h"
 #include "zTypes.h"
+#include "utils/mathlib.h"
 
 namespace VDFS
 {
@@ -42,16 +42,16 @@ namespace ZenLoad
 
     struct zCModelAniSample
     {
-        ZMath::float4 rotation; // Quaternion
+        ZMath::float4 rotation;  // Quaternion
         ZMath::float3 position;
     };
-}
+}  // namespace ZenLoad
 
 // FIXME: COMPATIBILITY FOR MASTER - REMOVE LATER!
 
 #include <vector>
-#include "utils/mathlib.h"
 #include "zTypes.h"
+#include "utils/mathlib.h"
 
 namespace VDFS
 {
@@ -64,10 +64,12 @@ namespace ZenLoad
     class zCModelAni
     {
     public:
-
         struct zCModelAniEvent
         {
-            enum { ANIEVENT_MAXSTRING = 4 };
+            enum
+            {
+                ANIEVENT_MAXSTRING = 4
+            };
 
             zTMdl_AniEventType aniEventType;
             uint32_t frameNr;
@@ -102,11 +104,11 @@ namespace ZenLoad
 
         struct AniSample
         {
-            ZMath::float4 rotation; // Quaternion
+            ZMath::float4 rotation;  // Quaternion
             ZMath::float3 position;
         };
 
-        zCModelAni(){}
+        zCModelAni() {}
 
         /**
         * @brief Loads the mesh from the given VDF-Archive
@@ -137,7 +139,7 @@ namespace ZenLoad
         /**
          * @return Whether the animation was correctly loaded
          */
-        bool isValid(){ return m_ModelAniHeader.version != 0; }
+        bool isValid() { return m_ModelAniHeader.version != 0; }
 
     private:
         /**
@@ -153,4 +155,4 @@ namespace ZenLoad
         std::vector<uint32_t> m_NodeIndexList;
         std::vector<AniSample> m_AniSamples;
     };
-}
+}  // namespace ZenLoad

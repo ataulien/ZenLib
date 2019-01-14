@@ -1,8 +1,8 @@
-#include <utils/logger.h>
-#include <algorithm>
 #include "DaedalusDialogManager.h"
-#include "DaedalusVM.h"
+#include <algorithm>
 #include "DaedalusStdlib.h"
+#include "DaedalusVM.h"
+#include <utils/logger.h>
 
 using namespace Daedalus;
 using namespace GameState;
@@ -12,27 +12,26 @@ DaedalusDialogManager::DaedalusDialogManager(Daedalus::DaedalusVM& vm,
                                              const std::string& ou_bin,
                                              const VDFS::FileIndex& vdfsFileIndex,
                                              std::map<size_t, std::set<size_t>>& knownInfos)
-  : m_VM(vm),
-    m_MessageLib(ou_bin, vdfsFileIndex),
-    m_KnownNpcInfoSymbolsByNpcSymbols(knownInfos)
+    : m_VM(vm)
+    , m_MessageLib(ou_bin, vdfsFileIndex)
+    , m_KnownNpcInfoSymbolsByNpcSymbols(knownInfos)
 {
-  gatherNpcInformation();
+    gatherNpcInformation();
 }
 
 DaedalusDialogManager::DaedalusDialogManager(Daedalus::DaedalusVM& vm,
                                              const std::string& ou_bin,
                                              std::map<size_t, std::set<size_t>>& knownInfos)
-    : m_VM(vm),
-      m_MessageLib(ou_bin),
-      m_KnownNpcInfoSymbolsByNpcSymbols(knownInfos)
+    : m_VM(vm)
+    , m_MessageLib(ou_bin)
+    , m_KnownNpcInfoSymbolsByNpcSymbols(knownInfos)
 {
     gatherNpcInformation();
 }
 
 void DaedalusDialogManager::gatherNpcInformation()
 {
-    m_VM.getDATFile().iterateSymbolsOfClass("C_Info", [&](size_t i, Daedalus::PARSymbol& s){
-
+    m_VM.getDATFile().iterateSymbolsOfClass("C_Info", [&](size_t i, Daedalus::PARSymbol& s) {
         // Create new info-object
         InfoHandle h = m_VM.getGameState().createInfo();
         Daedalus::GEngineClasses::C_Info& info = m_VM.getGameState().getInfo(h);
@@ -53,9 +52,11 @@ std::vector<InfoHandle> DaedalusDialogManager::getInfos(NpcHandle hnpc)
 {
     Daedalus::GEngineClasses::C_Npc& npc = m_VM.getGameState().getNpc(hnpc);
     std::vector<InfoHandle> result;
-    for (auto& infoHandle : m_NpcInfos){
+    for (auto& infoHandle : m_NpcInfos)
+    {
         Daedalus::GEngineClasses::C_Info& info = m_VM.getGameState().getInfo(infoHandle);
-        if (static_cast<size_t>(info.npc) == npc.instanceSymbol) {
+        if (static_cast<size_t>(info.npc) == npc.instanceSymbol)
+        {
             result.push_back(infoHandle);
         }
     }
@@ -67,10 +68,3 @@ bool DaedalusDialogManager::doesNpcKnowInfo(size_t npcInstance, size_t infoInsta
     const auto& m = m_KnownNpcInfoSymbolsByNpcSymbols[npcInstance];
     return m.find(infoInstance) != m.end();
 }
-
-
-
-
-
-
-

@@ -1,24 +1,30 @@
 #pragma once
+#include <algorithm>
+#include <cmath>
 #include <cstdint>
+#include <cstring>
+#include <functional>
 #include "freeList.h"
 #include "memUtils.h"
 #include <assert.h>
-#include <cstring>
-#include <functional>
-#include <cmath>
-#include <algorithm>
 
 namespace ZMemory
 {
     /**
      * Max size a GenericHandle can be in bits
      */
-    enum { GENERIC_HANDLE_MAX_SIZE_BITS = sizeof(uint32_t) * 8 * 2};
+    enum
+    {
+        GENERIC_HANDLE_MAX_SIZE_BITS = sizeof(uint32_t) * 8 * 2
+    };
 
-    template<int N1, int N2>
+    template <int N1, int N2>
     struct GenericHandle
     {
-        enum : uint32_t { INVALID_HANDLE = static_cast<uint32_t>(-1) >> (32 - N1) };
+        enum : uint32_t
+        {
+            INVALID_HANDLE = static_cast<uint32_t>(-1) >> (32 - N1)
+        };
 
         GenericHandle()
         {
@@ -41,12 +47,12 @@ namespace ZMemory
             return index != INVALID_HANDLE;
         }
 
-        bool operator<(const GenericHandle<N1,N2>& r) const
+        bool operator<(const GenericHandle<N1, N2>& r) const
         {
             return index < r.index;
         }
 
-        bool operator == (const GenericHandle<N1,N2>& r) const
+        bool operator==(const GenericHandle<N1, N2>& r) const
         {
             return index == r.index && generation == r.generation;
         }
@@ -55,12 +61,13 @@ namespace ZMemory
     /**
      * Casts between handles of different size
      */
-    template<typename HT, int M1, int M2> HT handleCast(const GenericHandle<M1, M2>& h)
+    template <typename HT, int M1, int M2>
+    HT handleCast(const GenericHandle<M1, M2>& h)
     {
         HT b;
         b.generation = h.generation;
 
-        if(!h.isValid())
+        if (!h.isValid())
             b.invalidate();
         else
             b.index = h.index;
@@ -71,8 +78,9 @@ namespace ZMemory
     /**
       * 32-32 bit handle, usefull if you don't know the exact type of your handles
       */
-    typedef GenericHandle<32,32> BigHandle;
-    template<int N1, int N2> BigHandle toBigHandle(const GenericHandle<N1, N2>& h)
+    typedef GenericHandle<32, 32> BigHandle;
+    template <int N1, int N2>
+    BigHandle toBigHandle(const GenericHandle<N1, N2>& h)
     {
         return handleCast<BigHandle>(h);
     }
@@ -81,7 +89,7 @@ namespace ZMemory
      * @param T Type of data stored in the allocator
      * @param NUM Number of elements statically allocated
      */
-    template<typename T, unsigned int NUM>
+    template <typename T, unsigned int NUM>
     class StaticReferencedAllocator
     {
     public:
@@ -93,15 +101,16 @@ namespace ZMemory
          */
         typedef T Type;
 
-        StaticReferencedAllocator() :
-                m_Elements(new T[NUM]),
-                m_ElementsToInternalHandles(new size_t[NUM]),
-                m_InternalHandles(new FLHandle[NUM]),
-                m_FreeList(m_InternalHandles, m_InternalHandles + NUM, sizeof(m_InternalHandles[0]), NUM, sizeof(m_InternalHandles[0]), 0),
-                m_LastInternalHandle(nullptr)
+        StaticReferencedAllocator()
+            : m_Elements(new T[NUM])
+            , m_ElementsToInternalHandles(new size_t[NUM])
+            , m_InternalHandles(new FLHandle[NUM])
+            , m_FreeList(m_InternalHandles, m_InternalHandles + NUM, sizeof(m_InternalHandles[0]), NUM, sizeof(m_InternalHandles[0]), 0)
+            , m_LastInternalHandle(nullptr)
         {
             // Initialize handles
-            for (size_t i = 0; i < NUM; i++) {
+            for (size_t i = 0; i < NUM; i++)
+            {
                 m_InternalHandles[i].m_Handle.invalidate();
             }
         }
@@ -125,7 +134,7 @@ namespace ZMemory
 
             // Get a new handle from the free-list
             auto* handle = m_FreeList.obtainElement();
-            handle->m_Handle.index = static_cast<uint32_t>(idx); // TODO: Care for bit-size of 'index'
+            handle->m_Handle.index = static_cast<uint32_t>(idx);  // TODO: Care for bit-size of 'index'
             // (Don't need to touch the generation, only needed on deletion)
 
             // Store this as the new handle to the end of the list
@@ -159,12 +168,12 @@ namespace ZMemory
         {
             // Check if the handle is still valid. If not, we are accessing a different object!
             assert(m_InternalHandles[h.index].m_Handle.generation == h.generation);
-            assert(m_LastInternalHandle != nullptr); // Must have at least one handle in there
+            assert(m_LastInternalHandle != nullptr);  // Must have at least one handle in there
 
             // Get actual index of handle-target
             uint32_t actIdx = m_InternalHandles[h.index].m_Handle.index;
 
-            if(m_OnRemoved)
+            if (m_OnRemoved)
                 m_OnRemoved(m_Elements[actIdx]);
 
             // Overwrite this element with the last one
@@ -181,7 +190,7 @@ namespace ZMemory
             m_FreeList.returnElement(&m_InternalHandles[h.index]);
 
             // Get new back-object
-            if(m_FreeList.getNumObtainedElements() > 0)
+            if (m_FreeList.getNumObtainedElements() > 0)
                 m_LastInternalHandle = &m_InternalHandles[m_ElementsToInternalHandles[m_FreeList.getNumObtainedElements() - 1]];
             else
                 m_LastInternalHandle = nullptr;
@@ -210,6 +219,7 @@ namespace ZMemory
         {
             return m_FreeList.getNumObtainedElements();
         }
+
     private:
         /** Actual element data */
         T* m_Elements;
@@ -220,7 +230,7 @@ namespace ZMemory
         /** Helper-struct to get around FreeList needing at least the size of a pointer to operate */
         struct FLHandle
         {
-            void* m_Next; // Don't let the free-list overwrite our generation
+            void* m_Next;  // Don't let the free-list overwrite our generation
             Handle m_Handle;
         };
 
@@ -236,4 +246,4 @@ namespace ZMemory
         /** Function to call when an object was removed */
         std::function<void(T&)> m_OnRemoved;
     };
-}
+}  // namespace ZMemory

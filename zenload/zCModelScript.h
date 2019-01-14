@@ -10,22 +10,22 @@ namespace ZenLoad
         ANIEVENT_MAX_NUM_VALUES = 4
     };
 
-// TODO: these should be general flags?
+    // TODO: these should be general flags?
     enum EModelScriptAniFlags
     {
         /// Animation moves model in world space
-                MSB_MOVE_MODEL = 0x00000001,
+        MSB_MOVE_MODEL = 0x00000001,
         /// Animation rotates model in world space
-                MSB_ROTATE_MODEL = 0x00000002,
+        MSB_ROTATE_MODEL = 0x00000002,
         /// Animation is queued after the current any on layer instead of started immediately
-                MSB_QUEUE_ANI = 0x00000004,
+        MSB_QUEUE_ANI = 0x00000004,
         /// Don't stick to ground
-                MSB_FLY = 0x00000008,
+        MSB_FLY = 0x00000008,
         /// Idle animation
-                MSB_IDLE = 0x00000010,
+        MSB_IDLE = 0x00000010,
     };
 
-// TODO: should general enum?
+    // TODO: should general enum?
     enum EModelScriptAniDir
     {
         MSB_FORWARD,
@@ -127,12 +127,10 @@ namespace ZenLoad
         std::string m_Name;
         std::string m_Pos;
         bool m_isAttached = false;
-
     };
     struct zCModelScriptEventPfxStop
     {
         int32_t m_Frame;
         int32_t m_Num;
-
     };
-}
+}  // namespace ZenLoad

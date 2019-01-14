@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "utils/mathlib.h"
 #include "zTypes.h"
+#include "utils/mathlib.h"
 
 namespace VDFS
 {
@@ -14,7 +14,6 @@ namespace ZenLoad
     class zCModelPrototype
     {
     public:
-
         struct Animation
         {
             std::string animationName;
@@ -37,7 +36,7 @@ namespace ZenLoad
             int startFrame, endFrame;
         };
 
-        zCModelPrototype(){}
+        zCModelPrototype() {}
 
         /**
 		 * @brief Loads the mesh from the given VDF-Archive
@@ -57,8 +56,8 @@ namespace ZenLoad
         {
             return m_Animations;
         }
-    private:
 
+    private:
         std::vector<Animation> m_Animations;
     };
-}
+}  // namespace ZenLoad

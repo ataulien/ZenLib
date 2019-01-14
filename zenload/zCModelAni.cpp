@@ -1,14 +1,13 @@
 // FIXME: COMPATIBILITY FOR MASTER - REMOVE LATER! (Complete file)
 
-
 #include "zCModelAni.h"
-#include "zenParser.h"
-#include "utils/logger.h"
-#include "zTypes.h"
 #include <string>
-#include "vdfs/fileIndex.h"
 #include "zCProgMeshProto.h"
+#include "zTypes.h"
+#include "zenParser.h"
 #include <math.h>
+#include "utils/logger.h"
+#include "vdfs/fileIndex.h"
 
 using namespace ZenLoad;
 
@@ -21,10 +20,10 @@ static const uint16_t MSID_MAN_SOURCE = 0xA010;
 static const uint16_t MSID_MAN_ANIEVENTS = 0xA030;
 static const uint16_t MSID_MAN_RAWDATA = 0xA090;
 
-static const float SAMPLE_ROT_BITS			= float(1 << 16) - 1.0f;
-static const float SAMPLE_ROT_SCALER		= (float(1.0f) / SAMPLE_ROT_BITS) * 2.0f * ZMath::Pi;
-static const float SAMPLE_QUAT_SCALER		= (1.0f / SAMPLE_ROT_BITS) * 2.1f;
-static const uint16_t SAMPLE_QUAT_MIDDLE      = (1 << 15) - 1;
+static const float SAMPLE_ROT_BITS = float(1 << 16) - 1.0f;
+static const float SAMPLE_ROT_SCALER = (float(1.0f) / SAMPLE_ROT_BITS) * 2.0f * ZMath::Pi;
+static const float SAMPLE_QUAT_SCALER = (1.0f / SAMPLE_ROT_BITS) * 2.1f;
+static const uint16_t SAMPLE_QUAT_MIDDLE = (1 << 15) - 1;
 
 void zCModelAni::zCModelAniEvent::load(ZenParser& parser)
 {
@@ -32,10 +31,10 @@ void zCModelAni::zCModelAniEvent::load(ZenParser& parser)
     frameNr = parser.readBinaryDWord();
     tagString = parser.readLine(true);
 
-    for (int i=0; i<ANIEVENT_MAXSTRING; i++)
+    for (int i = 0; i < ANIEVENT_MAXSTRING; i++)
         string[i] = parser.readLine(true);
 
-    for (int i=0; i<ANIEVENT_MAXSTRING; i++)
+    for (int i = 0; i < ANIEVENT_MAXSTRING; i++)
         values[i] = parser.readBinaryFloat();
 
     prob = parser.readBinaryFloat();
@@ -75,14 +74,13 @@ void SampleUnpackQuat(const uint16_t* in, ZMath::float4& out)
 */
 zCModelAni::zCModelAni(const std::string& fileName, const VDFS::FileIndex& fileIndex, float scale)
 {
-
     m_ModelAniHeader.version = 0;
 
     std::vector<uint8_t> data;
     fileIndex.getFileData(fileName, data);
 
-    if(data.empty())
-        return; // TODO: Throw an exception or something
+    if (data.empty())
+        return;  // TODO: Throw an exception or something
 
     try
     {
@@ -93,15 +91,15 @@ zCModelAni::zCModelAni(const std::string& fileName, const VDFS::FileIndex& fileI
         readObjectData(parser);
 
         // Apply scale
-        if(scale != 1.0f)
+        if (scale != 1.0f)
         {
-            for(size_t i = 0, end = m_AniSamples.size(); i < end; i++)
+            for (size_t i = 0, end = m_AniSamples.size(); i < end; i++)
             {
                 m_AniSamples[i].position = m_AniSamples[i].position * scale;
             }
         }
     }
-    catch(std::exception &e)
+    catch (std::exception& e)
     {
         LogError() << e.what();
         return;
@@ -119,21 +117,18 @@ void zCModelAni::readObjectData(ZenParser& parser)
     // Information about a single chunk
     BinaryChunkInfo chunkInfo;
 
-
     // Read chunks until we left the virtual binary file or got to the end-chunk
     // Each chunk starts with a header (BinaryChunkInfo) which gives information
     // about what to do and how long the chunk is
     bool doneReadingChunks = false;
-    while(!doneReadingChunks)
+    while (!doneReadingChunks)
     {
         // Read chunk header and calculate position of next chunk
         parser.readStructure(chunkInfo);
 
         size_t chunkEnd = parser.getSeek() + chunkInfo.length;
 
-
-
-        switch(chunkInfo.id)
+        switch (chunkInfo.id)
         {
             case MSID_MAN_HEADER:
                 m_ModelAniHeader.version = parser.readBinaryWord();
@@ -154,19 +149,21 @@ void zCModelAni::readObjectData(ZenParser& parser)
                 break;
 
             case MSID_MAN_SOURCE:
-                parser.setSeek(chunkEnd); // Skip chunk
+                parser.setSeek(chunkEnd);  // Skip chunk
                 break;
 
-            case MSID_MAN_ANIEVENTS: {
+            case MSID_MAN_ANIEVENTS:
+            {
                 uint32_t numAniEvents = parser.readBinaryDWord();
                 m_AniEvents.resize(numAniEvents);
 
-                for(uint32_t i = 0; i < numAniEvents; i++)
+                for (uint32_t i = 0; i < numAniEvents; i++)
                     m_AniEvents[i].load(parser);
             }
-                break;
+            break;
 
-            case MSID_MAN_RAWDATA: {
+            case MSID_MAN_RAWDATA:
+            {
                 m_ModelAniHeader.nodeChecksum = parser.readBinaryDWord();
 
                 m_NodeIndexList.resize(m_ModelAniHeader.numNodes);
@@ -176,10 +173,9 @@ void zCModelAni::readObjectData(ZenParser& parser)
                 zTMdl_AniSample* qSamples = new zTMdl_AniSample[numSamples];
                 m_AniSamples.resize(numSamples);
 
-
                 parser.readBinaryRaw(qSamples, sizeof(zTMdl_AniSample) * numSamples);
 
-                for(size_t i = 0; i < numSamples; i++)
+                for (size_t i = 0; i < numSamples; i++)
                 {
                     SampleUnpackTrans(qSamples[i].position, m_AniSamples[i].position, m_ModelAniHeader.samplePosScaler, m_ModelAniHeader.samplePosRangeMin);
                     SampleUnpackQuat(qSamples[i].rotation, m_AniSamples[i].rotation);
@@ -187,13 +183,12 @@ void zCModelAni::readObjectData(ZenParser& parser)
 
                 delete[] qSamples;
             }
-                break;
+            break;
             default:
-                parser.setSeek(chunkEnd); // Skip chunk
-
+                parser.setSeek(chunkEnd);  // Skip chunk
         }
 
-        if(parser.getSeek() >= parser.getFileSize())
-            doneReadingChunks = true; // No end-tag in here...
+        if (parser.getSeek() >= parser.getFileSize())
+            doneReadingChunks = true;  // No end-tag in here...
     }
 }

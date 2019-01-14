@@ -3,10 +3,10 @@
 //
 
 #include "zCFont.h"
-#include "zenParser.h"
-#include <vdfs/fileIndex.h>
-#include <utils/logger.h>
 #include <algorithm>
+#include "zenParser.h"
+#include <utils/logger.h>
+#include <vdfs/fileIndex.h>
 
 using namespace ZenLoad;
 
@@ -15,23 +15,22 @@ zCFont::zCFont(const std::string& fileName, const VDFS::FileIndex& fileIndex)
     std::string fntFile = fileName;
     std::transform(fntFile.begin(), fntFile.end(), fntFile.begin(), ::tolower);
 
-    if(fntFile.find(".tga") != std::string::npos)
+    if (fntFile.find(".tga") != std::string::npos)
         fntFile = fntFile.substr(0, fntFile.size() - 4) + ".FNT";
-    else if(fntFile.find(".fnt") == std::string::npos)
+    else if (fntFile.find(".fnt") == std::string::npos)
         fntFile += ".FNT";
 
     std::vector<uint8_t> data;
     fileIndex.getFileData(fileName, data);
 
-    if(data.empty())
-        return; // TODO: Throw an exception or something
+    if (data.empty())
+        return;  // TODO: Throw an exception or something
 
     parseFNTData(data);
 }
 
 zCFont::~zCFont()
 {
-
 }
 
 bool zCFont::parseFNTData(const std::vector<uint8_t>& fntData)
@@ -56,7 +55,7 @@ bool zCFont::parseFNTData(const std::vector<uint8_t>& fntData)
         std::string version = parser.readLine();
 
         // Only version 1 is used by gothic
-        if(version != "1")
+        if (version != "1")
         {
             LogError() << "Unknown font-version: " << version;
             return false;
@@ -67,7 +66,7 @@ bool zCFont::parseFNTData(const std::vector<uint8_t>& fntData)
         uint32_t height = parser.readBinaryDWord();
         uint32_t magic = parser.readBinaryDWord();
 
-        if(magic != 256)
+        if (magic != 256)
         {
             LogError() << "Invalid font-file! Magic: " << magic;
             return false;
@@ -83,7 +82,7 @@ bool zCFont::parseFNTData(const std::vector<uint8_t>& fntData)
         m_Info.fontName = name;
         m_Info.fontHeight = height;
     }
-    catch(std::exception &e)
+    catch (std::exception& e)
     {
         LogError() << e.what();
         return false;

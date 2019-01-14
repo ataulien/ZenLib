@@ -1,28 +1,28 @@
 #include "fileIndex.h"
-#include "utils/logger.h"
+#include <algorithm>
 #include <fstream>
 #include <iomanip>
 #include <regex>
-#include <algorithm>
-#include <physfs.h>
 #include <assert.h>
+#include <physfs.h>
 #include "../lib/physfs/extras/ignorecase.h"
+#include "utils/logger.h"
 
 using namespace VDFS;
 
-namespace internal {
-
+namespace internal
+{
     // Must be initialized with the 0th argument passed to the executable for PhysFS.
     std::string argv0;
 
     // We need to do some poor-mans-refcounting to be able to know when we
     // need to init and deinit physfs.
     size_t numAliveIndices = 0;
-}
+}  // namespace internal
 
 FileIndex::FileIndex()
 {
-    if(internal::argv0.empty())
+    if (internal::argv0.empty())
     {
         auto const error = "VDFS not intialized! Please call 'initVDFS' before using!";
         LogError() << error;
@@ -46,7 +46,7 @@ FileIndex::~FileIndex()
         PHYSFS_deinit();
 }
 
-void FileIndex::initVDFS(const char *argv0)
+void FileIndex::initVDFS(const char* argv0)
 {
     assert(internal::argv0.empty());
 
@@ -98,7 +98,7 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
 
     if (!exists) return false;
 
-    PHYSFS_File *handle = PHYSFS_openRead(caseSensitivePath.c_str());
+    PHYSFS_File* handle = PHYSFS_openRead(caseSensitivePath.c_str());
     if (!handle)
     {
         LogInfo() << "Cannot read file " << file << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
@@ -143,9 +143,7 @@ int64_t VDFS::FileIndex::getLastModTime(const std::string& name)
 
         if (std::regex_search(firstLine, match, rgxG1G2))
         {
-            std::istringstream datetime(match[1].str() + "-" + match[2].str() + "-"
-                + match[3].str() + " " + match[4].str() + ":"
-                + match[5].str() + ":" + match[6].str());
+            std::istringstream datetime(match[1].str() + "-" + match[2].str() + "-" + match[3].str() + " " + match[4].str() + ":" + match[5].str() + ":" + match[6].str());
 
             datetime >> std::get_time(&tm, "%d-%b-%Y %H:%M:%S");
             if (!datetime.fail())
@@ -153,9 +151,7 @@ int64_t VDFS::FileIndex::getLastModTime(const std::string& name)
         }
         else if (std::regex_search(firstLine, match, rgxG1))
         {
-            std::istringstream datetime(match[1].str() + "-" + match[2].str() + "-"
-                + match[3].str() + " " + match[4].str() + ":"
-                + match[5].str() + ":" + match[6].str());
+            std::istringstream datetime(match[1].str() + "-" + match[2].str() + "-" + match[3].str() + " " + match[4].str() + ":" + match[5].str() + ":" + match[6].str());
 
             datetime >> std::get_time(&tm, "%d-%m-%Y %H:%M:%S");
             if (!datetime.fail())
@@ -173,12 +169,13 @@ std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
     std::string filePath(path);
     std::vector<std::string> vec;
     bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
-    if (!exists) {
+    if (!exists)
+    {
         return vec;
     }
 
-    char **files = PHYSFS_enumerateFiles(filePath.c_str());
-    char **i;
+    char** files = PHYSFS_enumerateFiles(filePath.c_str());
+    char** i;
     for (i = files; *i != NULL; i++)
         vec.push_back(*i);
     PHYSFS_freeList(files);

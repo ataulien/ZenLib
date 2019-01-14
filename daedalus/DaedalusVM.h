@@ -1,20 +1,20 @@
 #pragma once
 
-#include <stack>
 #include <functional>
 #include <queue>
 #include <set>
+#include <stack>
 #include "DATFile.h"
-#include "DaedalusStdlib.h"
 #include "DaedalusGameState.h"
+#include "DaedalusStdlib.h"
 
 namespace Daedalus
 {
     class DaedalusVM
     {
     public:
-        DaedalusVM(const std::string& file, bool registerZenLibExternals=false);
-        DaedalusVM(const uint8_t* pDATFileData, size_t numBytes,  bool registerZenLibExternals=false);
+        DaedalusVM(const std::string& file, bool registerZenLibExternals = false);
+        DaedalusVM(const uint8_t* pDATFileData, size_t numBytes, bool registerZenLibExternals = false);
 
         /**
          * @brief Performs a single instruction on the stack
@@ -50,7 +50,7 @@ namespace Daedalus
         /**
          * @brief Clears the debug-callstack
          */
-        void clearCallStack(){ m_CallStack.clear(); }
+        void clearCallStack() { m_CallStack.clear(); }
 
         /**
          * @brief Registers an External-Function to the VM
@@ -62,7 +62,7 @@ namespace Daedalus
          */
         void pushInt(uint32_t value);
         void pushInt(int32_t value);
-        void pushVar(size_t index, uint32_t arrIdx=0);
+        void pushVar(size_t index, uint32_t arrIdx = 0);
         void pushVar(const std::string& symName);
         void pushString(const std::string& str);
 
@@ -83,7 +83,11 @@ namespace Daedalus
         template <typename T = int32_t>
         T popDataValue();
         float popFloatValue();
-        uint32_t popVar(){uint32_t arr; return popVar(arr); }
+        uint32_t popVar()
+        {
+            uint32_t arr;
+            return popVar(arr);
+        }
         uint32_t popVar(uint32_t& arrIdx);
         std::string popString(bool toUpper = false);
 
@@ -103,19 +107,19 @@ namespace Daedalus
         /**
          * @return all instances of the given class
          */
-        std::set<void*> getRegisteredInstancesOf(EInstanceClass classIdx){ return std::set<void*>(); }
+        std::set<void*> getRegisteredInstancesOf(EInstanceClass classIdx) { return std::set<void*>(); }
 
         /**
          * @return The currently registered instance-data pointer
          */
         void* getCurrentInstanceDataPtr();
-        EInstanceClass getCurrentInstanceClass(){ return m_CurrentInstanceClass; }
-        ZMemory::BigHandle getCurrentInstanceHandle(){ return m_CurrentInstanceHandle; }
+        EInstanceClass getCurrentInstanceClass() { return m_CurrentInstanceClass; }
+        ZMemory::BigHandle getCurrentInstanceHandle() { return m_CurrentInstanceHandle; }
 
         /**
          * @brief Returns the DAT-File this VM runs on
          */
-        DATFile& getDATFile() {return m_DATFile;}
+        DATFile& getDATFile() { return m_DATFile; }
 
         /**
          * @brief returns the gamestate
@@ -125,7 +129,7 @@ namespace Daedalus
         /**
          * @return Whether the stack is currently empty
          */
-        bool isStackEmpty(){ return m_Stack.empty(); }
+        bool isStackEmpty() { return m_Stack.empty(); }
 
         /**
          * @return Callstack in text-form
@@ -149,8 +153,8 @@ namespace Daedalus
         {
             m_OnExternalCalled = callback;
         }
-    private:
 
+    private:
         /**
          * Initialize the VM from the currently loaded DAT-File
          */
@@ -163,7 +167,8 @@ namespace Daedalus
         class CallStackFrame
         {
         public:
-            enum AddressType{
+            enum AddressType
+            {
                 Address,
                 SymbolIndex
             };
@@ -172,6 +177,7 @@ namespace Daedalus
             CallStackFrame(DaedalusVM& vm, size_t addressOrIndex, AddressType addrType, bool xmlLogging = false);
             ~CallStackFrame();
             std::string indent(int add = 0);
+
         private:
             DaedalusVM& vm;
             bool m_XmlLogging;
@@ -236,4 +242,4 @@ namespace Daedalus
         std::function<void(unsigned, EParOp)> m_OnSymbolValueChanged;
         std::function<void(unsigned)> m_OnExternalCalled;
     };
-}
+}  // namespace Daedalus

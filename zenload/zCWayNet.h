@@ -1,15 +1,14 @@
 #pragma once
+#include <map>
 #include "zTypes.h"
 #include "zenParser.h"
 #include "utils/logger.h"
-#include <map>
 
 namespace ZenLoad
 {
     class zCWayNet
     {
     public:
-
         /**
          * Reads a single waypoint
          */
@@ -37,7 +36,7 @@ namespace ZenLoad
             ReadObjectProperties(parser, info.properties,
                                  Prop("waynetVersion", info.waynetVersion));
 
-            if(info.waynetVersion == 0)
+            if (info.waynetVersion == 0)
             {
                 // TODO: Implement old waynet format
                 LogWarn() << "Old waynet-format not yet supported!";
@@ -51,7 +50,7 @@ namespace ZenLoad
             LogInfo() << "Loading " << numWaypoints << " freepoints";
 
             std::map<uint32_t, size_t> wpRefMap;
-            for(uint32_t i=0;i<numWaypoints;i++)
+            for (uint32_t i = 0; i < numWaypoints; i++)
             {
                 ZenParser::ChunkHeader wph;
 
@@ -73,12 +72,12 @@ namespace ZenLoad
 
             LogInfo() << "Loading " << numWays << " edges";
 
-            for(uint32_t i=0;i<numWays;i++)
+            for (uint32_t i = 0; i < numWays; i++)
             {
                 size_t wp1, wp2;
 
                 size_t* tgt = &wp1;
-                for(int i=0;i<2;i++)
+                for (int i = 0; i < 2; i++)
                 {
                     ZenParser::ChunkHeader wph;
 
@@ -89,7 +88,8 @@ namespace ZenLoad
                     if (wph.classname.empty())
                     {
                         *tgt = wpRefMap[wph.objectID];
-                    } else
+                    }
+                    else
                     {
                         // Create new waypoint
                         zCWaypointData w = readWaypoint(parser);
@@ -108,7 +108,7 @@ namespace ZenLoad
                 info.edges.push_back(std::make_pair(wp1, wp2));
             }
 
-			LogInfo() << "Done loading edges!";
+            LogInfo() << "Done loading edges!";
 
             parser.readChunkEnd();
         }
@@ -116,4 +116,4 @@ namespace ZenLoad
     private:
     };
 
-}
+}  // namespace ZenLoad

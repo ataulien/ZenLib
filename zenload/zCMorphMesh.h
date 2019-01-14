@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
-#include "utils/mathlib.h"
-#include "zTypes.h"
 #include "zCProgMeshProto.h"
+#include "zTypes.h"
+#include "utils/mathlib.h"
 
 namespace VDFS
 {
@@ -15,8 +15,7 @@ namespace ZenLoad
     class zCMorphMesh
     {
     public:
-
-        zCMorphMesh(){}
+        zCMorphMesh() {}
 
         /**
 		 * @brief Loads the mesh from the given VDF-Archive
@@ -33,10 +32,11 @@ namespace ZenLoad
          * @return Internal zCProgMeshProto of this soft skin. The soft-skin only displaces the vertices found in the ProgMesh.
          */
         const zCProgMeshProto& getMesh() const { return m_Mesh; }
+
     private:
         /**
          * @brief Internal zCProgMeshProto of this soft skin. The soft-skin only displaces the vertices found in the ProgMesh.
          */
         zCProgMeshProto m_Mesh;
     };
-}
+}  // namespace ZenLoad

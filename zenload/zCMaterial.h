@@ -6,8 +6,9 @@
 
 namespace ZenLoad
 {
-    enum class MaterialGroup : int {
-        UNDEF	= 0	,
+    enum class MaterialGroup : int
+    {
+        UNDEF = 0,
         METAL,
         STONE,
         WOOD,
@@ -18,25 +19,24 @@ namespace ZenLoad
     };
 
     static const std::string MaterialGroupNames[(int)MaterialGroup::NUM_MAT_GROUPS] = {
-            "UNDEF",
-            "METAL",
-            "STONE",
-            "WOOD",
-            "EARTH",
-            "WATER",
-            "SNOW",
+        "UNDEF",
+        "METAL",
+        "STONE",
+        "WOOD",
+        "EARTH",
+        "WATER",
+        "SNOW",
     };
 
     class zCMaterial
     {
     public:
-
         /**
          * Converts the given material-group enum value to the regarding string
          */
         static std::string getMatGroupString(MaterialGroup group)
         {
-            if((int)group >= (int)MaterialGroup::NUM_MAT_GROUPS)
+            if ((int)group >= (int)MaterialGroup::NUM_MAT_GROUPS)
             {
                 return MaterialGroupNames[(int)MaterialGroup::UNDEF];
             }
@@ -54,7 +54,7 @@ namespace ZenLoad
 
             materialInfo.objectClass = "zCMaterial";
 
-            if (version != 39939) // Gothic 1
+            if (version != 39939)  // Gothic 1
             {
                 ReadObjectProperties(parser, materialInfo.properties,
                                      Prop("MaterialName", materialInfo.matName),
@@ -71,7 +71,8 @@ namespace ZenLoad
                                      Prop("LoadDontCollapse", materialInfo.loadDontCollapse),
                                      Prop("DetailObject", materialInfo.detailObject),
                                      Prop("DefaultMapping", materialInfo.defaultMapping));
-            } else
+            }
+            else
             {
                 ReadObjectProperties(parser, materialInfo.properties,
                                      Prop("MaterialName", materialInfo.matName),
@@ -98,9 +99,7 @@ namespace ZenLoad
                                      Prop("IgnoreSun", materialInfo.ignoreSun),
                                      Prop("AlphaFunc", materialInfo.alphaFunc),
                                      Prop("DefaultMapping", materialInfo.defaultMapping));
-
             }
-
 
             return materialInfo;
         }
@@ -108,4 +107,4 @@ namespace ZenLoad
     private:
     };
 
-}
+}  // namespace ZenLoad
