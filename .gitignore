@@ -24,14 +24,12 @@
 *.out
 *.app
 
-#vdf
-*.vdf
-*.mod
-
 #build dir
 build/
 winbuild/
 cmake-build-*/
+.cquery_cached_index/
+compile_commands.json
 
 #dolphin
 .directory

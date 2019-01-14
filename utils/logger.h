@@ -190,7 +190,7 @@ namespace Utils
 			}
 
 #if defined(WIN32) || defined(_WIN32)
-			OutputDebugString((m_Info.str() + m_Message.str() + "\n").c_str());
+			OutputDebugStringA((m_Info.str() + m_Message.str() + "\n").c_str());
 #elif defined(__ANDROID__)
 			__android_log_print(ANDROID_LOG_INFO, "OpenZE", (m_Info.str() + m_Message.str() + "\n").c_str());
 #endif

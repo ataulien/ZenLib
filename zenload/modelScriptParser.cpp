@@ -39,6 +39,16 @@ ModelScriptBinParser::EChunkType ModelScriptBinParser::parse()
 
     switch(chunk.id)
     {
+        case CHUNK_MESH_AND_TREE:
+            readMeshAndTree();
+            m_Zen.setSeek(chunk_end);
+            return CHUNK_MESH_AND_TREE;
+            break;
+        case CHUNK_REGISTER_MESH:
+            readRegisterMesh();
+            m_Zen.setSeek(chunk_end);
+            return CHUNK_REGISTER_MESH;
+            break;
         case CHUNK_ANI:
             readAni();
             m_Zen.setSeek(chunk_end);
@@ -103,6 +113,25 @@ static EModelScriptAniDir makeAniDir(ZenParser &zen)
 {
     std::string str = zen.readLine();
     return (!str.empty() && str[0] == 'R') ? MSB_BACKWARD : MSB_FORWARD;
+}
+
+void ModelScriptBinParser::readMeshAndTree()
+{
+    bool dontUseMesh = m_Zen.readBinaryDWord() != 0;
+    std::string meshNameASC = m_Zen.readLine();
+
+    if (!dontUseMesh)
+    {
+        m_MeshesASC.push_back(meshNameASC);
+    }
+}
+
+void ModelScriptBinParser::readRegisterMesh()
+{
+    // Reads "Some_Mesh.ASC"
+    std::string mesh = m_Zen.readLine();
+
+    m_MeshesASC.push_back(mesh);
 }
 
 void ModelScriptBinParser::readAni()

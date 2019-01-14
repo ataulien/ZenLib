@@ -5,22 +5,52 @@
 #include <regex>
 #include <algorithm>
 #include <physfs.h>
+#include <assert.h>
 #include "../lib/physfs/extras/ignorecase.h"
 
 using namespace VDFS;
 
+namespace internal {
+
+    // Must be initialized with the 0th argument passed to the executable for PhysFS.
+    std::string argv0;
+
+    // We need to do some poor-mans-refcounting to be able to know when we
+    // need to init and deinit physfs.
+    size_t numAliveIndices = 0;
+}
+
 FileIndex::FileIndex()
 {
+    if(internal::argv0.empty())
+    {
+        auto const error = "VDFS not intialized! Please call 'initVDFS' before using!";
+        LogError() << error;
+        throw std::runtime_error(error);
+    }
+
+    if (!PHYSFS_isInit())
+        PHYSFS_init(internal::argv0.c_str());
+
+    internal::numAliveIndices++;
+
+    assert(!internal::argv0.empty());
 }
 
 FileIndex::~FileIndex()
 {
-    if (PHYSFS_isInit()) PHYSFS_deinit();
+    assert(internal::numAliveIndices != 0);
+    internal::numAliveIndices--;
+
+    if (internal::numAliveIndices == 0 && PHYSFS_isInit())
+        PHYSFS_deinit();
 }
 
-void FileIndex::Init(const char *argv0)
+void FileIndex::initVDFS(const char *argv0)
 {
-    if (!PHYSFS_isInit()) PHYSFS_init(argv0);
+    assert(internal::argv0.empty());
+
+    internal::argv0 = argv0;
 }
 
 /**
@@ -28,6 +58,14 @@ void FileIndex::Init(const char *argv0)
 */
 bool FileIndex::loadVDF(const std::string& vdf, uint32_t priority, const std::string& mountPoint)
 {
+    assert(!isFinalized());
+
+    if (isFinalized())
+    {
+        LogWarn() << "Cannot load new VDFS-archives into finalized index!";
+        return false;
+    }
+
     if (!PHYSFS_mount(vdf.c_str(), mountPoint.c_str(), 1))
     {
         LogInfo() << "Couldn't load VDF-Archive " << vdf << ": " << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
@@ -53,6 +91,8 @@ bool FileIndex::mountFolder(const std::string& path, const std::string& mountPoi
 */
 bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data) const
 {
+    assert(isFinalized());
+
     std::string caseSensitivePath = findCaseSensitiveNameOf(file);
     bool exists = caseSensitivePath != "";
 
@@ -79,6 +119,8 @@ bool FileIndex::getFileData(const std::string& file, std::vector<uint8_t>& data)
 
 bool FileIndex::hasFile(const std::string& name) const
 {
+    assert(isFinalized());
+
     return findCaseSensitiveNameOf(name) != "";
 }
 
@@ -159,6 +201,8 @@ void FileIndex::updateUpperedFilenamesMap()
 
 std::string FileIndex::findCaseSensitiveNameOf(const std::string& caseInsensitiveName) const
 {
+    assert(isFinalized());
+
     std::string uppered = caseInsensitiveName;
     std::transform(caseInsensitiveName.begin(), caseInsensitiveName.end(), uppered.begin(), ::toupper);
 
@@ -174,4 +218,9 @@ void FileIndex::finalizeLoad()
 {
     // Must be called here so opening files will actually work
     updateUpperedFilenamesMap();
+}
+
+bool FileIndex::isFinalized() const
+{
+    return !m_FilenamesByUpperedFileNames.empty();
 }

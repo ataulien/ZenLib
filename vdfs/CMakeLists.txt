@@ -15,3 +15,4 @@ endif()
 
 target_link_libraries(vdfs physfs-static)
 set_target_properties(vdfs PROPERTIES LINKER_LANGUAGE C)
+target_include_directories(vdfs PUBLIC ..)

@@ -11,6 +11,7 @@
 #include "ztex2dds.h"
 #include <squish.h>
 #include <math.h>
+#include <assert.h>
 
 #define ZTEX2DDS_ERROR_NONE   0 /* No Error                  */
 #define ZTEX2DDS_ERROR_ARGS   1 /* Invalid Params / Syntax   */
@@ -26,7 +27,7 @@ namespace ZenLoad
 	/**
 	 * @brief Returns whether x is a power of two
 	 */
-	bool IsPowerOfTwo(unsigned long x)
+	static bool IsPowerOfTwo(unsigned long x)
 	{
 		if(x == 0)
 			return false;
@@ -36,7 +37,7 @@ namespace ZenLoad
 	}
 
 	/*FIXME: Scanline Alignment */
-	uint32_t GetMipmapSize(unsigned long format, unsigned long width, unsigned long height, int level)
+	static uint32_t GetMipmapSize(unsigned long format, unsigned long width, unsigned long height, int level)
 	{
 		unsigned long x;
 		unsigned long y;
@@ -83,7 +84,7 @@ namespace ZenLoad
 	/**
 	 * @brief Utility function to read data from a vector safely
 	 */
-	bool readVectorData(void* target, size_t start, size_t size, const std::vector<uint8_t>& data)
+	static bool readVectorData(void* target, size_t start, size_t size, const std::vector<uint8_t>& data)
 	{
 		if(start + size > data.size())
 			return false;
@@ -96,7 +97,7 @@ namespace ZenLoad
 	/**
 	 * @brief Utility function to write to the end of a vector
 	 */
-	bool writeVectorData(void* data, size_t size, std::vector<uint8_t>& target)
+	static bool writeVectorData(void* data, size_t size, std::vector<uint8_t>& target)
 	{
 		uint8_t* bytes = reinterpret_cast<uint8_t*>(data);
 		for(size_t i = 0; i < size; i++)
@@ -416,7 +417,7 @@ namespace ZenLoad
 		return ZTEX2DDS_ERROR_NONE;
 	}
 
-	uint32_t ComputeSizeInBytes(int mip, int resolutionX, int resolutionY, bool dxt1)
+	static uint32_t ComputeSizeInBytes(int mip, int resolutionX, int resolutionY, bool dxt1)
 	{
 		int px = (int)std::max(1.0f, (float)floor(resolutionX / pow(2.0f, mip)));
 		int py = (int)std::max(1.0f, (float)floor(resolutionY / pow(2.0f, mip)));
@@ -427,6 +428,46 @@ namespace ZenLoad
 		int blockcount = ( ( px + 3 )/4 ) * ( ( py + 3 )/4 );
 		int blocksize = dxt1 ? 8 : 16;
 		return blockcount*blocksize;	
+	}
+
+	DXTLevel getDXTLevelFromDDS(const std::vector<uint8_t>& ddsData)
+	{
+		DDSURFACEDESC2 desc = getSurfaceDesc(ddsData);
+
+		switch (desc.ddpfPixelFormat.dwFourCC)
+		{
+		case MAKEFOURCC('D', 'X', 'T', '1'):
+			return DXTLevel::DXT1;
+			break;
+
+		case MAKEFOURCC('D', 'X', 'T', '3'):
+			return DXTLevel::DXT3;
+			break;
+
+		case MAKEFOURCC('D', 'X', 'T', '5'):
+			return DXTLevel::DXT5;
+			break;
+		default:
+			return DXTLevel::Unknown;
+		}
+	}
+
+	size_t getMipFileOffsetFromDDS(const std::vector<uint8_t>& ddsData, int mip)
+	{
+		size_t seek = 0;
+
+		seek += sizeof(uint32_t); // Skip magic number
+		seek += sizeof(DDSURFACEDESC2); // Skip header
+
+		DDSURFACEDESC2 desc = getSurfaceDesc(ddsData);
+		DXTLevel dxt = getDXTLevelFromDDS(ddsData);
+
+		for (int i = 0; i < mip; i++)
+		{
+			seek += ComputeSizeInBytes(i, desc.dwWidth, desc.dwHeight, dxt == DXTLevel::DXT1);
+		}
+
+		return seek;
 	}
 
 	/**
@@ -454,32 +495,37 @@ namespace ZenLoad
 
 		mip = std::min((int)mip, (int)desc->dwMipMapCount);
 
-		int dxtlvl = squish::kDxt1;
-		switch(desc->ddpfPixelFormat.dwFourCC)
+		DXTLevel dxtLevel = getDXTLevelFromDDS(ddsData);
+		int squishDxtLevel;
+		switch(dxtLevel)
 		{
-		case MAKEFOURCC('D', 'X', 'T', '1'):
-			dxtlvl = squish::kDxt1;
+		case DXTLevel::DXT1:
+			squishDxtLevel = squish::kDxt1;
 			break;
 
-		case MAKEFOURCC('D', 'X', 'T', '3'):
-			dxtlvl = squish::kDxt3;
+		case DXTLevel::DXT3:
+			squishDxtLevel = squish::kDxt3;
 			break;
 
-		case MAKEFOURCC('D', 'X', 'T', '5'):
-			dxtlvl = squish::kDxt5;
+		case DXTLevel::DXT5:
+			squishDxtLevel = squish::kDxt5;
 			break;
+
+		case DXTLevel::Unknown:
+			assert(false);
+			return;
 		}
 
 		for(int i = 0; i < mip; i++)
 		{
-			seek += ComputeSizeInBytes(i, desc->dwWidth, desc->dwHeight, dxtlvl == squish::kDxt1);
+			seek += ComputeSizeInBytes(i, desc->dwWidth, desc->dwHeight, squishDxtLevel == squish::kDxt1);
 		}
 
 		int px = (int)std::max(1.0f, (float)floor(desc->dwWidth / pow(2.0f, mip)));
 		int py = (int)std::max(1.0f, (float)floor(desc->dwHeight / pow(2.0f, mip)));
 		rgba8Data.resize(px * py* sizeof(uint32_t));
 
-		squish::DecompressImage(rgba8Data.data(), px, py, &ddsData[seek], dxtlvl);
+		squish::DecompressImage(rgba8Data.data(), px, py, &ddsData[seek], squishDxtLevel);
 	}
 }
 /* THE END */
