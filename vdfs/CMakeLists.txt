@@ -3,16 +3,18 @@ project(VDFS)
 
 file(GLOB SRC
     *.cpp
+    *.c
     *.h
 )
 
-add_library(vdfs STATIC ${SRC} "../lib/physfs/extras/ignorecase.c")
+find_package(PhysFS 3 REQUIRED)
+add_library(vdfs STATIC ${SRC})
 
 # Remove WIN-API min and max macros since they mess up std::min/max
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DNOMINMAX")
 endif()
 
-target_link_libraries(vdfs physfs-static)
+target_link_libraries(vdfs PhysFS::PhysFS)
 set_target_properties(vdfs PROPERTIES LINKER_LANGUAGE C)
 target_include_directories(vdfs PUBLIC ..)

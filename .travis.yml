@@ -11,13 +11,22 @@ addons:
 
 git:
   submodules: false
+install:
+  - wget https://www.icculus.org/physfs/downloads/physfs-3.0.1.tar.bz2
+  - tar xf physfs-3.0.1.tar.bz2
+  - mkdir deps
+  - mkdir build-physfs
+  - cd build-physfs
+  - cmake -DCMAKE_INSTALL_PREFIX=../deps ../physfs-3.0.1 -DPHYSFS_BUILD_TEST=OFF
+  - cmake --build . --target install
+  - cd ..
 
 script:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
   - git submodule update --init --recursive
   - mkdir -p build
   - cd build
-  - cmake -GNinja -DZENLIB_BUILD_EXAMPLES=On -DZENLIB_BUILD_TESTS=On ..
+  - cmake -GNinja -DZENLIB_BUILD_EXAMPLES=On -DZENLIB_BUILD_TESTS=On -DCMAKE_PREFIX_PATH=../deps ..
   - ninja
   - cd ../tests
   - ../build/tests/test_vdfs

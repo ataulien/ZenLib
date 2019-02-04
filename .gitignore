@@ -36,3 +36,5 @@ compile_commands.json
  
 # clion
 .idea/
+
+.vscode/

@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <physfs.h>
 #include <assert.h>
-#include "../lib/physfs/extras/ignorecase.h"
+#include "ignorecase.h"
 
 using namespace VDFS;
 
