@@ -1,6 +1,3 @@
 [submodule "lib/libsquish"]
 	path = lib/libsquish
 	url = https://github.com/tito/libsquish.git
-[submodule "lib/physfs"]
-	path = lib/physfs
-	url = https://github.com/REGoth-project/physfs
