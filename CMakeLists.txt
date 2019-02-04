@@ -18,6 +18,8 @@ if(MSVC)
 endif()
 
 # 3rd-party dependencies
+add_subdirectory(lib/libsquish)
+
 include_directories(lib/glm/glm)
 include_directories(lib/libsquish)
 include_directories(.)
