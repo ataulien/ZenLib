@@ -2,6 +2,7 @@
 #include <vector>
 #include "ztex.h"
 #include <inttypes.h>
+#include <stddef.h>
 
 namespace ZenLoad
 {
