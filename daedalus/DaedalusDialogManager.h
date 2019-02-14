@@ -1,10 +1,10 @@
 #pragma once
-#include <vector>
-#include <string>
 #include <functional>
 #include <set>
-#include <zenload/zCCSLib.h>
+#include <string>
+#include <vector>
 #include "DaedalusGameState.h"
+#include <zenload/zCCSLib.h>
 
 namespace ZenLoad
 {
@@ -20,14 +20,13 @@ namespace Daedalus
 {
     class DaedalusVM;
 
-
     namespace GameState
     {
         class DaedalusDialogManager
         {
         public:
-            DaedalusDialogManager(Daedalus::DaedalusVM &vm,
-                                  const std::string &ou_bin,
+            DaedalusDialogManager(Daedalus::DaedalusVM& vm,
+                                  const std::string& ou_bin,
                                   std::map<size_t, std::set<size_t>>& knownInfos);
 
             DaedalusDialogManager(Daedalus::DaedalusVM& vm,
@@ -56,14 +55,14 @@ namespace Daedalus
             /**
              * @return Map of NPC-Symbols -> All info they know
              */
-            const std::map<size_t, std::set<size_t>>& getKnownNPCInformation(){ return m_KnownNpcInfoSymbolsByNpcSymbols; };
+            const std::map<size_t, std::set<size_t>>& getKnownNPCInformation() { return m_KnownNpcInfoSymbolsByNpcSymbols; };
 
             /**
              * @return MessageLib
              */
             ZenLoad::zCCSLib& getMessageLib() { return m_MessageLib; }
-        private:
 
+        private:
             /**
 			 * Gathers all C_Info-Instances and puts them into m_NpcInfosByNpcSymbols
 			 */
@@ -77,7 +76,7 @@ namespace Daedalus
             /**
 			 * Current daedalus VM
 			 */
-            Daedalus::DaedalusVM &m_VM;
+            Daedalus::DaedalusVM& m_VM;
 
             /**
 			 * vector of all C_Info handles, can't use map here (infos by npc)
@@ -90,5 +89,5 @@ namespace Daedalus
 			 */
             std::map<size_t, std::set<size_t>>& m_KnownNpcInfoSymbolsByNpcSymbols;
         };
-    }
-}
+    }  // namespace GameState
+}  // namespace Daedalus

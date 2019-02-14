@@ -1,21 +1,22 @@
 #pragma once
 
-#include <vector>
 #include <cstddef>
+#include <vector>
 #include <inttypes.h>
 
 namespace Utils
 {
-    template<typename T>class Vector
+    template <typename T>
+    class Vector
     {
     public:
-        Vector(size_t size = 0) :
-            m_Data(size)
+        Vector(size_t size = 0)
+            : m_Data(size)
         {
         }
 
-        Vector(size_t size, T s) :
-            m_Data(size, s)
+        Vector(size_t size, T s)
+            : m_Data(size, s)
         {
         }
 
@@ -29,12 +30,12 @@ namespace Utils
             m_Data.resize(size);
         }
 
-        T &operator [](size_t s)
+        T& operator[](size_t s)
         {
             return m_Data[s];
         }
 
-        void push_back(const T &s)
+        void push_back(const T& s)
         {
             m_Data.push_back(s);
         }
@@ -47,7 +48,7 @@ namespace Utils
         void clear(bool freeMemory = false)
         {
             m_Data.clear();
-            if(freeMemory)
+            if (freeMemory)
                 m_Data.shrink_to_fit();
         }
 
@@ -55,5 +56,4 @@ namespace Utils
 
         std::vector<T> m_Data;
     };
-}
-
+}  // namespace Utils

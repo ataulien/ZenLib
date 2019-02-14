@@ -1,9 +1,9 @@
 #pragma once
 
 #include <functional>
+#include "zCMesh.h"
 #include "zTypes.h"
 #include "zenParser.h"
-#include "zCMesh.h"
 #include <assert.h>
 
 namespace ZenLoad
@@ -12,10 +12,9 @@ namespace ZenLoad
     class zCBspTree
     {
     public:
-
         enum EVersion
         {
-            Gothic_26f = 0, // TODO
+            Gothic_26f = 0,  // TODO
             Gothic_18k = 34144256
         };
 
@@ -39,7 +38,7 @@ namespace ZenLoad
             // Information about the whole file we are reading here
             BinaryFileInfo fileInfo;
             uint32_t version = 0;
-            size_t binFileEnd; // Ending location of the binary file
+            size_t binFileEnd;  // Ending location of the binary file
 
             // Read information about the current file. Mainly size is important here.
             parser.readStructure(fileInfo);
@@ -56,18 +55,18 @@ namespace ZenLoad
             BinaryChunkInfo chunkInfo;
 
             bool done = false;
-            while(!done && parser.getSeek() < binFileEnd)
+            while (!done && parser.getSeek() < binFileEnd)
             {
                 // Read chunk header and calculate position of next chunk
                 parser.readStructure(chunkInfo);
 
                 size_t chunkEnd = parser.getSeek() + chunkInfo.length;
 
-                switch(chunkInfo.id)
+                switch (chunkInfo.id)
                 {
                     case EBspChunk::CHUNK_BSP:
                         version = parser.readBinaryWord();
-                        info.mode = static_cast<zCBspTreeData::TreeMode >(parser.readBinaryDWord());
+                        info.mode = static_cast<zCBspTreeData::TreeMode>(parser.readBinaryDWord());
                         break;
 
                     case CHUNK_BSP_POLYLIST:
@@ -78,11 +77,10 @@ namespace ZenLoad
                         LogInfo() << "numPolys: " << numPolys;
 
                         // Convert these to size_t
-                        for(volatile uint32_t i=0;i<numPolys;i++)
+                        for (volatile uint32_t i = 0; i < numPolys; i++)
                             info.treePolyIndices[i] = static_cast<size_t>(parser.readBinaryDWord());
-
                     }
-                        break;
+                    break;
 
                     case CHUNK_BSP_TREE:
                     {
@@ -93,9 +91,9 @@ namespace ZenLoad
 
                         LogInfo() << "Num nodes: " << numNodes;
 
-                        if(!numNodes)
+                        if (!numNodes)
                         {
-                            parser.setSeek(chunkEnd); // Skip chunk
+                            parser.setSeek(chunkEnd);  // Skip chunk
                             break;
                         }
 
@@ -103,8 +101,7 @@ namespace ZenLoad
                         info.nodes.emplace_back();
                         info.nodes[0].parent = zCBspNode::INVALID_NODE;
 
-                        std::function<void(bool)> loadRec = [&](bool isNode)
-                        {
+                        std::function<void(bool)> loadRec = [&](bool isNode) {
                             size_t idx = info.nodes.size() - 1;
                             //LogInfo() << " - Reading node " << idx;
 
@@ -113,7 +110,7 @@ namespace ZenLoad
                             parser.readStructure(n.bbox3dMin);
                             parser.readStructure(n.bbox3dMax);
 
-                            n.bbox3dMin *= 0.01f; // Convert to meters
+                            n.bbox3dMin *= 0.01f;  // Convert to meters
                             n.bbox3dMax *= 0.01f;
 
                             // Read indices to the polys this contains
@@ -125,7 +122,7 @@ namespace ZenLoad
                             n.parent = zCBspNode::INVALID_NODE;
 
                             // Only need to load data if this isn't a leaf
-                            if(isNode)
+                            if (isNode)
                             {
                                 /**
                                  * Flags:
@@ -147,14 +144,14 @@ namespace ZenLoad
                                 parser.readStructure(n.plane.y);
                                 parser.readStructure(n.plane.z);
 
-                                n.plane.w *= 0.01f; // Convert to meters
+                                n.plane.w *= 0.01f;  // Convert to meters
 
                                 // G1 has an extra byte here
-                                if(fileInfo.version == Gothic_18k)
-                                    parser.readBinaryByte(); // Lod-flag
+                                if (fileInfo.version == Gothic_18k)
+                                    parser.readBinaryByte();  // Lod-flag
 
                                 // Read front node
-                                if((flags & FLAG_FRONT) != 0)
+                                if ((flags & FLAG_FRONT) != 0)
                                 {
                                     // Assign index and add actual node
                                     n.front = info.nodes.size();
@@ -166,7 +163,7 @@ namespace ZenLoad
                                     front.parent = idx;
 
                                     // If this is a leaf, add it to the leaf-list
-                                    if((flags & FLAG_FRONT_IS_LEAF) != 0)
+                                    if ((flags & FLAG_FRONT_IS_LEAF) != 0)
                                         info.leafIndices.push_back(n.front);
 
                                     // Continue to load the tree
@@ -174,7 +171,7 @@ namespace ZenLoad
                                 }
 
                                 // Read back node
-                                if((flags & FLAG_BACK) != 0)
+                                if ((flags & FLAG_BACK) != 0)
                                 {
                                     // Assign index and add actual node
                                     n.back = info.nodes.size();
@@ -186,28 +183,29 @@ namespace ZenLoad
                                     back.parent = idx;
 
                                     // If this is a leaf, add it to the leaf-list
-                                    if((flags & FLAG_BACK_IS_LEAF) != 0)
+                                    if ((flags & FLAG_BACK_IS_LEAF) != 0)
                                         info.leafIndices.push_back(n.back);
 
                                     // Continue to load the tree
                                     loadRec((flags & FLAG_BACK_IS_LEAF) == 0);
                                 }
-                            } else{
+                            }
+                            else
+                            {
                                 //LogInfo() << idx << " Leaf!";
                             }
-
                         };
 
                         loadRec(true);
                     }
-                        break;
+                    break;
 
                     case CHUNK_BSP_LEAF_LIGHT:
-                        parser.setSeek(chunkEnd); // Skip chunk
+                        parser.setSeek(chunkEnd);  // Skip chunk
                         break;
 
                     case CHUNK_BSP_OUTDOOR_SECTORS:
-                        parser.setSeek(chunkEnd); // Skip chunk
+                        parser.setSeek(chunkEnd);  // Skip chunk
                         break;
 
                     case CHUNK_BSP_END:
@@ -215,15 +213,16 @@ namespace ZenLoad
                         break;
 
                     default:
-                        parser.setSeek(chunkEnd); // Skip chunk
+                        parser.setSeek(chunkEnd);  // Skip chunk
                 }
             }
+            (void)version;
 
             // Now get the list of non-lod polygons to load the worldmesh without them
             std::vector<size_t> nonLodPolys = getNonLodPolygons(info);
 
             std::sort(nonLodPolys.begin(), nonLodPolys.end());
-            nonLodPolys.erase( std::unique( nonLodPolys.begin(), nonLodPolys.end() ), nonLodPolys.end() );
+            nonLodPolys.erase(std::unique(nonLodPolys.begin(), nonLodPolys.end()), nonLodPolys.end());
 
             LogInfo() << "Found " << nonLodPolys.size() << " non lod polys";
 
@@ -231,7 +230,6 @@ namespace ZenLoad
             size_t seek = parser.getSeek();
             parser.setSeek(meshPosition);
             mesh->readObjectData(parser, nonLodPolys);
-
 
             parser.setSeek(binFileEnd);
 
@@ -248,19 +246,17 @@ namespace ZenLoad
         {
             std::vector<size_t> r;
 
-            for(size_t nidx : d.leafIndices)
+            for (size_t nidx : d.leafIndices)
             {
                 const zCBspNode& n = d.nodes[nidx];
 
-                for(size_t i=n.treePolyIndex; i<n.treePolyIndex + n.numPolys; i++)
+                for (size_t i = n.treePolyIndex; i < n.treePolyIndex + n.numPolys; i++)
                     r.push_back(d.treePolyIndices[i]);
             }
-
-
 
             return r;
         }
 
     private:
     };
-}
+}  // namespace ZenLoad

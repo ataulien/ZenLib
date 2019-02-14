@@ -2,10 +2,10 @@
 // Created by andre on 13.05.16.
 //
 
-#include <utils/logger.h>
 #include "DaedalusStdlib.h"
-#include "DaedalusVM.h"
 #include "DATFile.h"
+#include "DaedalusVM.h"
+#include <utils/logger.h>
 
 #define REGISTER(cname, obj, var) datFile.registerMember(cname "." #var, obj, obj.var);
 #define REGISTER_IF_EXISTS(cname, obj, var) datFile.registerMember(cname "." #var, obj, obj.var, true);
@@ -14,39 +14,39 @@ void Daedalus::registerDaedalusStdLib(Daedalus::DaedalusVM& vm, bool enableVerbo
 {
     bool l = enableVerboseLogging;
 
-    vm.registerExternalFunction("inttostring", [l](Daedalus::DaedalusVM& vm){
+    vm.registerExternalFunction("inttostring", [l](Daedalus::DaedalusVM& vm) {
         int32_t x = vm.popDataValue();
 
         vm.setReturn(std::to_string(x));
     });
 
-    vm.registerExternalFunction("floattoint", [l](Daedalus::DaedalusVM& vm){
+    vm.registerExternalFunction("floattoint", [l](Daedalus::DaedalusVM& vm) {
         int32_t x = vm.popDataValue();
         float f = reinterpret_cast<float&>(x);
         vm.setReturn(static_cast<int32_t>(f));
     });
 
-    vm.registerExternalFunction("inttofloat", [l](Daedalus::DaedalusVM& vm){
+    vm.registerExternalFunction("inttofloat", [l](Daedalus::DaedalusVM& vm) {
         int32_t x = vm.popDataValue();
         float f = static_cast<float>(x);
         vm.setReturn(reinterpret_cast<int32_t&>(f));
     });
 
-    vm.registerExternalFunction("concatstrings", [l](Daedalus::DaedalusVM& vm){
+    vm.registerExternalFunction("concatstrings", [l](Daedalus::DaedalusVM& vm) {
         std::string s2 = vm.popString();
         std::string s1 = vm.popString();
 
         vm.setReturn(s1 + s2);
     });
 
-    vm.registerExternalFunction("hlp_strcmp", [l](Daedalus::DaedalusVM& vm){
+    vm.registerExternalFunction("hlp_strcmp", [l](Daedalus::DaedalusVM& vm) {
         std::string s1 = vm.popString();
         std::string s2 = vm.popString();
 
         vm.setReturn(s1 == s2 ? 1 : 0);
     });
 
-    vm.registerExternalFunction("hlp_random", [=](Daedalus::DaedalusVM& vm){
+    vm.registerExternalFunction("hlp_random", [=](Daedalus::DaedalusVM& vm) {
         int32_t n0 = vm.popDataValue();
 
         vm.setReturn(rand() % n0);
@@ -73,12 +73,13 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
 
     // the vm of the GOTHIC.DAT does not contain C_Menu and MENU.DAT's vm does not contain C_NPC
     // so we need to register only class members of existing classes
-    auto classExists = [&vm](const std::string& className){
+    auto classExists = [&vm](const std::string& className) {
         bool exists = vm.getDATFile().hasSymbolName(className);
         return exists && (vm.getDATFile().getSymbolByName(className).properties.elemProps.type == EParType_Class);
     };
 
-    if (classExists("C_Npc")){
+    if (classExists("C_Npc"))
+    {
         REGISTER("C_Npc", npc, id);
         REGISTER("C_Npc", npc, name);
         REGISTER("C_Npc", npc, slot);
@@ -113,7 +114,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER_IF_EXISTS("C_Npc", npc, noFocus);
     }
 
-    if (classExists("C_Focus")){
+    if (classExists("C_Focus"))
+    {
         REGISTER("C_Focus", focus, npc_longrange);
         REGISTER("C_Focus", focus, npc_range1);
         REGISTER("C_Focus", focus, npc_range2);
@@ -130,12 +132,13 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER("C_Focus", focus, mob_range1);
         REGISTER("C_Focus", focus, mob_range2);
         REGISTER("C_Focus", focus, mob_azi);
-        REGISTER("C_Focus", focus, mob_elevdo );
+        REGISTER("C_Focus", focus, mob_elevdo);
         REGISTER("C_Focus", focus, mob_elevup);
         REGISTER("C_Focus", focus, mob_prio);
     }
 
-    if (classExists("C_Info")){
+    if (classExists("C_Info"))
+    {
         REGISTER("C_Info", info, npc);
         REGISTER("C_Info", info, nr);
         REGISTER("C_Info", info, important);
@@ -146,7 +149,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER("C_Info", info, permanent);
     }
 
-    if (classExists("C_ItemReact")){
+    if (classExists("C_ItemReact"))
+    {
         REGISTER("C_ItemReact", itemreact, npc);
         REGISTER("C_ItemReact", itemreact, trade_item);
         REGISTER("C_ItemReact", itemreact, trade_amount);
@@ -156,15 +160,16 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER("C_ItemReact", itemreact, reaction);
     }
 
-    if (classExists("C_Item")) {
+    if (classExists("C_Item"))
+    {
         REGISTER("C_Item", item, id);
-        REGISTER("C_Item", item, name );
+        REGISTER("C_Item", item, name);
         REGISTER("C_Item", item, nameID);
         REGISTER("C_Item", item, hp);
         REGISTER("C_Item", item, hp_max);
-        REGISTER("C_Item", item, mainflag );
+        REGISTER("C_Item", item, mainflag);
         REGISTER("C_Item", item, flags);
-        REGISTER("C_Item", item, weight );
+        REGISTER("C_Item", item, weight);
         REGISTER("C_Item", item, value);
         REGISTER("C_Item", item, damageType);
         REGISTER("C_Item", item, damageTotal);
@@ -176,15 +181,15 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER("C_Item", item, cond_value);
         REGISTER("C_Item", item, change_atr);
         REGISTER("C_Item", item, change_value);
-        REGISTER("C_Item", item, magic   );
-        REGISTER("C_Item", item, on_equip    );
-        REGISTER("C_Item", item, on_unequip  );
+        REGISTER("C_Item", item, magic);
+        REGISTER("C_Item", item, on_equip);
+        REGISTER("C_Item", item, on_unequip);
         REGISTER("C_Item", item, on_state);
-        REGISTER("C_Item", item, owner   );
-        REGISTER("C_Item", item, ownerGuild    );
+        REGISTER("C_Item", item, owner);
+        REGISTER("C_Item", item, ownerGuild);
         REGISTER("C_Item", item, disguiseGuild);
         REGISTER("C_Item", item, visual);
-        REGISTER("C_Item", item, visual_change );
+        REGISTER("C_Item", item, visual_change);
         REGISTER_IF_EXISTS("C_Item", item, effect);
         REGISTER("C_Item", item, visual_skin);
         REGISTER("C_Item", item, scemeName);
@@ -203,7 +208,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER_IF_EXISTS("C_Item", item, inv_animate);
     }
 
-    if (classExists("C_Spell")){
+    if (classExists("C_Spell"))
+    {
         REGISTER_IF_EXISTS("C_Spell", spell, time_per_mana);
         REGISTER_IF_EXISTS("C_Spell", spell, damage_per_level);
         REGISTER_IF_EXISTS("C_Spell", spell, damageType);
@@ -218,7 +224,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER_IF_EXISTS("C_Spell", spell, targetCollectElev);
     };
 
-    if (classExists("C_Mission")) {
+    if (classExists("C_Mission"))
+    {
         REGISTER("C_Mission", mission, name);
         REGISTER("C_Mission", mission, description);
         REGISTER("C_Mission", mission, duration);
@@ -234,7 +241,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER("C_Mission", mission, running);
     }
 
-    if (classExists("C_Menu")) {
+    if (classExists("C_Menu"))
+    {
         REGISTER("C_Menu", menu, backPic);
         REGISTER("C_Menu", menu, backWorld);
         REGISTER("C_Menu", menu, posx);
@@ -250,7 +258,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER("C_Menu", menu, defaultInGame);
     }
 
-    if (classExists("C_Menu_Item")) {
+    if (classExists("C_Menu_Item"))
+    {
         REGISTER("C_Menu_Item", menuItem, fontName);
         REGISTER("C_Menu_Item", menuItem, text);
         REGISTER("C_Menu_Item", menuItem, backPic);
@@ -279,7 +288,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER_IF_EXISTS("C_Menu_Item", menuItem, hideOnValue);
     }
 
-    if (classExists("C_SFX")) {
+    if (classExists("C_SFX"))
+    {
         REGISTER("C_SFX", sfx, file);
         REGISTER("C_SFX", sfx, pitchOff);
         REGISTER("C_SFX", sfx, pitchVar);
@@ -291,7 +301,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER("C_SFX", sfx, pfxName);
     }
 
-    if (classExists("C_ParticleFX")) {
+    if (classExists("C_ParticleFX"))
+    {
         REGISTER("C_ParticleFX", pfx, ppsValue);
         REGISTER("C_ParticleFX", pfx, ppsScaleKeys_S);
         REGISTER("C_ParticleFX", pfx, ppsIsLooping);
@@ -351,7 +362,8 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER_IF_EXISTS("C_ParticleFX", pfx, m_bIsAmbientPFX);
     }
 
-    if (classExists("C_MUSICTHEME")) {
+    if (classExists("C_MUSICTHEME"))
+    {
         REGISTER("C_MUSICTHEME", musicTheme, file);
         REGISTER("C_MUSICTHEME", musicTheme, vol);
         REGISTER("C_MUSICTHEME", musicTheme, loop);
@@ -361,6 +373,3 @@ void Daedalus::registerGothicEngineClasses(DaedalusVM& vm)
         REGISTER("C_MUSICTHEME", musicTheme, transSubType);
     }
 }
-
-
-

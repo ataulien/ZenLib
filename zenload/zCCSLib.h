@@ -1,6 +1,6 @@
 #pragma once
-#include "zTypes.h"
 #include <map>
+#include "zTypes.h"
 
 namespace VDFS
 {
@@ -13,7 +13,6 @@ namespace ZenLoad
     class zCCSLib
     {
     public:
-
         /**
 		 * @brief Loads the file from the given VDF-Archive
 		 */
@@ -35,9 +34,9 @@ namespace ZenLoad
          */
         bool messageExists(const std::string& name) const;
 
-        const zCCSLibData& getData(){ return m_Data; }
-    private:
+        const zCCSLibData& getData() { return m_Data; }
 
+    private:
         /**
          * Loaded data straight from the file
          */
@@ -48,4 +47,4 @@ namespace ZenLoad
          */
         std::map<std::string, size_t> m_MessagesByName;
     };
-}
+}  // namespace ZenLoad

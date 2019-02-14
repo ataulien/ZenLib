@@ -1,10 +1,9 @@
 #pragma once
-#include "DaedalusStdlib.h"
-#include "DATFile.h"
-#include <utils/staticReferencedAllocator.h>
-#include <vector>
 #include <list>
-
+#include <vector>
+#include "DATFile.h"
+#include "DaedalusStdlib.h"
+#include <utils/staticReferencedAllocator.h>
 
 namespace Daedalus
 {
@@ -22,24 +21,68 @@ namespace Daedalus
         constexpr int MAX_NUM_INFO = 16000;
         constexpr int MAX_NUM_MENU = MAX_NUM_MISC;
         constexpr int MAX_NUM_MENUITEM = MAX_NUM_MISC;
-        constexpr int MAX_NUM_SFX = 4096; // G2 has 1700
+        constexpr int MAX_NUM_SFX = 4096;  // G2 has 1700
         constexpr int MAX_NUM_PFX = 1024;
         constexpr int MAX_NUM_MUSICTHEME = 512;
-        
+
         template <class T>
         constexpr size_t MAX_NUM();
 
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Npc>() { return MAX_NUM_NPCS; }
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Item>() { return MAX_NUM_ITEMS; }
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Mission>() { return MAX_NUM_MISSIONS; }
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Focus>() { return MAX_NUM_FOCUS; }
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_ItemReact>() { return MAX_NUM_ITEMREACT; }
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Info>() { return MAX_NUM_INFO; }
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Menu>() { return MAX_NUM_MENU; }
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Menu_Item>() { return MAX_NUM_MENUITEM; }
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_SFX>() { return MAX_NUM_SFX; }
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_ParticleFX>() { return MAX_NUM_PFX; }
-        template<> constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_MusicTheme>() { return MAX_NUM_MUSICTHEME; }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Npc>()
+        {
+            return MAX_NUM_NPCS;
+        }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Item>()
+        {
+            return MAX_NUM_ITEMS;
+        }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Mission>()
+        {
+            return MAX_NUM_MISSIONS;
+        }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Focus>()
+        {
+            return MAX_NUM_FOCUS;
+        }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_ItemReact>()
+        {
+            return MAX_NUM_ITEMREACT;
+        }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Info>()
+        {
+            return MAX_NUM_INFO;
+        }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Menu>()
+        {
+            return MAX_NUM_MENU;
+        }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_Menu_Item>()
+        {
+            return MAX_NUM_MENUITEM;
+        }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_SFX>()
+        {
+            return MAX_NUM_SFX;
+        }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_ParticleFX>()
+        {
+            return MAX_NUM_PFX;
+        }
+        template <>
+        constexpr size_t MAX_NUM<Daedalus::GEngineClasses::C_MusicTheme>()
+        {
+            return MAX_NUM_MUSICTHEME;
+        }
 
         template <typename C_Class>
         using CHandle = typename ZMemory::StaticReferencedAllocator<C_Class, MAX_NUM<C_Class>()>::Handle;
@@ -61,7 +104,7 @@ namespace Daedalus
             enum ELogStatus
             {
                 // TODO: Find the actual values for this
-                        LS_Running = 1,
+                LS_Running = 1,
                 LS_Success = 2,
                 LS_Failed = 3,
                 LS_Obsolete = 4
@@ -70,7 +113,7 @@ namespace Daedalus
             enum ESection
             {
                 // TODO: Find the actual values for this!
-                        LT_Mission = 0,
+                LT_Mission = 0,
                 LT_Note = 1
             };
 
@@ -102,34 +145,81 @@ namespace Daedalus
              * @tparam C_Class i.e. C_Npc C_Item, ...
              */
             template <class C_Class, size_t n = MAX_NUM<C_Class>()>
-            CAllocator<C_Class, n>& get() { C_Class::missing_template_function_spezialization; };
+            CAllocator<C_Class, n>& get()
+            {
+                C_Class::missing_template_function_spezialization;
+            };
         };
 
         /**
          * getter spezializations
          */
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_Npc>&
-        RegisteredObjects::get<GEngineClasses::C_Npc, MAX_NUM<GEngineClasses::C_Npc>()>() { return NPCs; };
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_Item>&
-        RegisteredObjects::get<GEngineClasses::C_Item, MAX_NUM<GEngineClasses::C_Item>()>() { return items; };
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_Mission>&
-        RegisteredObjects::get<GEngineClasses::C_Mission, MAX_NUM<GEngineClasses::C_Mission>()>() { return missions; };
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_Focus>&
-        RegisteredObjects::get<GEngineClasses::C_Focus, MAX_NUM<GEngineClasses::C_Focus>()>() { return focuses; };
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_ItemReact>&
-        RegisteredObjects::get<GEngineClasses::C_ItemReact, MAX_NUM<GEngineClasses::C_ItemReact>()>() { return itemReacts; };
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_Info>&
-        RegisteredObjects::get<GEngineClasses::C_Info, MAX_NUM<GEngineClasses::C_Info>()>() { return infos; };
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_Menu>&
-        RegisteredObjects::get<GEngineClasses::C_Menu, MAX_NUM<GEngineClasses::C_Menu>()>() { return menus; };
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_Menu_Item>&
-        RegisteredObjects::get<GEngineClasses::C_Menu_Item, MAX_NUM<GEngineClasses::C_Menu_Item>()>() { return menuItems; };
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_SFX>&
-        RegisteredObjects::get<GEngineClasses::C_SFX, MAX_NUM<GEngineClasses::C_SFX>()>() { return sfx; };
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_ParticleFX>&
-        RegisteredObjects::get<GEngineClasses::C_ParticleFX, MAX_NUM<GEngineClasses::C_ParticleFX>()>() { return pfx; };
-        template<> inline RegisteredObjects::CAllocator<GEngineClasses::C_MusicTheme>&
-        RegisteredObjects::get<GEngineClasses::C_MusicTheme, MAX_NUM<GEngineClasses::C_MusicTheme>()>() { return musicThemes; };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_Npc>&
+        RegisteredObjects::get<GEngineClasses::C_Npc, MAX_NUM<GEngineClasses::C_Npc>()>()
+        {
+            return NPCs;
+        };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_Item>&
+        RegisteredObjects::get<GEngineClasses::C_Item, MAX_NUM<GEngineClasses::C_Item>()>()
+        {
+            return items;
+        };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_Mission>&
+        RegisteredObjects::get<GEngineClasses::C_Mission, MAX_NUM<GEngineClasses::C_Mission>()>()
+        {
+            return missions;
+        };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_Focus>&
+        RegisteredObjects::get<GEngineClasses::C_Focus, MAX_NUM<GEngineClasses::C_Focus>()>()
+        {
+            return focuses;
+        };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_ItemReact>&
+        RegisteredObjects::get<GEngineClasses::C_ItemReact, MAX_NUM<GEngineClasses::C_ItemReact>()>()
+        {
+            return itemReacts;
+        };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_Info>&
+        RegisteredObjects::get<GEngineClasses::C_Info, MAX_NUM<GEngineClasses::C_Info>()>()
+        {
+            return infos;
+        };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_Menu>&
+        RegisteredObjects::get<GEngineClasses::C_Menu, MAX_NUM<GEngineClasses::C_Menu>()>()
+        {
+            return menus;
+        };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_Menu_Item>&
+        RegisteredObjects::get<GEngineClasses::C_Menu_Item, MAX_NUM<GEngineClasses::C_Menu_Item>()>()
+        {
+            return menuItems;
+        };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_SFX>&
+        RegisteredObjects::get<GEngineClasses::C_SFX, MAX_NUM<GEngineClasses::C_SFX>()>()
+        {
+            return sfx;
+        };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_ParticleFX>&
+        RegisteredObjects::get<GEngineClasses::C_ParticleFX, MAX_NUM<GEngineClasses::C_ParticleFX>()>()
+        {
+            return pfx;
+        };
+        template <>
+        inline RegisteredObjects::CAllocator<GEngineClasses::C_MusicTheme>&
+        RegisteredObjects::get<GEngineClasses::C_MusicTheme, MAX_NUM<GEngineClasses::C_MusicTheme>()>()
+        {
+            return musicThemes;
+        };
 
         /**
 		 * Class holding the current engine-side gamestate of a daedalus-VM
@@ -137,8 +227,7 @@ namespace Daedalus
         class DaedalusGameState
         {
         public:
-
-            DaedalusGameState(Daedalus::DaedalusVM &vm);
+            DaedalusGameState(Daedalus::DaedalusVM& vm);
 
             /**
              * @brief registers the games externals
@@ -211,7 +300,7 @@ namespace Daedalus
              * @return Handle to the created instance
              */
             ItemHandle insertItem(size_t instance);
-            ItemHandle insertItem(const std::string &instance);
+            ItemHandle insertItem(const std::string& instance);
 
             SfxHandle insertSFX(size_t instance);
             SfxHandle insertSFX(const std::string& instance);
@@ -241,48 +330,76 @@ namespace Daedalus
              */
             template <typename C_Class>
             inline C_Class& get(CHandle<C_Class> h)
-            { return m_RegisteredObjects.get<C_Class>().getElement(h); };
+            {
+                return m_RegisteredObjects.get<C_Class>().getElement(h);
+            };
 
             Daedalus::GEngineClasses::C_Npc& getNpc(NpcHandle h)
-            { return get<Daedalus::GEngineClasses::C_Npc>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_Npc>(h);
+            };
 
             Daedalus::GEngineClasses::C_Item& getItem(ItemHandle h)
-            { return get<Daedalus::GEngineClasses::C_Item>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_Item>(h);
+            };
 
             Daedalus::GEngineClasses::C_ItemReact& getItemReact(ItemReactHandle h)
-            { return get<Daedalus::GEngineClasses::C_ItemReact>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_ItemReact>(h);
+            };
 
             Daedalus::GEngineClasses::C_Mission& getMission(MissionHandle h)
-            { return get<Daedalus::GEngineClasses::C_Mission>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_Mission>(h);
+            };
 
             Daedalus::GEngineClasses::C_Focus& getFocus(FocusHandle h)
-            { return get<Daedalus::GEngineClasses::C_Focus>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_Focus>(h);
+            };
 
             Daedalus::GEngineClasses::C_Info& getInfo(InfoHandle h)
-            { return get<Daedalus::GEngineClasses::C_Info>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_Info>(h);
+            };
 
             Daedalus::GEngineClasses::C_Menu& getMenu(MenuHandle h)
-            { return get<Daedalus::GEngineClasses::C_Menu>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_Menu>(h);
+            };
 
             Daedalus::GEngineClasses::C_Menu_Item& getMenuItem(MenuItemHandle h)
-            { return get<Daedalus::GEngineClasses::C_Menu_Item>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_Menu_Item>(h);
+            };
 
             Daedalus::GEngineClasses::C_SFX& getSfx(SfxHandle h)
-            { return get<Daedalus::GEngineClasses::C_SFX>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_SFX>(h);
+            };
 
             Daedalus::GEngineClasses::C_ParticleFX& getPfx(PfxHandle h)
-            { return get<Daedalus::GEngineClasses::C_ParticleFX>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_ParticleFX>(h);
+            };
 
             Daedalus::GEngineClasses::C_MusicTheme& getMusicTheme(MusicThemeHandle h)
-            { return get<Daedalus::GEngineClasses::C_MusicTheme>(h); };
+            {
+                return get<Daedalus::GEngineClasses::C_MusicTheme>(h);
+            };
 
-            Daedalus::GEngineClasses::Instance *getByClass(ZMemory::BigHandle h, EInstanceClass instClass);
+            Daedalus::GEngineClasses::Instance* getByClass(ZMemory::BigHandle h, EInstanceClass instClass);
 
             RegisteredObjects& getRegisteredObjects()
-            { return m_RegisteredObjects; }
+            {
+                return m_RegisteredObjects;
+            }
 
             const std::list<ItemHandle>& getInventoryOf(NpcHandle npc)
-            { return m_NpcInventories[npc]; }
+            {
+                return m_NpcInventories[npc];
+            }
 
             /**
              * @param callback Function to be called right after an instance was created
@@ -299,15 +416,14 @@ namespace Daedalus
             {
                 m_OnInstanceRemoved = callback;
             }
+
         private:
-
-
             RegisteredObjects m_RegisteredObjects;
 
             /**
              * Daedalus-VM this is running on
              */
-            Daedalus::DaedalusVM &m_VM;
+            Daedalus::DaedalusVM& m_VM;
 
             /**
              * Inventories by npc handle
@@ -325,5 +441,5 @@ namespace Daedalus
             std::function<void(ZMemory::BigHandle, EInstanceClass)> m_OnInstanceCreated;
             std::function<void(ZMemory::BigHandle, EInstanceClass)> m_OnInstanceRemoved;
         };
-    }
-}
+    }  // namespace GameState
+}  // namespace Daedalus
