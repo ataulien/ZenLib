@@ -70,7 +70,7 @@ std::string ParserImplBinary::readString()
 /**
  * @brief Reads data of the expected type. Throws if the read type is not the same as specified and not 0
  */
-void ParserImplBinary::readEntry(const std::string& expectedName, void* target, size_t targetSize, EZenValueType expectedType)
+void ParserImplBinary::readEntry(const char* /*expectedName*/, void* target, size_t targetSize, EZenValueType expectedType)
 {
     // Special case for strings, they're read until 0-bytes
     if (expectedType == ZVT_STRING)
