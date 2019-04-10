@@ -357,8 +357,8 @@ namespace Daedalus
 		 */
         size_t addSymbol();
 
-        const PARSymTable& getSymTable() { return m_SymTable; }
-        const PARStack& getStack() { return m_Stack; }
+        const PARSymTable& getSymTable() const { return m_SymTable; }
+        const PARStack& getStack() const { return m_Stack; }
 
         // TODO move into Utils
         /**
