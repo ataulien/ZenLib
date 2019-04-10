@@ -8,6 +8,9 @@ addons:
             - g++-6
             - gcc-6
             - ninja-build
+            - libphysfs-dev
+            - libsquish-dev
+            - libglm-dev
 
 git:
   submodules: false
