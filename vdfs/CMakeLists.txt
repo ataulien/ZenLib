@@ -8,7 +8,7 @@ file(GLOB SRC
     *.h
 )
 
-add_library(vdfs STATIC ${SRC} "ignorecase.c")
+add_library(vdfs STATIC ${SRC})
 
 # Remove WIN-API min and max macros since they mess up std::min/max
 if(MSVC)
