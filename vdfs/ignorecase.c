@@ -5,7 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "physfs.h"
+#include <physfs.h>
 #include "ignorecase.h"
 
 /**
