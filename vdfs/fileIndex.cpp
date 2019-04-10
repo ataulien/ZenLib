@@ -5,7 +5,7 @@
 #include <regex>
 #include <assert.h>
 #include <physfs.h>
-#include "../lib/physfs/extras/ignorecase.h"
+#include "ignorecase.h"
 #include "utils/logger.h"
 
 using namespace VDFS;

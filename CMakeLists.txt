@@ -1,8 +1,10 @@
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 3.10)
 project(ZenLib)
 
 include(ExternalProject)
 include(cmake/clang-format.cmake)
+
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 set(ZENLIB_BUILD_EXAMPLES OFF CACHE BOOL "Whether to build the examples")
 set(ZENLIB_BUILD_TESTS OFF CACHE BOOL "Whether to build tests")
@@ -15,15 +17,9 @@ if(MSVC)
 	add_definitions(-DNOMINMAX)
 endif()
 
-# 3rd-party dependencies
-add_subdirectory(lib/libsquish)
+find_package(GLM REQUIRED)
 
-set(PHYSFS_BUILD_TEST OFF CACHE STRING "" FORCE)
-add_subdirectory(lib/physfs)
-
-include_directories(lib/glm/glm)
-include_directories(lib/libsquish)
-include_directories(lib/physfs/src)
+include_directories(${GLM_INCLUDE_DIRS})
 include_directories(.)
 
 # Internal libraries
