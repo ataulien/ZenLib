@@ -5,7 +5,6 @@
 #include <regex>
 #include <assert.h>
 #include <physfs.h>
-#include "ignorecase.h"
 #include "utils/logger.h"
 
 using namespace VDFS;
@@ -166,15 +165,8 @@ int64_t VDFS::FileIndex::getLastModTime(const std::string& name)
 
 std::vector<std::string> FileIndex::getKnownFiles(const std::string& path) const
 {
-    std::string filePath(path);
     std::vector<std::string> vec;
-    bool exists = PHYSFSEXT_locateCorrectCase(&filePath[0]) == 0;
-    if (!exists)
-    {
-        return vec;
-    }
-
-    char** files = PHYSFS_enumerateFiles(filePath.c_str());
+    char** files = PHYSFS_enumerateFiles(path.c_str());
     char** i;
     for (i = files; *i != NULL; i++)
         vec.push_back(*i);
