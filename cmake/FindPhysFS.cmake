@@ -43,7 +43,7 @@ find_path(PhysFS_INCLUDE_DIR
 )
 
 find_library(PhysFS_LIBRARY
-  NAMES physfs libphysfs
+  NAMES physfs libphysfs physfs-static
 )
 
 file(READ "${PhysFS_INCLUDE_DIR}/physfs.h" _PHYSFS_HEADER)
