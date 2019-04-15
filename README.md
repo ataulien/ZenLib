@@ -13,21 +13,42 @@ Contains loaders for:
 There is no possibility to write files at the moment. However, this is planned for a later release.
 
 # Building
-ZenLib requires a compiler capable of the C++14-standard and at least CMake 3.1!
+ZenLib requires a compiler capable of the C++14-standard and at least CMake 3.9!
 
-> Make sure to clone the repository with the '--recursive'-flag, since otherwise you will be missing some dependencies!
-> Like so: `git clone --recursive https://github.com/degenerated1123/ZenLib.git`
+## Linux and macOS
 
-### Linux
+If your distribution's package manager has available packages for GLM, libsquish and PhysFS (>= 3.0.0)
+like Ubuntu 18.04+, then you can proceed like so:
+
 ```sh
-$ cd <project-root>
+$ # install dependencies, for example on Ubuntu:
+$ sudo apt install libglm-dev libphysfs-dev libsquish-dev
+$ git clone https://github.com/ataulien/ZenLib
+$ cd ZenLib
 $ mkdir build
 $ cd build
 $ cmake ..
-$ make
+$ cmake --build .
 ```
-### Windows
-Use CMake-GUI to generate project-files for your favorite build-system/IDE. Then proceed to build the library as usual.
+
+If the dependencies are not available from your package manager, you can either compile and install
+them from sources and then proceed as explained before, or use the instructions for vcpkg in common with
+Windows.
+
+## Windows, Linux and maxOS using vcpkg
+
+You should follow the instructions for downloading, building and installing vcpkg from
+[its official repository](https://github.com/Microsoft/vcpkg), then run the following commands:
+
+```sh
+$ path/to/vcpkg/vcpkg.exe install glm physfs libsquish # Omit .exe on Linux
+$ git clone https://github.com/ataulien/ZenLib
+$ cd ZenLib
+$ mkdir build
+$ cd build
+$ cmake -DCMAKE_TOOLCHAIN_PATH=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+$ cmake --build .
+```
 
 # Samples
 There are some sample programs inside the */samples*-folder, which can teach you how the library works and what you can do with it.
