@@ -32,4 +32,4 @@ script:
 
 cache:
   directories:
-    - $HOME/vcpkg/installed
+    - /home/travis/build/ataulien/ZenLib/vcpkg/installed
