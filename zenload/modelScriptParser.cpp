@@ -118,6 +118,13 @@ namespace ZenLoad
 
         if (!dontUseMesh)
         {
+            // This should absolutely have an extension of .ASC, but sometimes doesn't.
+            // Add it, if it's not there.
+            if (meshNameASC.find_first_of('.') == std::string::npos)
+            {
+                meshNameASC += ".ASC";
+            }
+
             m_MeshesASC.push_back(meshNameASC);
         }
     }
