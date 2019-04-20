@@ -17,9 +17,6 @@ if(MSVC)
 	add_definitions(-DNOMINMAX)
 endif()
 
-find_package(GLM REQUIRED)
-
-include_directories(${GLM_INCLUDE_DIRS})
 include_directories(.)
 
 # Internal libraries
