@@ -465,13 +465,24 @@ namespace ZenLoad
         if (m_Token.text == "MESHANDTREE")
         {
             Result res = parseArguments();
+
+            // Second arg would be DONT_USE_MESH.
+            if (m_ArgCount == 1)
+            {
+                m_MeshesASC.push_back(m_Args[0]);
+            }
             // TODO
             return (res != Success) ? CHUNK_ERROR : CHUNK_MESH_AND_TREE;
         }
         else if (m_Token.text == "REGISTERMESH")
         {
             Result res = parseArguments();
-            // TODO
+
+            if (m_ArgCount == 1)
+            {
+                m_MeshesASC.push_back(m_Args[0]);
+            }
+
             return (res != Success) ? CHUNK_ERROR : CHUNK_REGISTER_MESH;
         }
         else if (m_Token.text == "ANIENUM")
