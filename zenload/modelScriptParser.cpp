@@ -639,7 +639,7 @@ namespace ZenLoad
 
         std::transform(m_Ani.m_Name.begin(), m_Ani.m_Name.end(), m_Ani.m_Name.begin(), ::toupper);
 
-        /*m_Ani.m_Layer = m_Args[1];*/
+        m_Ani.m_Layer = std::stoi(m_Args[1]);
         m_Ani.m_Next = m_Args[2];
         std::transform(m_Ani.m_Next.begin(), m_Ani.m_Next.end(), m_Ani.m_Next.begin(), ::toupper);
 
