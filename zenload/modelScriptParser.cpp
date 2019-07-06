@@ -713,8 +713,9 @@ namespace ZenLoad
         }
 
         m_Alias.m_Name = m_Args[0];
-
         std::transform(m_Alias.m_Name.begin(), m_Alias.m_Name.end(), m_Alias.m_Name.begin(), ::toupper);
+
+        m_Ani.m_Layer = std::stoi(m_Args[1]);
 
         m_Alias.m_Next = m_Args[2];
         std::transform(m_Alias.m_Next.begin(), m_Alias.m_Next.end(), m_Alias.m_Next.begin(), ::toupper);
@@ -780,6 +781,9 @@ namespace ZenLoad
 
         m_Blend.m_Next = m_Args[1];
         std::transform(m_Blend.m_Next.begin(), m_Blend.m_Next.end(), m_Blend.m_Next.begin(), ::toupper);
+
+        // There doesn't seem to be any layer information on the aniBlends
+        m_Blend.m_Layer = 1;
 
         if (m_ArgCount <= 2)
         {
