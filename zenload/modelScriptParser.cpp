@@ -769,6 +769,29 @@ namespace ZenLoad
         if (res != Success)
             return Error;
 
+        if (m_ArgCount < 2 || m_ArgCount > 4)
+        {
+            LogError() << "invalid number of arguments for aniBlend at line " << m_Line;
+            return Error;
+        }
+
+        m_Blend.m_Name = m_Args[0];
+        std::transform(m_Alias.m_Name.begin(), m_Alias.m_Name.end(), m_Alias.m_Name.begin(), ::toupper);
+
+        m_Blend.m_Next = m_Args[1];
+        std::transform(m_Alias.m_Next.begin(), m_Alias.m_Next.end(), m_Alias.m_Next.begin(), ::toupper);
+
+        if (m_ArgCount <= 2)
+        {
+            m_Blend.m_BlendIn = 0.0f;
+            m_Blend.m_BlendOut = 0.0f;
+        }
+        else
+        {
+            m_Blend.m_BlendIn = std::stof(m_Args[2]);
+            m_Blend.m_BlendOut = std::stof(m_Args[3]);
+        }
+
         return parseAniEvents();
     }
 

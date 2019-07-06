@@ -102,6 +102,7 @@ namespace ZenLoad
 
         zCModelScriptAni m_Ani;
         zCModelScriptAniAlias m_Alias;
+        zCModelScriptAniBlend m_Blend;
         std::vector<zCModelScriptEventPfx> m_Pfx;
         std::vector<zCModelScriptEventPfxStop> m_PfxStop;
         std::vector<zCModelScriptEventSfx> m_Sfx;
