@@ -776,10 +776,10 @@ namespace ZenLoad
         }
 
         m_Blend.m_Name = m_Args[0];
-        std::transform(m_Alias.m_Name.begin(), m_Alias.m_Name.end(), m_Alias.m_Name.begin(), ::toupper);
+        std::transform(m_Blend.m_Name.begin(), m_Blend.m_Name.end(), m_Blend.m_Name.begin(), ::toupper);
 
         m_Blend.m_Next = m_Args[1];
-        std::transform(m_Alias.m_Next.begin(), m_Alias.m_Next.end(), m_Alias.m_Next.begin(), ::toupper);
+        std::transform(m_Blend.m_Next.begin(), m_Blend.m_Next.end(), m_Blend.m_Next.begin(), ::toupper);
 
         if (m_ArgCount <= 2)
         {

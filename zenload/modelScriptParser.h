@@ -71,6 +71,14 @@ namespace ZenLoad
      */
         const zCModelScriptAniAlias& alias() const { return m_Alias; }
 
+        /** Returns the parsed animation blend.
+     *
+     * Call this if parse() returns CHUNK_ANI_BLEND.
+     *
+     * @return The alias read during the last call to parse().
+     */
+        const zCModelScriptAniBlend& blend() const { return m_Blend; }
+
         /** Returns the sfx event.
      *
      * Call this if parse() returns CHUNK_EVENT_SFX or CHUNK_EVENT_SFX_GRND.
