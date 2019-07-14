@@ -98,10 +98,9 @@ namespace ZenLoad
 	 */
     static bool writeVectorData(void* data, size_t size, std::vector<uint8_t>& target)
     {
-        uint8_t* bytes = reinterpret_cast<uint8_t*>(data);
-        for (size_t i = 0; i < size; i++)
-            target.emplace_back(bytes[i]);
-
+        size_t sz=target.size();
+        target.resize(target.size()+size);
+        memcpy(&target[sz],data,size);
         return true;
     }
 

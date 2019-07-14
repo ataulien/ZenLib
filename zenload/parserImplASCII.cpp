@@ -185,10 +185,10 @@ std::string ParserImplASCII::readString()
 /**
  * @brief Reads data of the expected type. Throws if the read type is not the same as specified and not 0
  */
-void ParserImplASCII::readEntry(const std::string& _expectedName, void* target, size_t targetSize, EZenValueType expectedType)
+void ParserImplASCII::readEntry(const char* _expectedName, void* target, size_t targetSize, EZenValueType expectedType)
 {
     // Some tools write
-    std::string expectedName = _expectedName;
+    std::string expectedName = _expectedName==nullptr ? "" : _expectedName;
     std::transform(expectedName.begin(), expectedName.end(), expectedName.begin(), ::toupper);
 
     m_pParser->skipSpaces();

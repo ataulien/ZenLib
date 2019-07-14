@@ -294,7 +294,7 @@ void ParserImplBinSafe::readTypeAndSizeBinSafe(EZenValueType& type, size_t& size
 /**
 * @brief Reads data of the expected type. Throws if the read type is not the same as specified and not 0
 */
-void ParserImplBinSafe::readEntry(const std::string& expectedName, void* target, size_t targetSize, EZenValueType expectedType)
+void ParserImplBinSafe::readEntry(const char *expectedName, void* target, size_t targetSize, EZenValueType expectedType)
 {
     EZenValueType type;
     size_t size;
@@ -314,7 +314,7 @@ void ParserImplBinSafe::readEntry(const std::string& expectedName, void* target,
 
     if (expectedType != ZVT_BYTE || type != ZVT_ENUM)  // International CSLibs have this
         if (expectedType != ZVT_0 && type != expectedType)
-            throw std::runtime_error("Valuetype name does not match expected type. Value:" + expectedName);
+            throw std::runtime_error("Valuetype name does not match expected type. Value:" + std::string(expectedName));
 
     switch (type)
     {
