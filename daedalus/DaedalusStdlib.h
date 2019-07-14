@@ -642,22 +642,15 @@ namespace Daedalus
         struct C_Info : Instance
         {
             // important, permanent and nr are optional in scripts, so we must to set a default value
-            C_Info()
-                : nr(0)
-                , important(0)
-                , condition(0)
-                , permanent(0)
-                , npc(0)
-            {
-            }
-            int32_t npc;
-            int32_t nr;
-            int32_t important;  //	Wichtig Flag -> ansprechen
-            uint32_t condition;
-            uint32_t information;
+            C_Info()=default;
+            int32_t npc=0;
+            int32_t nr=0;
+            int32_t important=0;  //	Wichtig Flag -> ansprechen
+            uint32_t condition=0;
+            uint32_t information=0;
             std::string description;
-            int32_t trade;
-            int32_t permanent;
+            int32_t trade=0; // bool32-flag
+            int32_t permanent=0;
             std::vector<SubChoice> subChoices;
             void addChoice(const SubChoice& subChoice)
             {
