@@ -103,6 +103,12 @@ namespace ZenLoad
         std::string m_Argument;
     };
 
+    struct zCModelScriptEventMMStartAni
+    {
+        int32_t m_Frame;
+        std::string m_Animation;
+    };
+
     struct zCModelScriptEventSfx
     {
         int32_t m_Frame = 0;

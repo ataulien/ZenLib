@@ -963,7 +963,10 @@ namespace ZenLoad
         if (res != Success)
             return Error;
 
-        // TODO: assign
+        m_MMStartAni.emplace_back();
+
+        m_MMStartAni.back().m_Frame = (uint32_t)atoi(m_Args[0].c_str());
+        m_MMStartAni.back().m_Animation = m_Args[1];
 
         return Success;
     }
