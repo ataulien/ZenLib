@@ -14,15 +14,6 @@ git:
 
 script:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-6" CC="gcc-6"; fi
-  # Use VCPKG because old Ubuntu versions don't have all the needed
-  #  packages
-  - git clone https://github.com/Microsoft/vcpkg || true
-  - cd vcpkg
-  - git fetch
-  - git pull
-  - ./bootstrap-vcpkg.sh
-  - ./vcpkg install libsquish physfs
-  - cd ..
   - mkdir -p build
   - cd build
   - cmake -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake -GNinja -DZENLIB_BUILD_EXAMPLES=On -DZENLIB_BUILD_TESTS=On ..

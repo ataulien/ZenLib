@@ -17,36 +17,13 @@ ZenLib requires a compiler capable of the C++14-standard and at least CMake 3.9!
 
 ## Linux and macOS
 
-If your distribution's package manager has available packages for GLM, libsquish and PhysFS (>= 3.0.0)
-like Ubuntu 18.04+, then you can proceed like so:
+ZenLib can be built by the standard CMake build procedure. After cloning, do
+this in the repository root:
 
 ```sh
-$ # install dependencies, for example on Ubuntu:
-$ sudo apt install libglm-dev libphysfs-dev libsquish-dev
-$ git clone https://github.com/ataulien/ZenLib
-$ cd ZenLib
 $ mkdir build
 $ cd build
 $ cmake ..
-$ cmake --build .
-```
-
-If the dependencies are not available from your package manager, you can either compile and install
-them from sources and then proceed as explained before, or use the instructions for vcpkg in common with
-Windows.
-
-## Windows, Linux and maxOS using vcpkg
-
-You should follow the instructions for downloading, building and installing vcpkg from
-[its official repository](https://github.com/Microsoft/vcpkg), then run the following commands:
-
-```sh
-$ path/to/vcpkg/vcpkg.exe install glm physfs libsquish # Omit .exe on Linux
-$ git clone https://github.com/ataulien/ZenLib
-$ cd ZenLib
-$ mkdir build
-$ cd build
-$ cmake -DCMAKE_TOOLCHAIN_PATH=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake ..
 $ cmake --build .
 ```
 
