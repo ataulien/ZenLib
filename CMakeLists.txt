@@ -24,6 +24,8 @@ if(NOT libsquish_POPULATED)
   message(STATUS "ZenLib: Populating libsquish...")
 
   FetchContent_Populate(libsquish)
+
+  SET(BUILD_SQUISH_WITH_OPENMP OFF CACHE BOOL "" FORCE)
   add_subdirectory(${libsquish_SOURCE_DIR} ${libsquish_BINARY_DIR})
 
   message(STATUS "ZenLib: Done populating libsquish!")
