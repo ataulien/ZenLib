@@ -43,6 +43,9 @@ if(NOT physfs_POPULATED)
   message(STATUS "ZenLib: Populating physfs...")
 
   FetchContent_Populate(physfs)
+
+  set(PHYSFS_BUILD_SHARED OFF)
+  set(PHYSFS_BUILD_TEST OFF)
   add_subdirectory(${physfs_SOURCE_DIR} ${physfs_BINARY_DIR})
 
   message(STATUS "ZenLib: Done populating physfs!")
