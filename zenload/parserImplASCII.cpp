@@ -37,7 +37,7 @@ bool ParserImplASCII::readChunkStart(ZenParser::ChunkHeader& header)
         size_t tmpSeek = m_pParser->m_Seek;
         while (m_pParser->m_Data[tmpSeek] != ']')
         {
-            if (m_pParser->m_Data[tmpSeek] == '\r' && m_pParser->m_Data[tmpSeek] == '\n')
+            if (m_pParser->m_Data[tmpSeek] == '\r' || m_pParser->m_Data[tmpSeek] == '\n')
                 throw std::runtime_error("Invalid vob descriptor");
 
             ++tmpSeek;
