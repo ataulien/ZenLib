@@ -77,7 +77,7 @@ namespace ZenLoad
                 size_t wp1, wp2;
 
                 size_t* tgt = &wp1;
-                for (int i = 0; i < 2; i++)
+                for (int j = 0; j < 2; j++)
                 {
                     ZenParser::ChunkHeader wph;
 
@@ -105,7 +105,7 @@ namespace ZenLoad
 
                     tgt = &wp2;
                 }
-                info.edges.push_back(std::make_pair(wp1, wp2));
+                info.edges.emplace_back(wp1, wp2);
             }
 
             LogInfo() << "Done loading edges!";
