@@ -14,7 +14,7 @@ namespace ZenLoad
     public:
         enum EVersion
         {
-            Gothic_26f = 0,  // TODO
+            Gothic_26f = 67698688,
             Gothic_18k = 34144256
         };
 
