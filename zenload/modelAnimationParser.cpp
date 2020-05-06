@@ -1,6 +1,7 @@
+#include "modelAnimationParser.h"
+
 #include <cmath>
 
-#include "modelAnimationParser.h"
 #include "zenParser.h"
 
 namespace ZenLoad
@@ -46,7 +47,7 @@ namespace ZenLoad
     {
         m_Header.version = m_Zen.readBinaryWord();
 
-        m_Header.aniName = m_Zen.readLine(true);
+        m_Header.aniName = m_Zen.readLine(false);
 
         m_Header.layer = m_Zen.readBinaryDWord();
         m_Header.numFrames = m_Zen.readBinaryDWord();
@@ -56,7 +57,7 @@ namespace ZenLoad
         m_Header.samplePosRangeMin = m_Zen.readBinaryFloat();
         m_Header.samplePosScaler = m_Zen.readBinaryFloat();
         m_Zen.readBinaryRaw(m_Header.aniBBox, sizeof(m_Header.aniBBox));
-        m_Header.nextAniName = m_Zen.readLine(true);
+        m_Header.nextAniName = m_Zen.readLine(false);
     }
 
     static void SampleUnpackTrans(const uint16_t* in, ZMath::float3& out, float samplePosScaler, float samplePosRangeMin)
