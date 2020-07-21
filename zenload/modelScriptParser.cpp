@@ -1,10 +1,11 @@
-#include <cmath>
+#include "modelScriptParser.h"
 
 #include <algorithm>
-#include <utils/logger.h>
+#include <cmath>
 
-#include "modelScriptParser.h"
 #include "zenParser.h"
+
+#include <utils/logger.h>
 
 namespace ZenLoad
 {
@@ -243,7 +244,10 @@ namespace ZenLoad
                         return Success;  // Need to return early here, because emtpy strings ( "" ) happen, which should not be seen as empty lines
 
                     if (ch == '\n')
-                        m_Line++;
+                    {
+                        LogError() << "parser error in line " << m_Line << ": unexpected newline in quoted string";
+                        return Error;
+                    }
 
                     m_NextToken.text.push_back(ch);
                 }
