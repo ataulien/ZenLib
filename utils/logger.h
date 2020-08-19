@@ -5,9 +5,14 @@
 #include <sstream>
 #include <string>
 #include <vector>
+
 #include <stdio.h>
 
-#define USE_LOG
+#ifndef ZENLIB_USE_LOG
+#define ZENLIB_USE_LOG 0
+#endif
+
+#if ZENLIB_USE_LOG
 
 /** Replace some HRESULT-Functionality used by this */
 #if !(defined(WIN32) || defined(_WIN32))
@@ -79,10 +84,21 @@
 #define LogInfoBox() Utils::Log("Info", __FILE__, __LINE__, FUNCTION_SIGNATURE, false, Utils::Log::EMessageType::MT_Info)
 #define LogWarnBox() Utils::Log("Warning", __FILE__, __LINE__, FUNCTION_SIGNATURE, true, Utils::Log::EMessageType::MT_Warning)
 #define LogErrorBox() Utils::Log("Error", __FILE__, __LINE__, FUNCTION_SIGNATURE, true, Utils::Log::EMessageType::MT_Error)
+#else /* ZENLIB_USE_LOG */
+/** Logging macros */
+#define LogInfo() Utils::Log("Info", "", 0, "", false, 0)
+#define LogWarn() Utils::Log("Warning", "", 0, "", true, 0)
+#define LogError() Utils::Log("Error", "", 0, "", true, 0)
+
+/** Displays a messagebox and loggs its content */
+#define LogInfoBox() Utils::Log("Info", "", 0, "", false, 0)
+#define LogWarnBox() Utils::Log("Warning", "", 0, "", true, 0)
+#define LogErrorBox() Utils::Log("Error", "", 0, "", true, 0)
+#endif /* ZENLIB_USE_LOG */
 
 namespace Utils
 {
-#ifdef USE_LOG
+#if ZENLIB_USE_LOG
     class Log
     {
     public:
@@ -267,7 +283,7 @@ namespace Utils
     class Log
     {
     public:
-        Log(const char* Type, const char* File, int Line, const char* Function, bool bIncludeInfo = false, UINT MessageBox = 0) {}
+        Log(const char* Type, const char* File, int Line, const char* Function, bool bIncludeInfo = false, unsigned MessageBox = 0) {}
 
         ~Log() {}
 
