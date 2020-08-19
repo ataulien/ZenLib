@@ -99,6 +99,11 @@ namespace ZenLoad
      */
         std::vector<std::string>& meshesASC() { return m_MeshesASC; }
 
+        /**
+         * @return Skeleton hierarchy to be used with the model script.
+         */
+        const std::string& meshAndTree() const { return m_MeshAndTree; }
+
         /** Reads the next chunk.
      *
      * @return The chunk type or CHUNK_ERROR / CHUNK_EOF.
@@ -119,6 +124,7 @@ namespace ZenLoad
         std::vector<zCModelScriptEventTag> m_Tag;
         std::vector<zCModelScriptEventMMStartAni> m_MMStartAni;
         std::vector<std::string> m_MeshesASC;
+        std::string m_MeshAndTree;
     };
 
     /** Streaming parser for .MSB files.

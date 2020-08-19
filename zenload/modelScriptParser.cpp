@@ -117,17 +117,19 @@ namespace ZenLoad
         bool dontUseMesh = m_Zen.readBinaryDWord() != 0;
         std::string meshNameASC = m_Zen.readLine();
 
+        // This should absolutely have an extension of .ASC, but sometimes doesn't.
+        // Add it, if it's not there.
+        if (meshNameASC.find_first_of('.') == std::string::npos)
+        {
+            meshNameASC += ".ASC";
+        }
+
         if (!dontUseMesh)
         {
-            // This should absolutely have an extension of .ASC, but sometimes doesn't.
-            // Add it, if it's not there.
-            if (meshNameASC.find_first_of('.') == std::string::npos)
-            {
-                meshNameASC += ".ASC";
-            }
-
             m_MeshesASC.push_back(meshNameASC);
         }
+
+        m_MeshAndTree = meshNameASC;
     }
 
     void ModelScriptBinParser::readRegisterMesh()
@@ -475,6 +477,9 @@ namespace ZenLoad
             {
                 m_MeshesASC.push_back(m_Args[0]);
             }
+
+            m_MeshAndTree = m_Args[0];
+
             // TODO
             return (res != Success) ? CHUNK_ERROR : CHUNK_MESH_AND_TREE;
         }
