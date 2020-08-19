@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
+
 #include <string.h>
 
 namespace ZMath
@@ -195,9 +196,13 @@ namespace ZMath
     // 4x4 Matrix (assumes right-handed cooordinates)
     struct Matrix
     {
-        Matrix() {}
+        Matrix()
+            : v{float4(), float4(), float4(), float4()}
+        {
+        }
 
         Matrix(float* pm)
+            : v{float4(), float4(), float4(), float4()}
         {
             memcpy(m, pm, sizeof(m));
         }
@@ -206,6 +211,7 @@ namespace ZMath
                float m10, float m11, float m12, float m13,
                float m20, float m21, float m22, float m23,
                float m30, float m31, float m32, float m33)
+            : v{float4(), float4(), float4(), float4()}
         {
             m[0][0] = m00;
             m[0][1] = m01;
@@ -252,60 +258,60 @@ namespace ZMath
 
         // Properties
         float3 Up() const { return float3(_21, _22, _23); }
-        void Up(const float3& v)
+        void Up(const float3& vec)
         {
-            _21 = v.x;
-            _22 = v.y;
-            _23 = v.z;
+            _21 = vec.x;
+            _22 = vec.y;
+            _23 = vec.z;
         }
 
         float3 Down() const { return float3(-_21, -_22, -_23); }
-        void Down(const float3& v)
+        void Down(const float3& vec)
         {
-            _21 = -v.x;
-            _22 = -v.y;
-            _23 = -v.z;
+            _21 = -vec.x;
+            _22 = -vec.y;
+            _23 = -vec.z;
         }
 
         float3 Right() const { return float3(_11, _12, _13); }
-        void Right(const float3& v)
+        void Right(const float3& vec)
         {
-            _11 = v.x;
-            _12 = v.y;
-            _13 = v.z;
+            _11 = vec.x;
+            _12 = vec.y;
+            _13 = vec.z;
         }
 
         float3 Left() const { return float3(-_11, -_12, -_13); }
-        void Left(const float3& v)
+        void Left(const float3& vec)
         {
-            _11 = -v.x;
-            _12 = -v.y;
-            _13 = -v.z;
+            _11 = -vec.x;
+            _12 = -vec.y;
+            _13 = -vec.z;
         }
 
         float3 Forward() const { return float3(-_31, -_32, -_33); }
-        void Forward(const float3& v)
+        void Forward(const float3& vec)
         {
-            _31 = -v.x;
-            _32 = -v.y;
-            _33 = -v.z;
+            _31 = -vec.x;
+            _32 = -vec.y;
+            _33 = -vec.z;
         }
 
         float3 Backward() const { return float3(_31, _32, _33); }
-        void Backward(const float3& v)
+        void Backward(const float3& vec)
         {
-            _31 = v.x;
-            _32 = v.y;
-            _33 = v.z;
+            _31 = vec.x;
+            _32 = vec.y;
+            _33 = vec.z;
         }
 
         float3 Translation() const { return float3(_41, _42, _43); }
         float3 TranslationT() const { return float3(_14, _24, _34); }
-        void Translation(const float3& v)
+        void Translation(const float3& vec)
         {
-            _41 = v.x;
-            _42 = v.y;
-            _43 = v.z;
+            _41 = vec.x;
+            _42 = vec.y;
+            _43 = vec.z;
         }
 
         static Matrix CreateIdentity()
