@@ -229,7 +229,7 @@ namespace ZenLoad
             // Reset to mesh position
             size_t seek = parser.getSeek();
             parser.setSeek(meshPosition);
-            mesh->readObjectData(parser, nonLodPolys);
+            mesh->readObjectData(parser, nonLodPolys, parser.getZenHeader().user == std::string("XZEN"));
 
             parser.setSeek(binFileEnd);
 
