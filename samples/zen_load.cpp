@@ -40,6 +40,7 @@ int main(int argc, char** argv)
 
     // Create file-index to load our vdf-archive
     // See the vdf_unpack for more information
+    VDFS::FileIndex::initVDFS(argv[0]);
     VDFS::FileIndex vdf;
     vdf.loadVDF(vdfsArchiveToLoad);
     vdf.finalizeLoad();
@@ -81,8 +82,8 @@ int main(int argc, char** argv)
         std::cout << "Waypoint [" << v.wpName << "] at " << v.position.toString() << std::endl;
     }
 
-    // std::cout << "Exporting obj..." << std::endl;
-    // Utils::exportPackedMeshToObj(packedWorldMesh, (zenFileName + std::string(".OBJ")));
+    std::cout << "Exporting obj..." << std::endl;
+    Utils::exportPackedMeshToObj(packedWorldMesh, (zenFileName + std::string(".OBJ")));
 
     return 0;
 }

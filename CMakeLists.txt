@@ -6,7 +6,7 @@ include(cmake/clang-format.cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-set(ZENLIB_BUILD_EXAMPLES OFF CACHE BOOL "Whether to build the examples")
+set(ZENLIB_BUILD_EXAMPLES ON CACHE BOOL "Whether to build the examples")
 set(ZENLIB_BUILD_TESTS OFF CACHE BOOL "Whether to build tests")
 
 set(CMAKE_CXX_STANDARD 14)

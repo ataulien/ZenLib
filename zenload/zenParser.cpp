@@ -167,7 +167,7 @@ void ZenParser::readHeader(ZenHeader& header, ParserImpl*& impl)
 
     // Skip possible user
     if (skipString("user"))
-        header.user = readLine();
+        header.user = readString();
 
     // Reached the end of the main header
     if (!skipString("END"))
