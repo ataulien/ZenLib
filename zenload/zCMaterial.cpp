@@ -1,3 +1,6 @@
 #include "zCMaterial.h"
 
-using namespace ZenLoad;
+namespace ZenLib
+{
+    using namespace ZenLoad;
+}

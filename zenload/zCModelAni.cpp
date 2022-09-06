@@ -9,186 +9,189 @@
 #include "utils/logger.h"
 #include "vdfs/fileIndex.h"
 
-using namespace ZenLoad;
-
-static const uint16_t MSID_MESHSOFTSKIN = 0xE100;
-static const uint16_t MSID_MESHSOFTSKIN_END = 0xE110;
-
-static const uint16_t MSID_MODELANI = 0xA000;
-static const uint16_t MSID_MAN_HEADER = 0xA020;
-static const uint16_t MSID_MAN_SOURCE = 0xA010;
-static const uint16_t MSID_MAN_ANIEVENTS = 0xA030;
-static const uint16_t MSID_MAN_RAWDATA = 0xA090;
-
-static const float SAMPLE_ROT_BITS = float(1 << 16) - 1.0f;
-static const float SAMPLE_ROT_SCALER = (float(1.0f) / SAMPLE_ROT_BITS) * 2.0f * ZMath::Pi;
-static const float SAMPLE_QUAT_SCALER = (1.0f / SAMPLE_ROT_BITS) * 2.1f;
-static const uint16_t SAMPLE_QUAT_MIDDLE = (1 << 15) - 1;
-
-void zCModelAni::zCModelAniEvent::load(ZenParser& parser)
+namespace ZenLib
 {
-    aniEventType = static_cast<zTMdl_AniEventType>(parser.readBinaryDWord());
-    frameNr = parser.readBinaryDWord();
-    tagString = parser.readLine(true);
+    using namespace ZenLoad;
 
-    for (int i = 0; i < ANIEVENT_MAXSTRING; i++)
-        string[i] = parser.readLine(true);
+    static const uint16_t MSID_MESHSOFTSKIN = 0xE100;
+    static const uint16_t MSID_MESHSOFTSKIN_END = 0xE110;
 
-    for (int i = 0; i < ANIEVENT_MAXSTRING; i++)
-        values[i] = parser.readBinaryFloat();
+    static const uint16_t MSID_MODELANI = 0xA000;
+    static const uint16_t MSID_MAN_HEADER = 0xA020;
+    static const uint16_t MSID_MAN_SOURCE = 0xA010;
+    static const uint16_t MSID_MAN_ANIEVENTS = 0xA030;
+    static const uint16_t MSID_MAN_RAWDATA = 0xA090;
 
-    prob = parser.readBinaryFloat();
-}
+    static const float SAMPLE_ROT_BITS = float(1 << 16) - 1.0f;
+    static const float SAMPLE_ROT_SCALER = (float(1.0f) / SAMPLE_ROT_BITS) * 2.0f * ZMath::Pi;
+    static const float SAMPLE_QUAT_SCALER = (1.0f / SAMPLE_ROT_BITS) * 2.1f;
+    static const uint16_t SAMPLE_QUAT_MIDDLE = (1 << 15) - 1;
 
-void SampleUnpackTrans(const uint16_t* in, ZMath::float3& out, float samplePosScaler, float samplePosRangeMin)
-{
-    out.x = float(in[0]) * samplePosScaler + samplePosRangeMin;
-    out.y = float(in[1]) * samplePosScaler + samplePosRangeMin;
-    out.z = float(in[2]) * samplePosScaler + samplePosRangeMin;
-};
-
-void SampleUnpackQuat(const uint16_t* in, ZMath::float4& out)
-{
-    out.x = (int(in[0]) - SAMPLE_QUAT_MIDDLE) * SAMPLE_QUAT_SCALER;
-    out.y = (int(in[1]) - SAMPLE_QUAT_MIDDLE) * SAMPLE_QUAT_SCALER;
-    out.z = (int(in[2]) - SAMPLE_QUAT_MIDDLE) * SAMPLE_QUAT_SCALER;
-
-    float len_q = out.x * out.x + out.y * out.y + out.z * out.z;
-
-    if (len_q > 1.0f)
+    void zCModelAni::zCModelAniEvent::load(ZenParser& parser)
     {
-        float l = 1.0f / sqrt(len_q);
-        out.x *= l;
-        out.y *= l;
-        out.z *= l;
-        out.w = 0;
-    }
-    else
-    {
-        out.w = sqrt(1.0f - len_q);
-    }
-};
+        aniEventType = static_cast<zTMdl_AniEventType>(parser.readBinaryDWord());
+        frameNr = parser.readBinaryDWord();
+        tagString = parser.readLine(true);
 
-/**
+        for (int i = 0; i < ANIEVENT_MAXSTRING; i++)
+            string[i] = parser.readLine(true);
+
+        for (int i = 0; i < ANIEVENT_MAXSTRING; i++)
+            values[i] = parser.readBinaryFloat();
+
+        prob = parser.readBinaryFloat();
+    }
+
+    void SampleUnpackTrans(const uint16_t* in, ZMath::float3& out, float samplePosScaler, float samplePosRangeMin)
+    {
+        out.x = float(in[0]) * samplePosScaler + samplePosRangeMin;
+        out.y = float(in[1]) * samplePosScaler + samplePosRangeMin;
+        out.z = float(in[2]) * samplePosScaler + samplePosRangeMin;
+    };
+
+    void SampleUnpackQuat(const uint16_t* in, ZMath::float4& out)
+    {
+        out.x = (int(in[0]) - SAMPLE_QUAT_MIDDLE) * SAMPLE_QUAT_SCALER;
+        out.y = (int(in[1]) - SAMPLE_QUAT_MIDDLE) * SAMPLE_QUAT_SCALER;
+        out.z = (int(in[2]) - SAMPLE_QUAT_MIDDLE) * SAMPLE_QUAT_SCALER;
+
+        float len_q = out.x * out.x + out.y * out.y + out.z * out.z;
+
+        if (len_q > 1.0f)
+        {
+            float l = 1.0f / sqrt(len_q);
+            out.x *= l;
+            out.y *= l;
+            out.z *= l;
+            out.w = 0;
+        }
+        else
+        {
+            out.w = sqrt(1.0f - len_q);
+        }
+    };
+
+    /**
 * @brief Loads the animation from the given VDF-Archive
 */
-zCModelAni::zCModelAni(const std::string& fileName, const VDFS::FileIndex& fileIndex, float scale)
-{
-    m_ModelAniHeader.version = 0;
-
-    std::vector<uint8_t> data;
-    fileIndex.getFileData(fileName, data);
-
-    if (data.empty())
-        return;  // TODO: Throw an exception or something
-
-    try
+    zCModelAni::zCModelAni(const std::string& fileName, const VDFS::FileIndex& fileIndex, float scale)
     {
-        // Create parser from memory
-        // FIXME: There is an internal copy of the data here. Optimize!
-        ZenLoad::ZenParser parser(data.data(), data.size());
+        m_ModelAniHeader.version = 0;
 
-        readObjectData(parser);
+        std::vector<uint8_t> data;
+        fileIndex.getFileData(fileName, data);
 
-        // Apply scale
-        if (scale != 1.0f)
+        if (data.empty())
+            return;  // TODO: Throw an exception or something
+
+        try
         {
-            for (size_t i = 0, end = m_AniSamples.size(); i < end; i++)
+            // Create parser from memory
+            // FIXME: There is an internal copy of the data here. Optimize!
+            ZenLoad::ZenParser parser(data.data(), data.size());
+
+            readObjectData(parser);
+
+            // Apply scale
+            if (scale != 1.0f)
             {
-                m_AniSamples[i].position = m_AniSamples[i].position * scale;
+                for (size_t i = 0, end = m_AniSamples.size(); i < end; i++)
+                {
+                    m_AniSamples[i].position = m_AniSamples[i].position * scale;
+                }
             }
         }
+        catch (std::exception& e)
+        {
+            LogError() << e.what();
+            return;
+        }
     }
-    catch (std::exception& e)
-    {
-        LogError() << e.what();
-        return;
-    }
-}
 
-/**
+    /**
 * @brief Reads the mesh-object from the given binary stream
 */
-void zCModelAni::readObjectData(ZenParser& parser)
-{
-    // Information about the whole file we are reading here
-    BinaryFileInfo fileInfo;
-
-    // Information about a single chunk
-    BinaryChunkInfo chunkInfo;
-
-    // Read chunks until we left the virtual binary file or got to the end-chunk
-    // Each chunk starts with a header (BinaryChunkInfo) which gives information
-    // about what to do and how long the chunk is
-    bool doneReadingChunks = false;
-    while (!doneReadingChunks)
+    void zCModelAni::readObjectData(ZenParser& parser)
     {
-        // Read chunk header and calculate position of next chunk
-        parser.readStructure(chunkInfo);
+        // Information about the whole file we are reading here
+        BinaryFileInfo fileInfo;
 
-        size_t chunkEnd = parser.getSeek() + chunkInfo.length;
+        // Information about a single chunk
+        BinaryChunkInfo chunkInfo;
 
-        switch (chunkInfo.id)
+        // Read chunks until we left the virtual binary file or got to the end-chunk
+        // Each chunk starts with a header (BinaryChunkInfo) which gives information
+        // about what to do and how long the chunk is
+        bool doneReadingChunks = false;
+        while (!doneReadingChunks)
         {
-            case MSID_MAN_HEADER:
-                m_ModelAniHeader.version = parser.readBinaryWord();
+            // Read chunk header and calculate position of next chunk
+            parser.readStructure(chunkInfo);
 
-                m_ModelAniHeader.aniName = parser.readLine(true);
+            size_t chunkEnd = parser.getSeek() + chunkInfo.length;
 
-                m_ModelAniHeader.layer = parser.readBinaryDWord();
-                m_ModelAniHeader.numFrames = parser.readBinaryDWord();
-                m_ModelAniHeader.numNodes = parser.readBinaryDWord();
-                m_ModelAniHeader.fpsRate = parser.readBinaryFloat();
-                m_ModelAniHeader.fpsRateSource = parser.readBinaryFloat();
-                m_ModelAniHeader.samplePosRangeMin = parser.readBinaryFloat();
-                m_ModelAniHeader.samplePosScaler = parser.readBinaryFloat();
-
-                parser.readBinaryRaw(m_ModelAniHeader.aniBBox, sizeof(m_ModelAniHeader.aniBBox));
-
-                m_ModelAniHeader.nextAniName = parser.readLine(true);
-                break;
-
-            case MSID_MAN_SOURCE:
-                parser.setSeek(chunkEnd);  // Skip chunk
-                break;
-
-            case MSID_MAN_ANIEVENTS:
+            switch (chunkInfo.id)
             {
-                uint32_t numAniEvents = parser.readBinaryDWord();
-                m_AniEvents.resize(numAniEvents);
+                case MSID_MAN_HEADER:
+                    m_ModelAniHeader.version = parser.readBinaryWord();
 
-                for (uint32_t i = 0; i < numAniEvents; i++)
-                    m_AniEvents[i].load(parser);
-            }
-            break;
+                    m_ModelAniHeader.aniName = parser.readLine(true);
 
-            case MSID_MAN_RAWDATA:
-            {
-                m_ModelAniHeader.nodeChecksum = parser.readBinaryDWord();
+                    m_ModelAniHeader.layer = parser.readBinaryDWord();
+                    m_ModelAniHeader.numFrames = parser.readBinaryDWord();
+                    m_ModelAniHeader.numNodes = parser.readBinaryDWord();
+                    m_ModelAniHeader.fpsRate = parser.readBinaryFloat();
+                    m_ModelAniHeader.fpsRateSource = parser.readBinaryFloat();
+                    m_ModelAniHeader.samplePosRangeMin = parser.readBinaryFloat();
+                    m_ModelAniHeader.samplePosScaler = parser.readBinaryFloat();
 
-                m_NodeIndexList.resize(m_ModelAniHeader.numNodes);
-                parser.readBinaryRaw(m_NodeIndexList.data(), m_NodeIndexList.size() * sizeof(uint32_t));
+                    parser.readBinaryRaw(m_ModelAniHeader.aniBBox, sizeof(m_ModelAniHeader.aniBBox));
 
-                uint32_t numSamples = m_ModelAniHeader.numNodes * m_ModelAniHeader.numFrames;
-                zTMdl_AniSample* qSamples = new zTMdl_AniSample[numSamples];
-                m_AniSamples.resize(numSamples);
+                    m_ModelAniHeader.nextAniName = parser.readLine(true);
+                    break;
 
-                parser.readBinaryRaw(qSamples, sizeof(zTMdl_AniSample) * numSamples);
+                case MSID_MAN_SOURCE:
+                    parser.setSeek(chunkEnd);  // Skip chunk
+                    break;
 
-                for (size_t i = 0; i < numSamples; i++)
+                case MSID_MAN_ANIEVENTS:
                 {
-                    SampleUnpackTrans(qSamples[i].position, m_AniSamples[i].position, m_ModelAniHeader.samplePosScaler, m_ModelAniHeader.samplePosRangeMin);
-                    SampleUnpackQuat(qSamples[i].rotation, m_AniSamples[i].rotation);
+                    uint32_t numAniEvents = parser.readBinaryDWord();
+                    m_AniEvents.resize(numAniEvents);
+
+                    for (uint32_t i = 0; i < numAniEvents; i++)
+                        m_AniEvents[i].load(parser);
                 }
+                break;
 
-                delete[] qSamples;
+                case MSID_MAN_RAWDATA:
+                {
+                    m_ModelAniHeader.nodeChecksum = parser.readBinaryDWord();
+
+                    m_NodeIndexList.resize(m_ModelAniHeader.numNodes);
+                    parser.readBinaryRaw(m_NodeIndexList.data(), m_NodeIndexList.size() * sizeof(uint32_t));
+
+                    uint32_t numSamples = m_ModelAniHeader.numNodes * m_ModelAniHeader.numFrames;
+                    zTMdl_AniSample* qSamples = new zTMdl_AniSample[numSamples];
+                    m_AniSamples.resize(numSamples);
+
+                    parser.readBinaryRaw(qSamples, sizeof(zTMdl_AniSample) * numSamples);
+
+                    for (size_t i = 0; i < numSamples; i++)
+                    {
+                        SampleUnpackTrans(qSamples[i].position, m_AniSamples[i].position, m_ModelAniHeader.samplePosScaler, m_ModelAniHeader.samplePosRangeMin);
+                        SampleUnpackQuat(qSamples[i].rotation, m_AniSamples[i].rotation);
+                    }
+
+                    delete[] qSamples;
+                }
+                break;
+                default:
+                    parser.setSeek(chunkEnd);  // Skip chunk
             }
-            break;
-            default:
-                parser.setSeek(chunkEnd);  // Skip chunk
-        }
 
-        if (parser.getSeek() >= parser.getFileSize())
-            doneReadingChunks = true;  // No end-tag in here...
+            if (parser.getSeek() >= parser.getFileSize())
+                doneReadingChunks = true;  // No end-tag in here...
+        }
     }
-}
+}  // namespace ZenLib

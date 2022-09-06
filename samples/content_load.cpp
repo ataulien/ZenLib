@@ -3,6 +3,8 @@
 #include <utils/export.h>
 #include <iostream>
 
+using namespace ZenLib;
+
 /**
  * ----------------------------- main ------------------------------
  */

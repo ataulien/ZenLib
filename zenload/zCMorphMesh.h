@@ -4,39 +4,42 @@
 #include "zTypes.h"
 #include "utils/mathlib.h"
 
-namespace VDFS
+namespace ZenLib
 {
-    class FileIndex;
-}
-
-namespace ZenLoad
-{
-    class ZenParser;
-    class zCMorphMesh
+    namespace VDFS
     {
-    public:
-        zCMorphMesh() {}
+        class FileIndex;
+    }
 
-        /**
+    namespace ZenLoad
+    {
+        class ZenParser;
+        class zCMorphMesh
+        {
+        public:
+            zCMorphMesh() {}
+
+            /**
 		 * @brief Loads the mesh from the given VDF-Archive
 		 */
-        zCMorphMesh(const std::string& fileName, const VDFS::FileIndex& fileIndex);
+            zCMorphMesh(const std::string& fileName, const VDFS::FileIndex& fileIndex);
 
-        /**
+            /**
          * @brief Reads the mesh-object from the given binary stream
          * @param fromZen Whether this mesh is supposed to be read from a zenfile. In this case, information about the binary chunk is also read.
          */
-        void readObjectData(ZenParser& parser);
+            void readObjectData(ZenParser& parser);
 
-        /**
+            /**
          * @return Internal zCProgMeshProto of this soft skin. The soft-skin only displaces the vertices found in the ProgMesh.
          */
-        const zCProgMeshProto& getMesh() const { return m_Mesh; }
+            const zCProgMeshProto& getMesh() const { return m_Mesh; }
 
-    private:
-        /**
+        private:
+            /**
          * @brief Internal zCProgMeshProto of this soft skin. The soft-skin only displaces the vertices found in the ProgMesh.
          */
-        zCProgMeshProto m_Mesh;
-    };
-}  // namespace ZenLoad
+            zCProgMeshProto m_Mesh;
+        };
+    }  // namespace ZenLoad
+}  // namespace ZenLib

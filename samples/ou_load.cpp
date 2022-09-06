@@ -3,6 +3,8 @@
 #include <iostream>
 #include <utils/logger.h>
 
+using namespace ZenLib;
+
 /**
  * ----------------------------- main ------------------------------
  */
