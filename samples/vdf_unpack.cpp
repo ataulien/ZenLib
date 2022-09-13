@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vdfs/fileIndex.h>
 
+using namespace ZenLib;
+
 /**
  * Utility function to write data to disk
  */

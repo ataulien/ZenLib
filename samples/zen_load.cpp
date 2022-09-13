@@ -4,6 +4,8 @@
 #include <zenload/zCMesh.h>
 #include <zenload/zenParser.h>
 
+using namespace ZenLib;
+
 /**
  * Recursive function to list some data about the zen-file
  */

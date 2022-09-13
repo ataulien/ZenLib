@@ -1,17 +1,20 @@
 #pragma once
 #include <windows.h>
 
-namespace Utils
+namespace ZenLib
 {
-    class System
+    namespace Utils
     {
-    public:
-        /**
+        class System
+        {
+        public:
+            /**
 		 * @brief Creates a directory on the systems file structure
 		 */
-        static void mkdir(const char* path)
-        {
-            CreateDirectory(path, nullptr);
-        }
-    };
-}  // namespace Utils
+            static void mkdir(const char* path)
+            {
+                CreateDirectory(path, nullptr);
+            }
+        };
+    }  // namespace Utils
+}  // namespace ZenLib

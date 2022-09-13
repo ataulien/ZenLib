@@ -2,14 +2,17 @@
 
 #include <sys/stat.h>
 
-namespace Utils
+namespace ZenLib
 {
-    class System
+    namespace Utils
     {
-    public:
-        static void mkdir(const char* path)
+        class System
         {
-            ::mkdir(path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
-        }
-    };
-}  // namespace Utils
+        public:
+            static void mkdir(const char* path)
+            {
+                ::mkdir(path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+            }
+        };
+    }  // namespace Utils
+}  // namespace ZenLib
